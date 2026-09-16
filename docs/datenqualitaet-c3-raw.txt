@@ -1,0 +1,168 @@
+Datenqualitaet, Stand 2026-09-16 17:16 UTC, 33 Auffaelligkeiten
+
+[!!] liquidity  FRED WALCL                         n= 1239 2002-12-18 .. 2026-09-09 | Abstand 7 T, max 7 T | alt 7 T
+        - 8 Ausreisser (z > 8)
+        Ausreisser 2008-01-09: -4.5 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-09-17: +7.5 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-09-24: +21.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-01: +24.1 (Prozent, bei Serien um null absolut)
+[!!] liquidity  FRED WTREGEN                       n= 1239 2002-12-18 .. 2026-09-09 | Abstand 7 T, max 7 T | alt 7 T
+        - 8 Ausreisser (z > 8)
+        Ausreisser 2007-05-02: +127.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-22: +215.7 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-29: +334.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2009-06-24: +180.8 (Prozent, bei Serien um null absolut)
+[!!] liquidity  FRED RRPONTSYD                     n= 3326 2003-02-07 .. 2026-09-15 | Abstand 1 T, max 1203 T | alt 1 T
+        - 21 Luecken ueber 10 Tage, groesste 1203 Tage
+        - 8 Ausreisser (z > 8)
+        Ausreisser 2013-12-31: +95.2 (Prozent, bei Serien um null absolut)
+        Ausreisser 2014-01-02: -114.0 (Prozent, bei Serien um null absolut)
+        Ausreisser 2014-03-31: +113.9 (Prozent, bei Serien um null absolut)
+        Ausreisser 2014-04-01: -129.1 (Prozent, bei Serien um null absolut)
+        Luecke 2003-02-07 .. 2003-03-19
+        Luecke 2003-03-19 .. 2003-04-08
+        Luecke 2003-04-08 .. 2003-06-04
+[!!] liquidity  FRED ECBASSETSW                    n= 1340 2001-01-12 .. 2026-09-11 | Abstand 7 T, max 7 T | alt 5 T
+        - 8 Ausreisser (z > 8)
+        Ausreisser 2001-02-23: +7.4 (Prozent, bei Serien um null absolut)
+        Ausreisser 2001-03-02: -4.6 (Prozent, bei Serien um null absolut)
+        Ausreisser 2001-04-20: +5.4 (Prozent, bei Serien um null absolut)
+        Ausreisser 2001-11-16: +6.4 (Prozent, bei Serien um null absolut)
+[ok] liquidity  FRED JPNASSETS                     n=  308 2001-01-01 .. 2026-08-01 | Abstand 31 T, max 31 T | alt 46 T
+[!!] liquidity  Serie net                          n= 1239 2002-12-18 .. 2026-09-09 | Abstand 7 T, max 7 T | alt 7 T
+        - 4 Ausreisser (z > 8)
+        Ausreisser 2008-09-24: +19.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-01: +24.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-15: +11.5 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-25: +10.7 (Prozent, bei Serien um null absolut)
+[!!] liquidity  Serie global                       n= 1188 2003-12-03 .. 2026-09-09 | Abstand 7 T, max 14 T | alt 7 T
+        - 5 Ausreisser (z > 8)
+        Ausreisser 2007-12-26: +7.0 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-01-09: -8.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-08: +9.7 (Prozent, bei Serien um null absolut)
+        Ausreisser 2009-07-01: +7.0 (Prozent, bei Serien um null absolut)
+[!!] liquidity  Serie tbill (MSPD)                 n=  308 2001-01-31 .. 2026-08-31 | Abstand 31 T, max 31 T | alt 16 T
+        - 1 Ausreisser (z > 8)
+        Ausreisser 2020-04-30: +39.4 (Prozent, bei Serien um null absolut)
+[ok] cycle      FRED GACDFSA066MSFRBPHI (Philadelphia) n=  308 2001-01-01 .. 2026-08-01 | Abstand 31 T, max 31 T | alt 46 T
+[ok] cycle      FRED GACDISA066MSFRBNY (New York)  n=  303 2001-07-01 .. 2026-09-01 | Abstand 31 T, max 31 T | alt 15 T
+[!!] cycle      FRED BACTSAMFRBDAL (Dallas)        n=  267 2004-06-01 .. 2026-08-01 | Abstand 31 T, max 31 T | alt 46 T
+        - 1 Ausreisser (z > 8)
+        Ausreisser 2020-03-01: -70.0 (Prozent, bei Serien um null absolut)
+[!!] cycle      Composite                          n=  302 2001-07-01 .. 2026-08-01 | Abstand 31 T, max 31 T | alt 46 T
+        - 2 Ausreisser (z > 8)
+        Ausreisser 2020-03-01: -50.0 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-06-01: +51.8 (Prozent, bei Serien um null absolut)
+[!!] markets    Yahoo AUDJPY=X                     n= 1191 2003-12-01 .. 2026-09-16 | Abstand 7 T, max 8 T | alt 0 T
+        - 3 Ausreisser (z > 8)
+        Ausreisser 2008-10-05: -15.4 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-19: -17.2 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-27: +14.3 (Prozent, bei Serien um null absolut)
+[ok] markets    Yahoo GC=F                         n= 1306 2001-09-17 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+[ok] markets    Yahoo HG=F                         n= 1306 2001-09-17 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+[!!] markets    Yahoo HYG                          n= 1016 2007-04-09 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+        - 8 Ausreisser (z > 8)
+        Ausreisser 2008-10-06: -17.2 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-11-17: -9.1 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-12-15: +9.2 (Prozent, bei Serien um null absolut)
+        Ausreisser 2009-03-02: -6.8 (Prozent, bei Serien um null absolut)
+[ok] markets    Yahoo IEF                          n= 1261 2002-07-29 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+[!!] markets    Yahoo RSP                          n= 1222 2003-04-28 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+        - 3 Ausreisser (z > 8)
+        Ausreisser 2008-10-06: -18.3 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-16: -17.1 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-04-06: +15.5 (Prozent, bei Serien um null absolut)
+[!!] markets    Yahoo SPY                          n= 1306 2001-09-17 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+        - 2 Ausreisser (z > 8)
+        Ausreisser 2008-10-06: -19.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-16: -14.5 (Prozent, bei Serien um null absolut)
+[!!] markets    Signal breadth                     n= 1222 2003-04-28 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+        - 1 Ausreisser (z > 8)
+        Ausreisser 2020-06-01: +4.5 (Prozent, bei Serien um null absolut)
+[!!] markets    Signal risk                        n= 1191 2003-12-01 .. 2026-09-16 | Abstand 7 T, max 8 T | alt 0 T
+        - 3 Ausreisser (z > 8)
+        Ausreisser 2008-10-05: -15.4 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-19: -17.2 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-10-27: +14.3 (Prozent, bei Serien um null absolut)
+[ok] markets    Signal real                        n= 1306 2001-09-17 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+[!!] markets    Signal credit                      n= 1016 2007-04-09 .. 2026-09-16 | Abstand 7 T, max 7 T | alt 0 T
+        - 6 Ausreisser (z > 8)
+        Ausreisser 2008-10-06: -14.9 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-11-17: -12.1 (Prozent, bei Serien um null absolut)
+        Ausreisser 2009-03-02: -7.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-16: -14.2 (Prozent, bei Serien um null absolut)
+[!!] structure  FRED T10Y2Y                        n= 6422 2001-01-10 .. 2026-09-15 | Abstand 1 T, max 4 T | alt 1 T
+        - 6 Ausreisser (z > 8)
+        Ausreisser 2001-09-13: +0.3 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-06-09: -0.2 (Prozent, bei Serien um null absolut)
+        Ausreisser 2008-12-17: -0.2 (Prozent, bei Serien um null absolut)
+        Ausreisser 2009-03-18: -0.3 (Prozent, bei Serien um null absolut)
+[!!] structure  FRED DFII10                        n= 5929 2003-01-02 .. 2026-09-14 | Abstand 1 T, max 4 T | alt 2 T
+        - 4 Ausreisser (z > 8)
+        Ausreisser 2008-10-08: +0.4 (Prozent, bei Serien um null absolut)
+        Ausreisser 2009-03-18: -0.6 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-17: +0.4 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-20: -0.4 (Prozent, bei Serien um null absolut)
+[!!] structure  FRED CPILFESL                      n=  307 2001-01-01 .. 2026-08-01 | Abstand 31 T, max 61 T | alt 46 T
+        - 1 Luecken ueber 45 Tage, groesste 61 Tage
+        Luecke 2025-09-01 .. 2025-11-01
+[!!] structure  FRED TDSP                          n=   85 2005-01-01 .. 2026-01-01 | Abstand 92 T, max 92 T | alt 258 T
+        - 2 Ausreisser (z > 8)
+        Ausreisser 2020-04-01: -16.0 (Prozent, bei Serien um null absolut)
+        Ausreisser 2021-01-01: -12.9 (Prozent, bei Serien um null absolut)
+[ok] structure  FRED A091RC1Q027SBEA               n=  102 2001-01-01 .. 2026-04-01 | Abstand 91 T, max 92 T | alt 168 T
+[ok] structure  FRED W006RC1Q027SBEA               n=  102 2001-01-01 .. 2026-04-01 | Abstand 91 T, max 92 T | alt 168 T
+[!!] structure  FRED DGS10                         n= 6421 2001-01-10 .. 2026-09-14 | Abstand 1 T, max 4 T | alt 2 T
+        - 8 Ausreisser (z > 8)
+        Ausreisser 2009-03-18: -16.9 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-06: -19.6 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-09: -27.0 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-03-10: +40.7 (Prozent, bei Serien um null absolut)
+[!!] structure  FRED CPIAUCSL                      n=  307 2001-01-01 .. 2026-08-01 | Abstand 31 T, max 61 T | alt 46 T
+        - 1 Luecken ueber 45 Tage, groesste 61 Tage
+        - 1 Ausreisser (z > 8)
+        Ausreisser 2008-11-01: -1.8 (Prozent, bei Serien um null absolut)
+        Luecke 2025-09-01 .. 2025-11-01
+[ok] structure  Serie curve                        n= 1341 2001-01-12 .. 2026-09-15 | Abstand 7 T, max 8 T | alt 1 T
+[!!] structure  Serie real                         n= 1238 2003-01-03 .. 2026-09-14 | Abstand 7 T, max 8 T | alt 2 T
+        - 1 Ausreisser (z > 8)
+        Ausreisser 2008-10-10: +0.8 (Prozent, bei Serien um null absolut)
+[!!] structure  Serie cpi                          n=  295 2002-02-15 .. 2026-09-15 | Abstand 31 T, max 61 T | alt 1 T
+        - 1 Luecken ueber 45 Tage, groesste 61 Tage
+        - 2 Ausreisser (z > 8)
+        Ausreisser 2011-02-15: +48.6 (Prozent, bei Serien um null absolut)
+        Ausreisser 2021-05-16: +80.5 (Prozent, bei Serien um null absolut)
+        Luecke 2025-10-16 .. 2025-12-16
+[!!] structure  Serie dsr                          n=   85 2005-06-20 .. 2026-06-20 | Abstand 92 T, max 92 T | alt 88 T
+        - 2 Ausreisser (z > 8)
+        Ausreisser 2020-09-18: -16.0 (Prozent, bei Serien um null absolut)
+        Ausreisser 2021-06-20: -12.9 (Prozent, bei Serien um null absolut)
+[ok] structure  Serie interest                     n=  102 2001-05-01 .. 2026-07-30 | Abstand 91 T, max 92 T | alt 48 T
+[!!] mechanics  Serie vix                          n= 1916 1990-01-05 .. 2026-09-15 | Abstand 7 T, max 11 T | alt 1 T
+        - 4 Ausreisser (z > 8)
+        Ausreisser 2010-05-07: +85.7 (Prozent, bei Serien um null absolut)
+        Ausreisser 2015-08-21: +118.5 (Prozent, bei Serien um null absolut)
+        Ausreisser 2020-02-28: +134.8 (Prozent, bei Serien um null absolut)
+        Ausreisser 2025-04-04: +109.3 (Prozent, bei Serien um null absolut)
+[ok] mechanics  Serie term                         n=  885 2009-09-18 .. 2026-09-15 | Abstand 7 T, max 14 T | alt 1 T
+[ok] mechanics  Serie skew                         n= 1306 2001-09-17 .. 2026-09-15 | Abstand 7 T, max 7 T | alt 1 T
+[!!] valuation  Serie cape                         n= 1749 1881-02-05 .. 2026-10-06 | Abstand 31 T, max 31 T | alt 11 T
+        - Vorlauf: letzter Termin 2026-10-06 liegt in der Zukunft (laufende Periode)
+        - 3 Ausreisser (z > 8)
+        Ausreisser 1929-12-06: -26.9 (Prozent, bei Serien um null absolut)
+        Ausreisser 1932-09-05: +51.3 (Prozent, bei Serien um null absolut)
+        Ausreisser 1933-06-05: +29.0 (Prozent, bei Serien um null absolut)
+[!!] valuation  Serie ecy                          n= 1749 1881-02-05 .. 2026-10-06 | Abstand 31 T, max 31 T | alt 11 T
+        - Vorlauf: letzter Termin 2026-10-06 liegt in der Zukunft (laufende Periode)
+        - 3 Ausreisser (z > 8)
+        Ausreisser 1932-05-06: +3.2 (Prozent, bei Serien um null absolut)
+        Ausreisser 1932-09-05: -5.7 (Prozent, bei Serien um null absolut)
+        Ausreisser 1933-06-05: -2.6 (Prozent, bei Serien um null absolut)
+[ok] valuation  Serie buffett                      n=  206 1975-06-10 .. 2026-09-08 | Abstand 91 T, max 92 T | alt 8 T
+
+[ok] Saeule liquidity  Raster 2005-12-04 .. 2026-09-13 | Abdeckung 100.0 % | laengste Luecke 0 W | live 55 vs Verlauf 54 (2026-09-09)
+[ok] Saeule cycle      Raster 2004-08-01 .. 2026-09-13 | Abdeckung 100.0 % | laengste Luecke 0 W | live 93 vs Verlauf 93 (2026-08-31)
+[ok] Saeule markets    Raster 2009-04-12 .. 2026-09-13 | Abdeckung 100.0 % | laengste Luecke 0 W | live 52 vs Verlauf 52 (2026-09-16)
+[ok] Saeule structure  Raster 2008-06-22 .. 2026-09-13 | Abdeckung 100.0 % | laengste Luecke 0 W | live 45 vs Verlauf 45 (2026-09-15)
+[ok] Saeule mechanics  Raster 2011-09-18 .. 2026-09-13 | Abdeckung 100.0 % | laengste Luecke 0 W | live 49 vs Verlauf 49 (2026-09-15)
+[ok] Saeule valuation  Raster 2003-01-05 .. 2026-09-13 | Abdeckung 100.0 % | laengste Luecke 0 W | live 14 vs Verlauf 16 (2026-09-05)

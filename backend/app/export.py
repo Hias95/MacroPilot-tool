@@ -1,0 +1,91 @@
+"""Statischer Export (D2): alles, was das Frontend braucht, als JSON-Dateien.
+
+Gedacht fuer einen taeglichen Lauf in GitHub Actions: Zustand (Tagesbilder, Ereignisse) einlesen, Refresh mit
+Benachrichtigung, Dateien schreiben, Zustand zuruecksichern. Das Frontend liest im Modus
+NEXT_PUBLIC_DATA_MODE=static diese Dateien statt der API. Aufruf:
+  python -m app.export --out ../frontend/public/data --state ../data/state.json
+"""
+
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import sys
+from dataclasses import asdict
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from . import backtest, data_quality, store
+from .config import get_settings
+from .explain import explain_pillar, resolve_provider
+from .history import build_history
+from .refresh import build_dashboard, refresh
+
+
+def _dump(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
+
+
+async def run(out: Path, state_file: Path | None, with_backtest: bool = True, with_explanations: bool = True, log=print) -> dict:
+    if state_file and state_file.exists():
+        store.import_state(json.loads(state_file.read_text(encoding="utf-8")))
+        log(f"Zustand eingelesen: {state_file}")
+    result = await refresh(force_network=True)
+    log(f"Refresh {result.date}: {len(result.events)} Ereignisse, gemeldet {result.notified.get('sent')}")
+
+    dashboard = await build_dashboard()
+    _dump(out / "dashboard.json", dashboard.model_dump(mode="json"))
+    history = await build_history()
+    _dump(out / "history.json", history.model_dump(mode="json"))
+    _dump(out / "changes.json", {"days": 365, "events": store.list_events(365, 500), "last_refresh": store.get_meta("last_refresh"),
+                                 "snapshot_date": store.get_meta("last_snapshot_date")})
+    _dump(out / "snapshots.json", {"days": 3650, "snapshots": store.list_snapshots(3650)})
+    if with_backtest:
+        _dump(out / "backtest.json", asdict(await backtest.run_backtest(force=True)))
+    quality = await data_quality.run_audit()
+    _dump(out / "data-quality.json", data_quality.to_dict(quality))
+    provider = await resolve_provider()
+    explanations = {}
+    if with_explanations:
+        for p in [*dashboard.pillars, *dashboard.overlays]:
+            try:
+                explanations[p.id] = (await explain_pillar(p)).model_dump(mode="json")
+            except Exception as exc:  # noqa: BLE001 - eine fehlende Erklaerung darf den Export nicht stoppen
+                log(f"Erklaerung {p.id} fehlgeschlagen: {exc}")
+    _dump(out / "explanations.json", explanations)
+    settings = get_settings()
+    meta = {
+        "status": "ok", "generated_at": datetime.now(tz=timezone.utc).isoformat(timespec="seconds"), "mode": "static",
+        "fred_api_key_configured": bool(settings.fred_api_key), "anthropic_api_key_configured": bool(settings.anthropic_api_key),
+        "gemini_api_key_configured": bool(settings.gemini_api_key), "explain_provider": provider,
+        "explain_model": {"anthropic": settings.explain_model, "gemini": settings.gemini_model, "ollama": settings.ollama_model, "template": "regelbasiert"}.get(provider),
+        "cache_ttl_seconds": settings.cache_ttl_seconds, "last_refresh": store.get_meta("last_refresh"),
+        "snapshot_date": store.get_meta("last_snapshot_date"), "auto_refresh": False, "alert_channels": result.notified.get("sent", []),
+    }
+    _dump(out / "meta.json", meta)
+    if state_file:
+        _dump(state_file, store.export_state())
+        log(f"Zustand gesichert: {state_file}")
+    log(f"Export nach {out}: {sorted(p.name for p in out.glob('*.json'))}")
+    return meta
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Statischer Export des MacroPilot-Dashboards")
+    parser.add_argument("--out", default="../frontend/public/data")
+    parser.add_argument("--state", default="../data/state.json", help="JSON-Datei mit Tagesbildern und Ereignissen ('' = keine)")
+    parser.add_argument("--no-backtest", action="store_true")
+    parser.add_argument("--no-explanations", action="store_true")
+    args = parser.parse_args(argv)
+    base = Path(__file__).resolve().parent.parent
+    out = (base / args.out).resolve() if not Path(args.out).is_absolute() else Path(args.out)
+    state = None if not args.state else ((base / args.state).resolve() if not Path(args.state).is_absolute() else Path(args.state))
+    asyncio.run(run(out, state, not args.no_backtest, not args.no_explanations, log=lambda s: print(s, file=sys.stderr, flush=True)))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

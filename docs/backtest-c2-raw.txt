@@ -1,0 +1,161 @@
+Kalibrierung C2, Walk-Forward. Lernen bis 2019-01-01, Pruefen danach. Ziel = Mittel aus IC13 und IC26 im Lernfenster.
+Rang-Wochen: 404 Lernen, 402 Pruefen.
+
+Basis (aktuelle Parameter): W 0.35/0.25/0.25/0.15 | Liq 13W | Mech +5 | Deckel an | Vetos an | Maerkte normal
+   Lernen +0.147 (IC4 +0.11 13 +0.13 26 +0.17 52 +0.15) | Pruefen +0.155 (IC4 +0.05 13 +0.14 26 +0.17 52 +0.08)
+   Pruefen ab 2019 (402 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 13% -> +4.5% (75% Treffer) | Negativ 20% -> +4.4% (70% Treffer) | Neutral 44% -> +3.0% (76% Treffer) | Positiv 15% -> +5.1% (82% Treffer) | Stark positiv 8% -> +7.3% (97% Treffer)
+   Pruefen ab 2019: Basis CAGR 14.87% Sharpe 0.89 DD -20.68% | defensiv CAGR 10.38% Sharpe 0.93 DD -10.44% | Buy&Hold CAGR 17.13% Sharpe 0.81 DD -31.83% | Zonenwechsel/Jahr 14.4
+   Gesamt (806 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 14% -> +4.5% (77% Treffer) | Negativ 25% -> +1.9% (62% Treffer) | Neutral 43% -> +3.5% (80% Treffer) | Positiv 13% -> +4.9% (88% Treffer) | Stark positiv 6% -> +6.2% (94% Treffer)
+   Gesamt: Basis CAGR 12.32% Sharpe 0.91 DD -20.68% | defensiv CAGR 8.49% Sharpe 1.03 DD -10.44% | Buy&Hold CAGR 13.93% Sharpe 0.79 DD -31.83% | Zonenwechsel/Jahr 13.9
+
+Stufe 1: 2574 Konfigurationen (Gewichte Schritt 0,1 x Liquiditaets-Momentum x Mechanik). Top 12 nach Lernfenster:
+   W 0.60/0.00/0.20/0.20 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.298 (IC4 +0.15 13 +0.23 26 +0.36 52 +0.18) | Pruefen +0.361 (IC4 +0.17 13 +0.35 26 +0.37 52 +0.29)
+   W 0.70/0.00/0.20/0.10 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.291 (IC4 +0.15 13 +0.23 26 +0.35 52 +0.15) | Pruefen +0.350 (IC4 +0.17 13 +0.34 26 +0.36 52 +0.28)
+   W 0.50/0.00/0.20/0.30 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.290 (IC4 +0.15 13 +0.22 26 +0.36 52 +0.20) | Pruefen +0.366 (IC4 +0.16 13 +0.36 26 +0.38 52 +0.29)
+   W 0.80/0.00/0.20/0.00 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.287 (IC4 +0.15 13 +0.23 26 +0.34 52 +0.14) | Pruefen +0.336 (IC4 +0.17 13 +0.32 26 +0.35 52 +0.28)
+   W 0.50/0.00/0.30/0.20 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.286 (IC4 +0.17 13 +0.25 26 +0.32 52 +0.16) | Pruefen +0.299 (IC4 +0.12 13 +0.29 26 +0.31 52 +0.23)
+   W 0.40/0.00/0.20/0.40 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.283 (IC4 +0.14 13 +0.21 26 +0.36 52 +0.22) | Pruefen +0.367 (IC4 +0.15 13 +0.36 26 +0.37 52 +0.29)
+   W 0.40/0.00/0.30/0.30 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.282 (IC4 +0.16 13 +0.25 26 +0.32 52 +0.17) | Pruefen +0.299 (IC4 +0.11 13 +0.29 26 +0.31 52 +0.22)
+   W 0.60/0.00/0.30/0.10 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.282 (IC4 +0.17 13 +0.25 26 +0.32 52 +0.14) | Pruefen +0.301 (IC4 +0.13 13 +0.29 26 +0.31 52 +0.24)
+   W 0.60/0.10/0.20/0.10 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.282 (IC4 +0.17 13 +0.23 26 +0.33 52 +0.15) | Pruefen +0.323 (IC4 +0.15 13 +0.31 26 +0.34 52 +0.25)
+   W 0.40/0.10/0.20/0.30 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.279 (IC4 +0.16 13 +0.22 26 +0.34 52 +0.20) | Pruefen +0.327 (IC4 +0.13 13 +0.32 26 +0.34 52 +0.24)
+   W 0.50/0.10/0.20/0.20 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.279 (IC4 +0.16 13 +0.22 26 +0.33 52 +0.17) | Pruefen +0.325 (IC4 +0.14 13 +0.31 26 +0.34 52 +0.24)
+   W 0.70/0.10/0.20/0.00 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.279 (IC4 +0.17 13 +0.23 26 +0.33 52 +0.14) | Pruefen +0.315 (IC4 +0.16 13 +0.30 26 +0.33 52 +0.25)
+
+Randeffekte Stufe 1 (je Parameterwert ueber alle anderen Kombinationen):
+   Liquiditaets-Momentum (Wochen):
+          13: Mittel Lernen +0.133, bestes Lernen +0.256 (dessen Pruefen +0.309), Mittel Pruefen +0.182
+          26: Mittel Lernen +0.157, bestes Lernen +0.298 (dessen Pruefen +0.361), Mittel Pruefen +0.168
+          52: Mittel Lernen +0.142, bestes Lernen +0.267 (dessen Pruefen +0.352), Mittel Pruefen +0.156
+   Mechanik-Spanne:
+        -5.0: Mittel Lernen +0.178, bestes Lernen +0.298 (dessen Pruefen +0.361), Mittel Pruefen +0.187
+         0.0: Mittel Lernen +0.145, bestes Lernen +0.255 (dessen Pruefen +0.348), Mittel Pruefen +0.170
+         5.0: Mittel Lernen +0.109, bestes Lernen +0.212 (dessen Pruefen +0.325), Mittel Pruefen +0.149
+   Gewicht Liquiditaet:
+         0.0: Mittel Lernen +0.121, bestes Lernen +0.238 (dessen Pruefen +0.253), Mittel Pruefen +0.075
+         0.1: Mittel Lernen +0.131, bestes Lernen +0.256 (dessen Pruefen +0.270), Mittel Pruefen +0.108
+         0.2: Mittel Lernen +0.141, bestes Lernen +0.268 (dessen Pruefen +0.284), Mittel Pruefen +0.145
+         0.3: Mittel Lernen +0.152, bestes Lernen +0.273 (dessen Pruefen +0.325), Mittel Pruefen +0.187
+         0.4: Mittel Lernen +0.162, bestes Lernen +0.283 (dessen Pruefen +0.367), Mittel Pruefen +0.231
+         0.5: Mittel Lernen +0.169, bestes Lernen +0.290 (dessen Pruefen +0.366), Mittel Pruefen +0.276
+         0.6: Mittel Lernen +0.174, bestes Lernen +0.298 (dessen Pruefen +0.361), Mittel Pruefen +0.317
+         0.7: Mittel Lernen +0.176, bestes Lernen +0.291 (dessen Pruefen +0.350), Mittel Pruefen +0.346
+         0.8: Mittel Lernen +0.174, bestes Lernen +0.287 (dessen Pruefen +0.336), Mittel Pruefen +0.364
+         0.9: Mittel Lernen +0.167, bestes Lernen +0.261 (dessen Pruefen +0.368), Mittel Pruefen +0.373
+         1.0: Mittel Lernen +0.155, bestes Lernen +0.229 (dessen Pruefen +0.384), Mittel Pruefen +0.378
+   Gewicht Marktsignale:
+         0.0: Mittel Lernen +0.163, bestes Lernen +0.298 (dessen Pruefen +0.361), Mittel Pruefen +0.246
+         0.1: Mittel Lernen +0.156, bestes Lernen +0.282 (dessen Pruefen +0.323), Mittel Pruefen +0.224
+         0.2: Mittel Lernen +0.148, bestes Lernen +0.264 (dessen Pruefen +0.336), Mittel Pruefen +0.195
+         0.3: Mittel Lernen +0.140, bestes Lernen +0.250 (dessen Pruefen +0.278), Mittel Pruefen +0.158
+         0.4: Mittel Lernen +0.132, bestes Lernen +0.227 (dessen Pruefen +0.128), Mittel Pruefen +0.116
+         0.5: Mittel Lernen +0.125, bestes Lernen +0.202 (dessen Pruefen +0.074), Mittel Pruefen +0.077
+         0.6: Mittel Lernen +0.117, bestes Lernen +0.179 (dessen Pruefen +0.035), Mittel Pruefen +0.043
+         0.7: Mittel Lernen +0.108, bestes Lernen +0.159 (dessen Pruefen -0.001), Mittel Pruefen +0.010
+         0.8: Mittel Lernen +0.096, bestes Lernen +0.141 (dessen Pruefen -0.018), Mittel Pruefen -0.025
+         0.9: Mittel Lernen +0.085, bestes Lernen +0.120 (dessen Pruefen -0.057), Mittel Pruefen -0.057
+         1.0: Mittel Lernen +0.073, bestes Lernen +0.096 (dessen Pruefen -0.076), Mittel Pruefen -0.085
+   Gewicht Konjunktur:
+         0.0: Mittel Lernen +0.104, bestes Lernen +0.238 (dessen Pruefen +0.371), Mittel Pruefen +0.258
+         0.1: Mittel Lernen +0.147, bestes Lernen +0.273 (dessen Pruefen +0.373), Mittel Pruefen +0.227
+         0.2: Mittel Lernen +0.174, bestes Lernen +0.298 (dessen Pruefen +0.361), Mittel Pruefen +0.185
+         0.3: Mittel Lernen +0.179, bestes Lernen +0.286 (dessen Pruefen +0.299), Mittel Pruefen +0.140
+         0.4: Mittel Lernen +0.166, bestes Lernen +0.259 (dessen Pruefen +0.229), Mittel Pruefen +0.100
+         0.5: Mittel Lernen +0.148, bestes Lernen +0.233 (dessen Pruefen +0.164), Mittel Pruefen +0.070
+         0.6: Mittel Lernen +0.131, bestes Lernen +0.201 (dessen Pruefen +0.118), Mittel Pruefen +0.047
+         0.7: Mittel Lernen +0.115, bestes Lernen +0.168 (dessen Pruefen +0.072), Mittel Pruefen +0.030
+         0.8: Mittel Lernen +0.105, bestes Lernen +0.141 (dessen Pruefen +0.037), Mittel Pruefen +0.016
+         0.9: Mittel Lernen +0.098, bestes Lernen +0.127 (dessen Pruefen +0.019), Mittel Pruefen +0.003
+         1.0: Mittel Lernen +0.095, bestes Lernen +0.115 (dessen Pruefen -0.003), Mittel Pruefen -0.008
+   Gewicht Struktur:
+         0.0: Mittel Lernen +0.138, bestes Lernen +0.287 (dessen Pruefen +0.336), Mittel Pruefen +0.099
+         0.1: Mittel Lernen +0.145, bestes Lernen +0.291 (dessen Pruefen +0.350), Mittel Pruefen +0.122
+         0.2: Mittel Lernen +0.151, bestes Lernen +0.298 (dessen Pruefen +0.361), Mittel Pruefen +0.148
+         0.3: Mittel Lernen +0.154, bestes Lernen +0.290 (dessen Pruefen +0.366), Mittel Pruefen +0.177
+         0.4: Mittel Lernen +0.154, bestes Lernen +0.283 (dessen Pruefen +0.367), Mittel Pruefen +0.211
+         0.5: Mittel Lernen +0.150, bestes Lernen +0.271 (dessen Pruefen +0.359), Mittel Pruefen +0.247
+         0.6: Mittel Lernen +0.139, bestes Lernen +0.256 (dessen Pruefen +0.270), Mittel Pruefen +0.282
+         0.7: Mittel Lernen +0.120, bestes Lernen +0.238 (dessen Pruefen +0.253), Mittel Pruefen +0.312
+         0.8: Mittel Lernen +0.103, bestes Lernen +0.191 (dessen Pruefen +0.377), Mittel Pruefen +0.336
+         0.9: Mittel Lernen +0.093, bestes Lernen +0.163 (dessen Pruefen +0.356), Mittel Pruefen +0.353
+         1.0: Mittel Lernen +0.080, bestes Lernen +0.116 (dessen Pruefen +0.386), Mittel Pruefen +0.365
+
+Stufe 2: 1040 Konfigurationen (Schritt 0,05 um die Top-5-Gewichte x Deckel x Vetos x Maerkte invers). Top 12:
+   W 0.45/0.10/0.20/0.25 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte invers
+      Lernen +0.312 (IC4 +0.15 13 +0.25 26 +0.38 52 +0.19) | Pruefen +0.368 (IC4 +0.17 13 +0.37 26 +0.37 52 +0.30)
+   W 0.45/0.10/0.20/0.25 | Liq 26W | Mech -5 | Deckel an | Vetos aus | Maerkte invers
+      Lernen +0.312 (IC4 +0.15 13 +0.25 26 +0.38 52 +0.19) | Pruefen +0.368 (IC4 +0.17 13 +0.36 26 +0.37 52 +0.30)
+   W 0.45/0.10/0.20/0.25 | Liq 26W | Mech -5 | Deckel aus | Vetos an | Maerkte invers
+      Lernen +0.312 (IC4 +0.15 13 +0.25 26 +0.38 52 +0.19) | Pruefen +0.368 (IC4 +0.17 13 +0.37 26 +0.37 52 +0.29)
+   W 0.45/0.10/0.20/0.25 | Liq 26W | Mech -5 | Deckel aus | Vetos aus | Maerkte invers
+      Lernen +0.312 (IC4 +0.15 13 +0.25 26 +0.38 52 +0.19) | Pruefen +0.368 (IC4 +0.17 13 +0.36 26 +0.37 52 +0.30)
+   W 0.40/0.10/0.20/0.30 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte invers
+      Lernen +0.311 (IC4 +0.14 13 +0.25 26 +0.38 52 +0.21) | Pruefen +0.371 (IC4 +0.16 13 +0.37 26 +0.37 52 +0.29)
+   W 0.40/0.10/0.20/0.30 | Liq 26W | Mech -5 | Deckel an | Vetos aus | Maerkte invers
+      Lernen +0.311 (IC4 +0.14 13 +0.25 26 +0.38 52 +0.21) | Pruefen +0.371 (IC4 +0.16 13 +0.37 26 +0.37 52 +0.30)
+   W 0.40/0.10/0.20/0.30 | Liq 26W | Mech -5 | Deckel aus | Vetos an | Maerkte invers
+      Lernen +0.311 (IC4 +0.14 13 +0.25 26 +0.38 52 +0.21) | Pruefen +0.370 (IC4 +0.17 13 +0.37 26 +0.37 52 +0.29)
+   W 0.40/0.10/0.20/0.30 | Liq 26W | Mech -5 | Deckel aus | Vetos aus | Maerkte invers
+      Lernen +0.311 (IC4 +0.14 13 +0.25 26 +0.38 52 +0.21) | Pruefen +0.371 (IC4 +0.17 13 +0.37 26 +0.37 52 +0.29)
+   W 0.50/0.10/0.20/0.20 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte invers
+      Lernen +0.308 (IC4 +0.15 13 +0.24 26 +0.37 52 +0.18) | Pruefen +0.367 (IC4 +0.17 13 +0.36 26 +0.37 52 +0.30)
+   W 0.50/0.10/0.20/0.20 | Liq 26W | Mech -5 | Deckel an | Vetos aus | Maerkte invers
+      Lernen +0.308 (IC4 +0.15 13 +0.24 26 +0.37 52 +0.18) | Pruefen +0.367 (IC4 +0.17 13 +0.36 26 +0.37 52 +0.30)
+   W 0.50/0.10/0.20/0.20 | Liq 26W | Mech -5 | Deckel aus | Vetos an | Maerkte invers
+      Lernen +0.308 (IC4 +0.15 13 +0.24 26 +0.37 52 +0.18) | Pruefen +0.366 (IC4 +0.17 13 +0.36 26 +0.37 52 +0.29)
+   W 0.50/0.10/0.20/0.20 | Liq 26W | Mech -5 | Deckel aus | Vetos aus | Maerkte invers
+      Lernen +0.308 (IC4 +0.15 13 +0.24 26 +0.37 52 +0.18) | Pruefen +0.366 (IC4 +0.17 13 +0.36 26 +0.37 52 +0.30)
+
+Randeffekte Stufe 2:
+   Bewertungs-Deckel an:
+       False: Mittel Lernen +0.281, bestes Lernen +0.312 (dessen Pruefen +0.368), Mittel Pruefen +0.338
+        True: Mittel Lernen +0.281, bestes Lernen +0.312 (dessen Pruefen +0.368), Mittel Pruefen +0.338
+   Vetos an:
+       False: Mittel Lernen +0.281, bestes Lernen +0.312 (dessen Pruefen +0.368), Mittel Pruefen +0.338
+        True: Mittel Lernen +0.281, bestes Lernen +0.312 (dessen Pruefen +0.368), Mittel Pruefen +0.339
+   Marktsignale Vorzeichen:
+          -1: Mittel Lernen +0.286, bestes Lernen +0.312 (dessen Pruefen +0.368), Mittel Pruefen +0.347
+           1: Mittel Lernen +0.277, bestes Lernen +0.298 (dessen Pruefen +0.361), Mittel Pruefen +0.329
+
+Finalisten im Detail (Zonen und Strategie im Pruef-Fenster und gesamt):
+   W 0.45/0.10/0.20/0.25 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte invers
+      Lernen +0.312 (IC4 +0.15 13 +0.25 26 +0.38 52 +0.19) | Pruefen +0.368 (IC4 +0.17 13 +0.37 26 +0.37 52 +0.30)
+   Pruefen ab 2019 (402 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 18% -> +1.0% (58% Treffer) | Negativ 20% -> +2.6% (75% Treffer) | Neutral 34% -> +5.4% (83% Treffer) | Positiv 12% -> +2.2% (77% Treffer) | Stark positiv 16% -> +8.5% (92% Treffer)
+   Pruefen ab 2019: Basis CAGR 15.94% Sharpe 0.86 DD -31.87% | defensiv CAGR 13.41% Sharpe 0.87 DD -27.2% | Buy&Hold CAGR 17.13% Sharpe 0.81 DD -31.83% | Zonenwechsel/Jahr 9.7
+   Gesamt (806 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 18% -> +1.1% (59% Treffer) | Negativ 25% -> +2.6% (73% Treffer) | Neutral 38% -> +4.3% (82% Treffer) | Positiv 11% -> +3.4% (85% Treffer) | Stark positiv 9% -> +8.5% (93% Treffer)
+   Gesamt: Basis CAGR 13.26% Sharpe 0.89 DD -31.87% | defensiv CAGR 10.39% Sharpe 0.92 DD -27.2% | Buy&Hold CAGR 13.93% Sharpe 0.79 DD -31.83% | Zonenwechsel/Jahr 13.1
+
+   W 0.45/0.10/0.20/0.25 | Liq 26W | Mech -5 | Deckel an | Vetos aus | Maerkte invers
+      Lernen +0.312 (IC4 +0.15 13 +0.25 26 +0.38 52 +0.19) | Pruefen +0.368 (IC4 +0.17 13 +0.36 26 +0.37 52 +0.30)
+   Pruefen ab 2019 (402 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 17% -> +1.0% (57% Treffer) | Negativ 21% -> +2.6% (75% Treffer) | Neutral 34% -> +5.4% (83% Treffer) | Positiv 12% -> +2.2% (77% Treffer) | Stark positiv 16% -> +8.5% (92% Treffer)
+   Pruefen ab 2019: Basis CAGR 15.89% Sharpe 0.86 DD -31.87% | defensiv CAGR 13.35% Sharpe 0.87 DD -27.2% | Buy&Hold CAGR 17.13% Sharpe 0.81 DD -31.83% | Zonenwechsel/Jahr 9.6
+   Gesamt (806 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 18% -> +1.1% (59% Treffer) | Negativ 25% -> +2.6% (73% Treffer) | Neutral 38% -> +4.3% (82% Treffer) | Positiv 11% -> +3.4% (85% Treffer) | Stark positiv 9% -> +8.5% (93% Treffer)
+   Gesamt: Basis CAGR 13.24% Sharpe 0.89 DD -31.87% | defensiv CAGR 10.36% Sharpe 0.92 DD -27.2% | Buy&Hold CAGR 13.93% Sharpe 0.79 DD -31.83% | Zonenwechsel/Jahr 13.0
+
+   W 0.45/0.10/0.20/0.25 | Liq 26W | Mech -5 | Deckel aus | Vetos an | Maerkte invers
+      Lernen +0.312 (IC4 +0.15 13 +0.25 26 +0.38 52 +0.19) | Pruefen +0.368 (IC4 +0.17 13 +0.37 26 +0.37 52 +0.29)
+   Pruefen ab 2019 (402 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 18% -> +1.0% (58% Treffer) | Negativ 20% -> +2.6% (75% Treffer) | Neutral 34% -> +5.4% (83% Treffer) | Positiv 12% -> +2.2% (77% Treffer) | Stark positiv 16% -> +8.5% (92% Treffer)
+   Pruefen ab 2019: Basis CAGR 15.94% Sharpe 0.86 DD -31.87% | defensiv CAGR 13.41% Sharpe 0.87 DD -27.2% | Buy&Hold CAGR 17.13% Sharpe 0.81 DD -31.83% | Zonenwechsel/Jahr 9.7
+   Gesamt (806 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 18% -> +1.1% (59% Treffer) | Negativ 25% -> +2.6% (73% Treffer) | Neutral 38% -> +4.3% (82% Treffer) | Positiv 11% -> +3.4% (85% Treffer) | Stark positiv 9% -> +8.5% (93% Treffer)
+   Gesamt: Basis CAGR 13.26% Sharpe 0.89 DD -31.87% | defensiv CAGR 10.39% Sharpe 0.92 DD -27.2% | Buy&Hold CAGR 13.93% Sharpe 0.79 DD -31.83% | Zonenwechsel/Jahr 13.1
+
+   W 0.60/0.00/0.20/0.20 | Liq 26W | Mech -5 | Deckel an | Vetos an | Maerkte normal
+      Lernen +0.298 (IC4 +0.15 13 +0.23 26 +0.36 52 +0.18) | Pruefen +0.361 (IC4 +0.17 13 +0.35 26 +0.37 52 +0.29)
+   Pruefen ab 2019 (402 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 17% -> +2.0% (63% Treffer) | Negativ 17% -> +2.6% (79% Treffer) | Neutral 40% -> +3.8% (74% Treffer) | Positiv 15% -> +5.0% (88% Treffer) | Stark positiv 11% -> +9.7% (95% Treffer)
+   Pruefen ab 2019: Basis CAGR 16.17% Sharpe 0.89 DD -29.03% | defensiv CAGR 13.33% Sharpe 0.95 DD -19.6% | Buy&Hold CAGR 17.13% Sharpe 0.81 DD -31.83% | Zonenwechsel/Jahr 8.4
+   Gesamt (806 Wochen): 13-Wochen-Rendite je Zone: Stark negativ 18% -> +1.8% (62% Treffer) | Negativ 20% -> +2.5% (75% Treffer) | Neutral 43% -> +3.5% (77% Treffer) | Positiv 13% -> +4.9% (92% Treffer) | Stark positiv 6% -> +9.5% (96% Treffer)
+   Gesamt: Basis CAGR 13.19% Sharpe 0.9 DD -29.03% | defensiv CAGR 10.12% Sharpe 0.97 DD -19.6% | Buy&Hold CAGR 13.93% Sharpe 0.79 DD -31.83% | Zonenwechsel/Jahr 10.5
+
+3619 Auswertungen, 39s gesamt.

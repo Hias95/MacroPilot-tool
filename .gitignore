@@ -1,0 +1,29 @@
+# Node / Next.js
+node_modules/
+.next/
+.next-static/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Env / Secrets
+.env
+.env.local
+.env.*.local
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# MacroPilot Persistenz (D1) und statischer Export (D2); data/state.json bleibt versioniert
+backend/data/
+frontend/public/data/
+frontend/out/

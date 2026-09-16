@@ -1,0 +1,101 @@
+Marktsignale: welche Rolle traegt Information? SPY-Vorwaertsrenditen, Wochenraster, kein Blick in die Zukunft.
+
+1. Rangkorrelation (IC) je Einzelsignal und Parametrisierung
+   [Standard (40% Niveau 5J, 60% Momentum 13W)]
+      breadth  4W +0.050 | 13W +0.077 | 26W +0.016 | 52W -0.083
+      risk     4W +0.007 | 13W -0.032 | 26W -0.031 | 52W -0.130
+      real     4W -0.007 | 13W -0.046 | 26W -0.078 | 52W -0.272
+      credit   4W -0.112 | 13W -0.152 | 26W -0.098 | 52W -0.084
+      Mittel   4W -0.028 | 13W -0.043 | 26W -0.016 | 52W -0.134
+   [nur Niveau 5J]
+      breadth  4W -0.038 | 13W -0.057 | 26W -0.109 | 52W -0.205
+      risk     4W -0.072 | 13W -0.133 | 26W -0.149 | 52W -0.250
+      real     4W -0.105 | 13W -0.221 | 26W -0.322 | 52W -0.538
+      credit   4W -0.147 | 13W -0.225 | 26W -0.189 | 52W -0.184
+      Mittel   4W -0.124 | 13W -0.226 | 26W -0.237 | 52W -0.331
+   [nur Momentum 13W]
+      breadth  4W +0.103 | 13W +0.151 | 26W +0.101 | 52W +0.032
+      risk     4W +0.056 | 13W +0.063 | 26W +0.057 | 52W -0.027
+      real     4W +0.053 | 13W +0.072 | 26W +0.104 | 52W -0.012
+      credit   4W -0.048 | 13W -0.052 | 26W +0.002 | 52W +0.018
+      Mittel   4W +0.020 | 13W +0.035 | 26W +0.059 | 52W -0.007
+   [nur Momentum 26W]
+      breadth  4W +0.044 | 13W +0.076 | 26W +0.030 | 52W -0.069
+      risk     4W +0.024 | 13W +0.040 | 26W +0.043 | 52W -0.084
+      real     4W +0.015 | 13W +0.067 | 26W +0.062 | 52W -0.078
+      credit   4W -0.095 | 13W -0.089 | 26W +0.030 | 52W +0.007
+      Mittel   4W -0.046 | 13W -0.024 | 26W +0.023 | 52W -0.095
+   [nur Momentum 52W]
+      breadth  4W +0.012 | 13W +0.032 | 26W -0.014 | 52W -0.079
+      risk     4W +0.003 | 13W -0.019 | 26W -0.036 | 52W -0.159
+      real     4W -0.012 | 13W +0.015 | 26W +0.019 | 52W -0.101
+      credit   4W -0.054 | 13W -0.123 | 26W -0.066 | 52W -0.164
+      Mittel   4W -0.069 | 13W -0.121 | 26W -0.113 | 52W -0.271
+   [Niveau 10J + Momentum 26W]
+      breadth  4W -0.002 | 13W +0.012 | 26W -0.014 | 52W -0.133
+      risk     4W -0.019 | 13W -0.043 | 26W -0.051 | 52W -0.164
+      real     4W -0.055 | 13W -0.087 | 26W -0.163 | 52W -0.362
+      credit   4W -0.128 | 13W -0.122 | 26W -0.001 | 52W -0.036
+      Mittel   4W -0.064 | 13W -0.055 | 26W -0.036 | 52W -0.191
+
+2. Makro-Kern (Liquiditaet 50 / Konjunktur 15 / Struktur 25, Rang 10J) gegen Marktsignale, 806 gemeinsame Wochen
+   Makro-Kern-Rang allein:      4W +0.175 | 13W +0.312 | 26W +0.369 | 52W +0.254
+   Marktsignal-Score allein:    4W -0.046 | 13W -0.073 | 26W -0.001 | 52W -0.107
+   Marktsignal-Rang 10J allein: 4W -0.019 | 13W -0.025 | 26W +0.053 | 52W -0.035
+   Divergenz Markt minus Makro: 4W -0.141 | 13W -0.249 | 26W -0.226 | 52W -0.198
+   Quadranten (Makro-Rang / Markt-Rang, Grenze 50):
+   Makro hoch + Markt hoch: 154 Wochen | 13W +5.9% (Treffer 94%, P10 +1.3%, unter -10%: 1%) | 26W +10.3% | Drawdown 13W im Mittel -1.3%
+   Makro hoch + Markt tief: 120 Wochen | 13W +5.9% (Treffer 84%, P10 -4.3%, unter -10%: 8%) | 26W +10.0% | Drawdown 13W im Mittel -3.1%
+   Makro tief + Markt hoch: 198 Wochen | 13W +1.8% (Treffer 66%, P10 -5.4%, unter -10%: 4%) | 26W +6.0% | Drawdown 13W im Mittel -3.9%
+   Makro tief + Markt tief: 334 Wochen | 13W +2.7% (Treffer 73%, P10 -6.3%, unter -10%: 4%) | 26W +5.8% | Drawdown 13W im Mittel -3.5%
+   Makro-Rang in Terzilen, je nach Markt-Bestaetigung (Markt-Rang >= 50):
+   Makro unteres Drittel, Markt bestaetigt: 133 Wochen | 13W +1.1% (Treffer 60%, P10 -6.5%, unter -10%: 4%) | 26W +4.8% | Drawdown 13W im Mittel -4.3%
+   Makro unteres Drittel, Markt widerspricht: 238 Wochen | 13W +2.6% (Treffer 72%, P10 -5.9%, unter -10%: 2%) | 26W +5.1% | Drawdown 13W im Mittel -3.2%
+   Makro Mitte, Markt bestaetigt: 124 Wochen | 13W +4.3% (Treffer 84%, P10 -3.0%, unter -10%: 3%) | 26W +8.7% | Drawdown 13W im Mittel -2.6%
+   Makro Mitte, Markt widerspricht: 143 Wochen | 13W +3.4% (Treffer 74%, P10 -8.5%, unter -10%: 8%) | 26W +7.4% | Drawdown 13W im Mittel -4.0%
+   Makro oberes Drittel, Markt bestaetigt: 95 Wochen | 13W +6.2% (Treffer 96%, P10 +2.0%, unter -10%: 0%) | 26W +11.1% | Drawdown 13W im Mittel -1.0%
+   Makro oberes Drittel, Markt widerspricht: 73 Wochen | 13W +6.7% (Treffer 90%, P10 +0.4%, unter -10%: 7%) | 26W +11.8% | Drawdown 13W im Mittel -2.9%
+
+3. Extremzonen der Marktsignale (Kapitulation) als Kontra-Signal
+   Score < 15: 23 Wochen | 13W +13.3% (Treffer 100%, P10 +7.2%, unter -10%: 0%) | 26W +21.9% | Drawdown 13W im Mittel -1.5%
+   Score < 20: 39 Wochen | 13W +10.5% (Treffer 95%, P10 +2.9%, unter -10%: 0%) | 26W +17.4% | Drawdown 13W im Mittel -1.3%
+   Score < 25: 61 Wochen | 13W +8.0% (Treffer 89%, P10 -0.9%, unter -10%: 3%) | 26W +14.0% | Drawdown 13W im Mittel -2.7%
+   Niveau < 10: 17 Wochen | 13W +15.5% (Treffer 100%, P10 +9.2%, unter -10%: 0%) | 26W +23.7% | Drawdown 13W im Mittel -0.4%
+   Momentum < 10: 16 Wochen | 13W +15.6% (Treffer 100%, P10 +9.5%, unter -10%: 0%) | 26W +24.8% | Drawdown 13W im Mittel -0.9%
+   Score > 75: 34 Wochen | 13W +4.8% (Treffer 88%, P10 -1.7%, unter -10%: 9%) | 26W +8.1% | Drawdown 13W im Mittel -1.9%
+   Score > 80: 13 Wochen | 13W +7.8% (Treffer 100%, P10 +5.5%, unter -10%: 0%) | 26W +12.3% | Drawdown 13W im Mittel +0.2%
+   Kredit (HYG/IEF) allein:
+   Kredit-Score < 20: 38 Wochen | 13W +10.2% (Treffer 92%, P10 +2.2%, unter -10%: 0%) | 26W +17.7% | Drawdown 13W im Mittel -1.8%
+   Kredit-Momentum < 10: 57 Wochen | 13W +9.7% (Treffer 91%, P10 +2.0%, unter -10%: 0%) | 26W +16.5% | Drawdown 13W im Mittel -1.3%
+   Kredit-Niveau < 10: 11 Wochen | 13W +16.6% (Treffer 100%, P10 +10.0%, unter -10%: 0%) | 26W +24.1% | Drawdown 13W im Mittel +2.2%
+   Kredit-Score > 80: 143 Wochen | 13W +1.9% (Treffer 71%, P10 -6.5%, unter -10%: 7%) | 26W +6.5% | Drawdown 13W im Mittel -4.3%
+
+4. Drawdown-Warnung: Verteilung der Folgerenditen je Quintil
+   Marktsignal-Score: Quintile (niedrig bis hoch)
+   Q1 (0 bis 36): 182 Wochen | 13W +5.6% (Treffer 83%, P10 -3.8%, unter -10%: 3%) | 26W +9.9% | Drawdown 13W im Mittel -2.8%
+   Q2 (36 bis 48): 182 Wochen | 13W +2.8% (Treffer 75%, P10 -5.6%, unter -10%: 3%) | 26W +5.7% | Drawdown 13W im Mittel -3.5%
+   Q3 (48 bis 56): 182 Wochen | 13W +2.9% (Treffer 71%, P10 -5.9%, unter -10%: 7%) | 26W +6.8% | Drawdown 13W im Mittel -3.8%
+   Q4 (56 bis 64): 182 Wochen | 13W +3.2% (Treffer 74%, P10 -5.3%, unter -10%: 1%) | 26W +7.3% | Drawdown 13W im Mittel -2.6%
+   Q5 (64 bis 84): 182 Wochen | 13W +4.4% (Treffer 83%, P10 -1.8%, unter -10%: 3%) | 26W +7.8% | Drawdown 13W im Mittel -2.6%
+   Kredit-Score: Quintile (niedrig bis hoch)
+   Q1 (0 bis 44): 182 Wochen | 13W +5.6% (Treffer 81%, P10 -4.7%, unter -10%: 1%) | 26W +9.9% | Drawdown 13W im Mittel -2.7%
+   Q2 (44 bis 58): 182 Wochen | 13W +3.6% (Treffer 81%, P10 -6.6%, unter -10%: 6%) | 26W +7.0% | Drawdown 13W im Mittel -3.4%
+   Q3 (58 bis 68): 182 Wochen | 13W +3.9% (Treffer 77%, P10 -2.8%, unter -10%: 2%) | 26W +7.1% | Drawdown 13W im Mittel -2.2%
+   Q4 (68 bis 78): 182 Wochen | 13W +4.1% (Treffer 78%, P10 -4.5%, unter -10%: 1%) | 26W +7.7% | Drawdown 13W im Mittel -2.7%
+   Q5 (78 bis 99): 182 Wochen | 13W +1.8% (Treffer 70%, P10 -6.6%, unter -10%: 8%) | 26W +5.6% | Drawdown 13W im Mittel -4.3%
+   Makro-Kern-Rang: Quintile (niedrig bis hoch)
+   Q1 (0 bis 11): 161 Wochen | 13W +1.8% (Treffer 63%, P10 -6.3%, unter -10%: 4%) | 26W +3.9% | Drawdown 13W im Mittel -4.2%
+   Q2 (11 bis 28): 161 Wochen | 13W +2.2% (Treffer 73%, P10 -6.0%, unter -10%: 2%) | 26W +5.1% | Drawdown 13W im Mittel -3.1%
+   Q3 (28 bis 43): 161 Wochen | 13W +2.7% (Treffer 71%, P10 -6.3%, unter -10%: 5%) | 26W +7.7% | Drawdown 13W im Mittel -3.8%
+   Q4 (44 bis 68): 161 Wochen | 13W +4.6% (Treffer 84%, P10 -3.0%, unter -10%: 6%) | 26W +8.4% | Drawdown 13W im Mittel -2.9%
+   Q5 (68 bis 100): 162 Wochen | 13W +6.6% (Treffer 94%, P10 +1.3%, unter -10%: 2%) | 26W +11.5% | Drawdown 13W im Mittel -1.7%
+
+5. Strategien auf den Makro-Kern-Zonen (Basis-Quoten 50/70/85/100/100) plus Markt-Regeln
+   Consensus aktuell (Marktsignale 10%): gesamt CAGR 13.35% Sharpe 0.92 DD -29.03% Exp 0.77 | ab 2019 CAGR 16.35% Sharpe 0.9 DD -29.03%
+   Makro-Kern ohne Marktsignale: gesamt CAGR 12.91% Sharpe 0.87 DD -31.87% Exp 0.77 | ab 2019 CAGR 15.83% Sharpe 0.85 DD -31.87%
+   Buy and Hold: gesamt CAGR 13.93% Sharpe 0.79 DD -31.83% Exp 1.0 | ab 2019 CAGR 17.13% Sharpe 0.81 DD -31.83%
+   Kapitulation: Markt-Score < 20 -> voll investiert: gesamt CAGR 13.53% Sharpe 0.9 DD -31.83% Exp 0.79 | ab 2019 CAGR 16.29% Sharpe 0.87 DD -31.83%
+   Risk-off: Markt-Score < 30 -> Quote x0,5: gesamt CAGR 11.79% Sharpe 0.93 DD -17.07% Exp 0.73 | ab 2019 CAGR 15.25% Sharpe 0.97 DD -17.07%
+   Risk-off: Kredit-Momentum < 10 -> Quote x0,5: gesamt CAGR 11.59% Sharpe 0.88 DD -22.32% Exp 0.75 | ab 2019 CAGR 14.81% Sharpe 0.92 DD -22.32%
+   Bestaetigung: Markt-Score >= 50 -> +0,15 Quote, sonst -0,15: gesamt CAGR 12.35% Sharpe 0.89 DD -27.59% Exp 0.77 | ab 2019 CAGR 14.56% Sharpe 0.82 DD -27.59%
+   Kapitulation < 20 voll + Kredit-Momentum < 10 halb: gesamt CAGR 12.92% Sharpe 0.88 DD -31.83% Exp 0.77 | ab 2019 CAGR 15.56% Sharpe 0.85 DD -31.83%

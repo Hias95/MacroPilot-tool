@@ -1,0 +1,101 @@
+Backtest gegen SPY, 2010-06-20 bis 2026-09-13
+
+== Consensus Rang (10 Jahre rollierend, live) (848 Wochen, 2010-06-20 bis 2026-09-13)
+   Verteilung: min 0.0 | p10 2.0 | median 34.0 | p90 82.0 | max 100.0 | std 28.3
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W +0.142, 13W +0.250, 26W +0.280, 52W +0.213
+   Zonen: Stark negativ 18.4% (13W 1.82%, Treffer 64.1%, 52W 10.85%) | Negativ 27.0% (13W 3.42%, Treffer 76.1%, 52W 14.33%) | Neutral 38.2% (13W 3.64%, Treffer 79.7%, 52W 15.38%) | Positiv 10.1% (13W 4.08%, Treffer 82.4%, 52W 8.12%) | Stark positiv 6.2% (13W 10.64%, Treffer 100.0%, 52W 35.57%)
+   Dezile 13W: D1:1.43 D2:2.65 D3:2.58 D4:3.21 D5:3.61 D6:3.68 D7:3.14 D8:4.86 D9:3.12 D10:8.98
+   Strategie defensiv: CAGR 9.23% | Vol 9.53% | Sharpe 0.82 | MaxDD -29.53% | Exposure 0.4 | Zonenwechsel/Jahr 9.8
+   Strategie Basis:    CAGR 13.19% | Vol 13.12% | Sharpe 0.9 | MaxDD -31.83% | Exposure 0.77
+   Buy&Hold:  CAGR 14.51% | Vol 16.06% | Sharpe 0.83 | MaxDD -31.83%
+   Jahre (Strategie/B&H): 2011:3.3/1.9 2015:0.5/1.3 2018:3.4/-5.9 2020:20.9/18.1 2022:-0.1/-18.2 2023:14.1/24.2 2024:15.5/28.1 2025:9.9/16.8
+
+== Consensus Rohwert (848 Wochen, 2010-06-20 bis 2026-09-13)
+   Verteilung: min 28.0 | p10 40.0 | median 53.0 | p90 70.0 | max 82.0 | std 11.1
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W +0.113, 13W +0.226, 26W +0.230, 52W +0.105
+   Zonen: Stark negativ 0.0% (13W None%, Treffer None%, 52W None%) | Negativ 0.6% (13W -1.83%, Treffer 20.0%, 52W 13.68%) | Neutral 87.5% (13W 3.26%, Treffer 75.9%, 52W 13.65%) | Positiv 11.9% (13W 7.4%, Treffer 91.1%, 52W 22.88%) | Stark positiv 0.0% (13W None%, Treffer None%, 52W None%)
+   Dezile 13W: D1:0.1 D2:2.47 D3:3.81 D4:3.67 D5:4.34 D6:3.12 D7:5.06 D8:3.19 D9:3.64 D10:7.81
+   Strategie defensiv: CAGR 9.05% | Vol 9.13% | Sharpe 0.83 | MaxDD -22.13% | Exposure 0.53 | Zonenwechsel/Jahr 1.3
+   Strategie Basis:    CAGR 13.16% | Vol 14.24% | Sharpe 0.83 | MaxDD -30.45% | Exposure 0.87
+   Buy&Hold:  CAGR 14.51% | Vol 16.06% | Sharpe 0.83 | MaxDD -31.83%
+   Jahre (Strategie/B&H): 2011:1.1/1.9 2015:0.9/1.3 2018:-1.7/-5.9 2020:17.0/18.1 2022:-5.1/-18.2 2023:14.6/24.2 2024:16.3/28.1 2025:10.7/16.8
+
+== Stimmen-Modell (4 Treiber) (848 Wochen, 2010-06-20 bis 2026-09-13)
+   Verteilung: min 0.0 | p10 22.5 | median 57.5 | p90 92.5 | max 100.0 | std 26.9
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W +0.127, 13W +0.215, 26W +0.228, 52W +0.106
+   Zonen: Stark negativ 5.4% (13W 0.86%, Treffer 52.2%, 52W 15.76%) | Negativ 10.5% (13W 1.15%, Treffer 64.0%, 52W 11.89%) | Neutral 42.9% (13W 3.52%, Treffer 76.9%, 52W 14.05%) | Positiv 26.7% (13W 4.54%, Treffer 80.5%, 52W 14.65%) | Stark positiv 14.5% (13W 5.76%, Treffer 91.9%, 52W 18.67%)
+   Dezile 13W: D1:1.11 D2:1.82 D3:2.71 D4:4.92 D5:3.44 D6:3.58 D7:4.13 D8:3.19 D9:7.15 D10:5.18
+   Strategie defensiv: CAGR 11.89% | Vol 10.29% | Sharpe 1.0 | MaxDD -23.97% | Exposure 0.59 | Zonenwechsel/Jahr 7.9
+   Strategie Basis:    CAGR 14.5% | Vol 14.18% | Sharpe 0.92 | MaxDD -30.41% | Exposure 0.88
+   Buy&Hold:  CAGR 14.51% | Vol 16.06% | Sharpe 0.83 | MaxDD -31.83%
+   Jahre (Strategie/B&H): 2011:2.3/1.9 2015:0.5/1.3 2018:6.5/-5.9 2020:20.4/18.1 2022:-6.0/-18.2 2023:14.1/24.2 2024:17.8/28.1 2025:13.5/16.8
+
+== Ungewichtetes Mittel, ohne Overlays (848 Wochen, 2010-06-20 bis 2026-09-13)
+   Verteilung: min 21.3 | p10 37.7 | median 51.7 | p90 68.3 | max 86.0 | std 12.0
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W +0.051, 13W +0.141, 26W +0.104, 52W -0.012
+   Zonen: Stark negativ 0.0% (13W None%, Treffer None%, 52W None%) | Negativ 2.9% (13W 0.56%, Treffer 48.0%, 52W 14.75%) | Neutral 89.0% (13W 3.51%, Treffer 76.8%, 52W 14.25%) | Positiv 8.0% (13W 7.32%, Treffer 94.1%, 52W 20.71%) | Stark positiv 0.0% (13W None%, Treffer None%, 52W None%)
+   Dezile 13W: D1:1.41 D2:3.18 D3:4.23 D4:2.61 D5:2.6 D6:4.12 D7:5.22 D8:4.3 D9:3.09 D10:6.59
+   Strategie defensiv: CAGR 8.39% | Vol 8.6% | Sharpe 0.81 | MaxDD -22.13% | Exposure 0.51 | Zonenwechsel/Jahr 1.3
+   Strategie Basis:    CAGR 12.77% | Vol 13.91% | Sharpe 0.83 | MaxDD -30.45% | Exposure 0.86
+   Buy&Hold:  CAGR 14.51% | Vol 16.06% | Sharpe 0.83 | MaxDD -31.83%
+   Jahre (Strategie/B&H): 2011:3.0/1.9 2015:0.9/1.3 2018:-1.7/-5.9 2020:12.0/18.1 2022:-9.0/-18.2 2023:14.6/24.2 2024:16.3/28.1 2025:10.7/16.8
+
+== Nur liquidity (1085 Wochen, 2005-12-04 bis 2026-09-13)
+   Verteilung: min 26.0 | p10 40.0 | median 58.0 | p90 77.0 | max 100.0 | std 15.5
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W +0.050, 13W +0.051, 26W +0.095, 52W +0.117
+   Zonen: Stark negativ 0.0% (13W None%, Treffer None%, 52W None%) | Negativ 0.5% (13W 7.16%, Treffer 100.0%, 52W 16.63%) | Neutral 73.8% (13W 2.72%, Treffer 71.6%, 52W 11.41%) | Positiv 20.6% (13W 2.82%, Treffer 78.1%, 52W 9.0%) | Stark positiv 5.1% (13W 6.56%, Treffer 74.5%, 52W 36.83%)
+   Dezile 13W: D1:2.84 D2:4.3 D3:2.65 D4:3.28 D5:2.12 D6:1.73 D7:1.93 D8:2.82 D9:2.88 D10:4.99
+   Strategie defensiv: CAGR 7.51% | Vol 12.28% | Sharpe 0.51 | MaxDD -45.97% | Exposure 0.58 | Zonenwechsel/Jahr 4.3
+   Strategie Basis:    CAGR 10.03% | Vol 16.39% | Sharpe 0.56 | MaxDD -53.87% | Exposure 0.89
+   Buy&Hold:  CAGR 11.01% | Vol 17.75% | Sharpe 0.58 | MaxDD -54.61%
+   Jahre (Strategie/B&H): 2009:13.7/22.7 2011:0.0/1.9 2015:0.9/1.3 2018:-1.7/-5.9 2020:28.4/18.1 2022:-8.1/-18.2 2023:16.3/24.2 2024:16.5/28.1 2025:10.7/16.8
+
+== Nur cycle (1155 Wochen, 2004-08-01 bis 2026-09-13)
+   Verteilung: min 0.0 | p10 16.0 | median 47.0 | p90 77.6 | max 98.0 | std 23.6
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W -0.011, 13W +0.044, 26W -0.007, 52W -0.064
+   Zonen: Stark negativ 5.9% (13W 0.93%, Treffer 51.5%, 52W 10.38%) | Negativ 18.7% (13W 3.98%, Treffer 74.5%, 52W 14.01%) | Neutral 54.9% (13W 2.65%, Treffer 74.5%, 52W 11.1%) | Positiv 17.7% (13W 3.24%, Treffer 72.5%, 52W 14.41%) | Stark positiv 2.8% (13W 4.99%, Treffer 100.0%, 52W 9.67%)
+   Dezile 13W: D1:1.12 D2:4.45 D3:4.6 D4:-0.64 D5:1.83 D6:2.27 D7:3.93 D8:5.27 D9:2.6 D10:4.19
+   Strategie defensiv: CAGR 6.17% | Vol 8.62% | Sharpe 0.53 | MaxDD -25.3% | Exposure 0.48 | Zonenwechsel/Jahr 5.6
+   Strategie Basis:    CAGR 9.45% | Vol 14.19% | Sharpe 0.58 | MaxDD -44.86% | Exposure 0.83
+   Buy&Hold:  CAGR 11.1% | Vol 17.39% | Sharpe 0.59 | MaxDD -54.61%
+   Jahre (Strategie/B&H): 2009:15.0/22.7 2011:8.7/1.9 2015:-0.8/1.3 2018:-0.4/-5.9 2020:-4.4/18.1 2022:-9.6/-18.2 2023:10.8/24.2 2024:14.8/28.1 2025:3.7/16.8
+
+== Nur markets (910 Wochen, 2009-04-12 bis 2026-09-13)
+   Verteilung: min 0.0 | p10 28.0 | median 52.0 | p90 70.0 | max 84.0 | std 16.0
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W -0.028, 13W -0.043, 26W -0.016, 52W -0.134
+   Zonen: Stark negativ 1.4% (13W 16.87%, Treffer 100.0%, 52W 48.82%) | Negativ 9.9% (13W 4.53%, Treffer 78.9%, 52W 17.7%) | Neutral 78.1% (13W 3.38%, Treffer 75.8%, 52W 14.26%) | Positiv 10.5% (13W 4.39%, Treffer 83.3%, 52W 13.4%) | Stark positiv 0.0% (13W None%, Treffer None%, 52W None%)
+   Dezile 13W: D1:6.63 D2:4.62 D3:3.19 D4:2.4 D5:3.1 D6:2.64 D7:3.62 D8:2.84 D9:4.41 D10:4.46
+   Strategie defensiv: CAGR 7.7% | Vol 7.61% | Sharpe 0.83 | MaxDD -17.6% | Exposure 0.49 | Zonenwechsel/Jahr 5.7
+   Strategie Basis:    CAGR 12.87% | Vol 13.1% | Sharpe 0.88 | MaxDD -23.59% | Exposure 0.85
+   Buy&Hold:  CAGR 15.34% | Vol 16.22% | Sharpe 0.88 | MaxDD -31.83%
+   Jahre (Strategie/B&H): 2009:16.6/31.9 2011:-2.3/1.9 2015:0.3/1.3 2018:-3.1/-5.9 2020:9.0/18.1 2022:-12.4/-18.2 2023:14.2/24.2 2024:14.8/28.1 2025:10.6/16.8
+
+== Nur structure (952 Wochen, 2008-06-22 bis 2026-09-13)
+   Verteilung: min 12.0 | p10 32.0 | median 52.0 | p90 68.0 | max 84.0 | std 13.8
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W +0.076, 13W +0.148, 26W +0.188, 52W +0.112
+   Zonen: Stark negativ 0.0% (13W None%, Treffer None%, 52W None%) | Negativ 6.4% (13W 0.35%, Treffer 55.0%, 52W 10.1%) | Neutral 85.4% (13W 3.31%, Treffer 75.7%, 52W 14.97%) | Positiv 8.2% (13W 5.25%, Treffer 85.9%, 52W 18.95%) | Stark positiv 0.0% (13W None%, Treffer None%, 52W None%)
+   Dezile 13W: D1:0.49 D2:2.62 D3:3.62 D4:3.04 D5:1.91 D6:4.12 D7:2.91 D8:4.86 D9:4.31 D10:4.9
+   Strategie defensiv: CAGR 7.88% | Vol 9.3% | Sharpe 0.71 | MaxDD -25.66% | Exposure 0.5 | Zonenwechsel/Jahr 3.2
+   Strategie Basis:    CAGR 11.17% | Vol 15.54% | Sharpe 0.67 | MaxDD -41.03% | Exposure 0.85
+   Buy&Hold:  CAGR 12.1% | Vol 18.21% | Sharpe 0.64 | MaxDD -46.89%
+   Jahre (Strategie/B&H): 2009:13.8/22.7 2011:3.6/1.9 2015:0.9/1.3 2018:-2.5/-5.9 2020:13.8/18.1 2022:-4.7/-18.2 2023:16.4/24.2 2024:15.4/28.1 2025:10.7/16.8
+
+== Nur mechanics (783 Wochen, 2011-09-18 bis 2026-09-13)
+   Verteilung: min 5.0 | p10 23.2 | median 51.0 | p90 71.0 | max 92.0 | std 18.0
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W -0.135, 13W -0.214, 26W -0.187, 52W -0.098
+   Zonen: Stark negativ 0.9% (13W 7.65%, Treffer 100.0%, 52W 20.75%) | Negativ 16.5% (13W 6.43%, Treffer 82.2%, 52W 18.54%) | Neutral 69.5% (13W 3.24%, Treffer 77.0%, 52W 14.84%) | Positiv 12.9% (13W 2.99%, Treffer 76.5%, 52W 13.61%) | Stark positiv 0.3% (13W 4.77%, Treffer 100.0%, 52W 16.02%)
+   Dezile 13W: D1:6.36 D2:6.52 D3:3.71 D4:4.61 D5:2.87 D6:1.93 D7:2.6 D8:3.28 D9:2.5 D10:3.38
+   Strategie defensiv: CAGR 6.99% | Vol 6.71% | Sharpe 0.8 | MaxDD -14.51% | Exposure 0.49 | Zonenwechsel/Jahr 17.2
+   Strategie Basis:    CAGR 12.2% | Vol 12.59% | Sharpe 0.85 | MaxDD -23.3% | Exposure 0.84
+   Buy&Hold:  CAGR 14.97% | Vol 15.91% | Sharpe 0.86 | MaxDD -31.83%
+   Jahre (Strategie/B&H): 2011:0.1/3.9 2015:-0.4/1.3 2018:-1.8/-5.9 2020:10.4/18.1 2022:-13.4/-18.2 2023:14.3/24.2 2024:14.4/28.1 2025:9.0/16.8
+
+== Nur valuation (1237 Wochen, 2003-01-05 bis 2026-09-13)
+   Verteilung: min 13.0 | p10 24.0 | median 38.0 | p90 57.0 | max 79.0 | std 13.0
+   Rangkorrelation Score vs. Vorwaertsrendite: 4W +0.083, 13W +0.100, 26W +0.100, 52W +0.233
+   Zonen: Stark negativ 0.0% (13W None%, Treffer None%, 52W None%) | Negativ 27.2% (13W 2.99%, Treffer 70.6%, 52W 10.93%) | Neutral 71.5% (13W 2.92%, Treffer 74.2%, 52W 12.22%) | Positiv 1.4% (13W 12.54%, Treffer 94.1%, 52W 42.66%) | Stark positiv 0.0% (13W None%, Treffer None%, 52W None%)
+   Dezile 13W: D1:2.37 D2:2.98 D3:3.45 D4:4.24 D5:1.39 D6:2.18 D7:4.65 D8:1.95 D9:2.27 D10:5.16
+   Strategie defensiv: CAGR 6.37% | Vol 8.37% | Sharpe 0.57 | MaxDD -34.84% | Exposure 0.44 | Zonenwechsel/Jahr 1.1
+   Strategie Basis:    CAGR 9.79% | Vol 14.36% | Sharpe 0.6 | MaxDD -50.21% | Exposure 0.81
+   Buy&Hold:  CAGR 11.34% | Vol 17.13% | Sharpe 0.61 | MaxDD -54.61%
+   Jahre (Strategie/B&H): 2009:12.9/22.7 2011:1.5/1.9 2015:0.9/1.3 2018:-1.0/-5.9 2020:10.3/18.1 2022:-8.1/-18.2 2023:13.3/24.2 2024:12.8/28.1 2025:12.0/16.8
