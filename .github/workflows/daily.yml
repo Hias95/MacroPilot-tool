@@ -47,7 +47,7 @@ jobs:
         run: |
           set -o pipefail
           python -m app.export --out ../frontend/public/data --state ../data/state.json 2>&1 | tee export.log || { echo "## Export fehlgeschlagen" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; tail -60 export.log >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; exit 1; }
-          grep -E "^(Refresh|Export)" export.log >> "$GITHUB_STEP_SUMMARY" || true
+          grep -E "^(Refresh|Kanaele|Export)" export.log >> "$GITHUB_STEP_SUMMARY" || true
       - name: Zustand sichern
         run: |
           git config user.name "macropilot-bot"

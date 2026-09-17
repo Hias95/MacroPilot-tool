@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from . import backtest, data_quality, store
+from . import backtest, data_quality, notify, store
 from .config import get_settings
 from .explain import explain_pillar, resolve_provider
 from .history import build_history
@@ -34,7 +34,10 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
         store.import_state(json.loads(state_file.read_text(encoding="utf-8")))
         log(f"Zustand eingelesen: {state_file}")
     result = await refresh(force_network=True)
+    # Zwei getrennte Angaben, damit "nichts verschickt" nicht mit "kein Kanal eingerichtet" verwechselt wird.
     log(f"Refresh {result.date}: {len(result.events)} Ereignisse, gemeldet {result.notified.get('sent')}")
+    log(f"Kanaele eingerichtet: {notify.configured_channels() or 'keine'}"
+        + (f", Fehler: {result.notified['failed']}" if result.notified.get("failed") else ""))
 
     dashboard = await build_dashboard()
     _dump(out / "dashboard.json", dashboard.model_dump(mode="json"))
@@ -63,7 +66,12 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
         "gemini_api_key_configured": bool(settings.gemini_api_key), "explain_provider": provider,
         "explain_model": {"anthropic": settings.explain_model, "gemini": settings.gemini_model, "ollama": settings.ollama_model, "template": "regelbasiert"}.get(provider),
         "cache_ttl_seconds": settings.cache_ttl_seconds, "last_refresh": store.get_meta("last_refresh"),
-        "snapshot_date": store.get_meta("last_snapshot_date"), "auto_refresh": False, "alert_channels": result.notified.get("sent", []),
+        "snapshot_date": store.get_meta("last_snapshot_date"), "auto_refresh": False,
+        # Eingerichtete Kanaele, nicht die benutzten: ohne neue Ereignisse verschickt ein Lauf nichts, das sagt
+        # aber nichts ueber die Konfiguration. Was wirklich rausging, steht daneben.
+        "alert_channels": notify.configured_channels(),
+        "alerts_sent": result.notified.get("sent", []), "alerts_failed": result.notified.get("failed", []),
+        "alert_events": result.notified.get("events", 0),
     }
     _dump(out / "meta.json", meta)
     if state_file:

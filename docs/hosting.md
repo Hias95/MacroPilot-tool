@@ -67,6 +67,12 @@ Ausgabe des gescheiterten Schritts, auch ohne Login. Typische Ursachen:
 - **Export**: eine Quelle antwortet nicht (Yahoo, Shiller). Der Lauf am naechsten Tag holt es nach; der Zustand in
   `data/state.json` bleibt erhalten.
 - **Deploy**: "Get Pages site failed" heisst, Pages ist nicht auf "GitHub Actions" gestellt (Settings, Pages).
+- **Keine Benachrichtigung angekommen**: meistens kein Fehler, sondern nichts zu melden. Verschickt wird nur bei
+  einem erkannten Wechsel (Zone, Phase, Regime-Flag, Marktbestaetigung, Veto); an ruhigen Tagen gibt es keinen.
+  Ob der Kanal ueberhaupt eingerichtet ist, steht seit dem 17.09.2026 in der Zusammenfassung des Laufs (Zeile
+  "Kanaele eingerichtet") und in `data/meta.json` unter `alert_channels`; `alerts_sent` daneben zeigt, was in
+  diesem Lauf wirklich rausging. Zum Testen: ntfy-App auf dasselbe Thema abonnieren und
+  `curl -d "Test" https://ntfy.sh/<thema>` aufrufen.
 
 ## Alternative: Vercel
 

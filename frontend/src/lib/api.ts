@@ -310,3 +310,48 @@ export interface ChangesResponse {
   snapshot_date: string | null;
 }
 export const fetchChanges = (days: number, signal?: AbortSignal) => request<ChangesResponse>(`/api/v1/changes?days=${days}`, signal);
+
+/** Backtest (C1): wie sich der Consensus seit 2010 zum Vergleichsindex verhalten hat. Reine Historie. */
+export interface BacktestBand {
+  key: ZoneKey;
+  label: string;
+  weeks: number;
+  share_pct: number;
+  /** Mittlere Rendite des Vergleichsindex in den 13 bzw. 52 Wochen nach einer Woche in dieser Zone, in Prozent. */
+  mean_fwd_13w: number;
+  mean_fwd_52w: number;
+  /** Anteil der Faelle mit positiver 13-Wochen-Rendite, in Prozent. */
+  hit_rate_13w: number;
+}
+export interface BacktestPerformance {
+  cagr_pct: number;
+  vol_pct: number;
+  sharpe: number;
+  max_drawdown_pct: number;
+  /** Mittlere Investitionsquote der Regel, 1 = immer voll investiert. */
+  avg_exposure: number;
+  band_changes_per_year: number;
+  yearly: Record<string, number>;
+}
+export interface BacktestVariant {
+  name: string;
+  start: string;
+  end: string;
+  weeks: number;
+  /** Rangkorrelation zum Vorwaertsertrag je Horizont in Wochen. */
+  ic: Record<string, number>;
+  bands: BacktestBand[];
+  distribution: { min: number; p10: number; p50: number; p90: number; max: number; std: number };
+  buy_hold: BacktestPerformance;
+  /** Defensive Variante (0 bis 100 % investiert) und die Variante mit Grundquote (50 bis 100 %). */
+  strategy: BacktestPerformance;
+  strategy_base: BacktestPerformance;
+}
+export interface BacktestResponse {
+  benchmark: string;
+  start: string;
+  end: string;
+  variants: BacktestVariant[];
+  generated_at: number;
+}
+export const fetchBacktest = (signal?: AbortSignal) => request<BacktestResponse>("/api/v1/backtest", signal);

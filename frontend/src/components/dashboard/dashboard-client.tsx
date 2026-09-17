@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchDashboard, fetchHistory, type DashboardResponse, type HistoryResponse } from "@/lib/api";
 import { useViewMode } from "@/lib/mode";
+import { BenchmarkPanel } from "./benchmark-panel";
 import { ChangesPanel } from "./changes-panel";
 import { EasyDashboard } from "./easy/easy-dashboard";
 import { ConsensusPanel } from "./consensus-panel";
@@ -123,6 +124,7 @@ export function DashboardClient() {
           </div>
         </section>
       ) : null}
+      <BenchmarkPanel currentZone={consensus.zone_key} />
     </>
   );
 }

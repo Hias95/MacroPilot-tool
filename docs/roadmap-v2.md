@@ -114,8 +114,12 @@ Phase A: Modell v2
 Phase B: Easy- und Pro-Modus
 - B1 (erledigt 16.09.2026) Umschalter Einfach/Profi im Header, gemerkt im Browser. Easy zeigt je Baustein
   Score, Ampel, Trend-Pfeil, 26-Wochen-Verlauf und einen Satz; oben Tacho, Ampelzone, Phase, 12-Monats-Verlauf.
-- B2 (erledigt, bis auf den S&P-500-Vergleich, der mit dem Backtest in C1 kommt) Profi-Ansicht mit Kennzahlen,
-  Bestandteilen, Overlays, Erklaerungen, Rechenweg und Consensus-Verlauf seit 2009.
+- B2 (erledigt 17.09.2026) Profi-Ansicht mit Kennzahlen, Bestandteilen, Overlays, Erklaerungen, Rechenweg und
+  Consensus-Verlauf seit 2009. Dazu der S&P-500-Vergleich (`frontend/src/components/dashboard/benchmark-panel.tsx`,
+  Daten aus dem Backtest C1): was nach Wochen in jeder Ampelzone folgte (13 und 52 Wochen, Anteil positiver Faelle,
+  Haeufigkeit der Zone) und wie sich zwei Regeln entlang der Zonen gegen schlichtes Halten geschlagen haetten
+  (Rendite, Schwankung, groesster Rueckgang, Zeit im Markt). Bewusst ohne Quoten-Empfehlung, mit den Grenzen des
+  Rueckblicks im Text.
 
 Phase C: Backtest und Kalibrierung
 - C1 (Engine erledigt 16.09.2026, backend/app/backtest.py, Endpunkt /api/v1/backtest, Rohbericht in
