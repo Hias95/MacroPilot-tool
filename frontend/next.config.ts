@@ -7,7 +7,9 @@ import type { NextConfig } from "next";
  *    public/data liest (taeglicher Export in GitHub Actions). NEXT_PUBLIC_BASE_PATH fuer GitHub Pages unter /<repo>.
  */
 const isStatic = process.env.NEXT_PUBLIC_DATA_MODE === "static";
-const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "");
+// "/repo", "repo/" oder "repo" ergeben alle "/repo"; leer bleibt leer. Next verlangt einen fuehrenden Schraegstrich.
+const rawBase = (process.env.NEXT_PUBLIC_BASE_PATH ?? "").trim().replace(/^\/+|\/+$/g, "");
+const basePath = rawBase ? `/${rawBase}` : "";
 
 const nextConfig: NextConfig = {
   // Eigenes Build-Verzeichnis, damit ein statischer Build neben dem laufenden Dev-Server nicht kollidiert.

@@ -47,6 +47,18 @@ Was der taegliche Lauf tut (`.github/workflows/daily.yml`, 07:40 MESZ, auch von 
 4. **Ersten Lauf starten.** Actions, "MacroPilot taeglich", "Run workflow". Danach steht die Seite unter der
    Pages-Adresse. Der Zustand beginnt mit diesem Tag; Wechsel gibt es ab dem zweiten Lauf.
 
+## Wenn ein Lauf fehlschlaegt
+
+Die Zusammenfassung des Laufs (Actions, der Lauf, Reiter "Summary") zeigt seit dem 16.09.2026 das Ende der
+Ausgabe des gescheiterten Schritts, auch ohne Login. Typische Ursachen:
+
+- **Frontend-Build**: die Variable `BASE_PATH` muss zum Repository passen (`/<repo>`); jede Schreibweise wird
+  jetzt normalisiert. Schriften kommen aus dem npm-Paket `geist`, nicht mehr von Google, damit der Build ohne
+  Fremdserver auskommt.
+- **Export**: eine Quelle antwortet nicht (Yahoo, Shiller). Der Lauf am naechsten Tag holt es nach; der Zustand in
+  `data/state.json` bleibt erhalten.
+- **Deploy**: "Get Pages site failed" heisst, Pages ist nicht auf "GitHub Actions" gestellt (Settings, Pages).
+
 ## Alternative: Vercel
 
 Vercel Hobby ist ebenfalls kostenlos und baut bei jedem Push. Dafuer im Vercel-Projekt Root Directory `frontend`,

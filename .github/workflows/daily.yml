@@ -31,6 +31,7 @@ jobs:
         run: pip install -r backend/requirements.txt
       - name: Export (Refresh, Tagesbild, Hinweise, JSON)
         working-directory: backend
+        # Bei einem Fehler landet das Ende der Ausgabe in der Zusammenfassung des Laufs (ohne Login lesbar).
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -43,7 +44,10 @@ jobs:
           EXPLAIN_PROVIDER: ${{ secrets.GEMINI_API_KEY != '' && 'gemini' || 'template' }}
           AUTO_REFRESH: "false"
           DATA_DIR: ${{ github.workspace }}/backend/data
-        run: python -m app.export --out ../frontend/public/data --state ../data/state.json
+        run: |
+          set -o pipefail
+          python -m app.export --out ../frontend/public/data --state ../data/state.json 2>&1 | tee export.log || { echo "## Export fehlgeschlagen" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; tail -60 export.log >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; exit 1; }
+          grep -E "^(Refresh|Export)" export.log >> "$GITHUB_STEP_SUMMARY" || true
       - name: Zustand sichern
         run: |
           git config user.name "macropilot-bot"
@@ -62,10 +66,15 @@ jobs:
           NEXT_PUBLIC_DATA_MODE: static
           NEXT_PUBLIC_DATA_URL: /data
           NEXT_PUBLIC_BASE_PATH: ${{ vars.BASE_PATH }}
+          NEXT_TELEMETRY_DISABLED: "1"
         run: |
-          npm ci
-          npm run build
+          set -o pipefail
+          echo "BASE_PATH='${NEXT_PUBLIC_BASE_PATH}' Node $(node --version) npm $(npm --version)"
+          npm ci --no-audit --no-fund 2>&1 | tee install.log || { echo "## npm ci fehlgeschlagen" >> "$GITHUB_STEP_SUMMARY"; tail -40 install.log >> "$GITHUB_STEP_SUMMARY"; exit 1; }
+          npm run build 2>&1 | tee build.log || { echo "## next build fehlgeschlagen" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; tail -80 build.log >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; exit 1; }
+          test -f .next-static/index.html || { echo "## Export fehlt: .next-static/index.html nicht gefunden" >> "$GITHUB_STEP_SUMMARY"; ls -la >> "$GITHUB_STEP_SUMMARY"; exit 1; }
           touch .next-static/.nojekyll
+          echo "## Frontend gebaut: $(find .next-static -type f | wc -l) Dateien" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/.next-static

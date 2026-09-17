@@ -1,17 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+// Schriften aus dem npm-Paket "geist" (lokal gebuendelt): kein Download von Google beim Build, also auch kein
+// Fehlschlag in GitHub Actions, wenn fonts.googleapis.com nicht erreichbar ist.
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "MacroPilot",
@@ -23,7 +16,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="de"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <TooltipProvider>{children}</TooltipProvider>
