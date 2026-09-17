@@ -41,8 +41,9 @@ Was der taegliche Lauf tut (`.github/workflows/daily.yml`, 07:40 MESZ, auch von 
    - Secret `NTFY_TOPIC` fuer Push-Hinweise (siehe unten), optional `SMTP_*` und `ALERT_EMAIL_*` fuer E-Mail.
    - Secret `GEMINI_API_KEY` (optional): dann schreibt Gemini die Erklaerungen im Export; ohne Key regelbasiert.
      Das Gratis-Kontingent von Google AI Studio reicht fuer sechs Texte am Tag; die Pro-Abos decken die API nicht.
-   - Variable `BASE_PATH` = `/<repo>` (nur wenn die Seite unter `https://<user>.github.io/<repo>/` liegt; bei
-     einer eigenen Domain oder `<user>.github.io` leer lassen).
+   - Variable `BASE_PATH`: **nicht noetig**. Der Workflow leitet den Unterpfad seit dem 17.09.2026 selbst aus dem
+     Repository-Namen ab (`/<repo>`, ausser das Repository heisst `<user>.github.io`). Nur fuer eine eigene Domain
+     die Variable auf `/` oder `none` setzen, dann baut er ohne Praefix.
 
 4. **Ersten Lauf starten.** Actions, "MacroPilot taeglich", "Run workflow". Danach steht die Seite unter der
    Pages-Adresse. Der Zustand beginnt mit diesem Tag; Wechsel gibt es ab dem zweiten Lauf.
@@ -57,9 +58,12 @@ Ausgabe des gescheiterten Schritts, auch ohne Login. Typische Ursachen:
   Eintraege (`@emnapi/core`, `@emnapi/runtime` unter den wasm32-Fallbacks von Tailwind), die npm 11 nicht mehr in
   die Lock-Datei schreibt. Der Workflow nagelt npm deshalb auf Version 11 fest (`npm install -g npm@11`). Regel:
   lokal und im Workflow dieselbe npm-Hauptversion (`npm --version`), dann bleibt `npm ci` deterministisch.
-- **Frontend-Build**: die Variable `BASE_PATH` muss zum Repository passen (`/<repo>`); jede Schreibweise wird
-  normalisiert. Schriften kommen aus dem npm-Paket `geist`, nicht von Google, damit der Build ohne Fremdserver
-  auskommt.
+- **Seite laedt, aber ohne Stil und ohne Zahlen** (Adresse antwortet mit 200, CSS/JS/JSON mit 404): der Unterpfad
+  fehlte im Build, die Pfade zeigten auf den Domain-Root. Ursache bis 17.09.2026 war die fehlende Variable
+  `BASE_PATH`; seitdem leitet der Workflow den Pfad selbst ab und bricht ab, wenn `index.html` danach noch auf
+  `/_next` verweist. Zum Nachstellen: `curl -s <Adresse> | grep -o '"/[^"]*_next[^"]*"' | head`.
+- **Frontend-Build**: Schriften kommen aus dem npm-Paket `geist`, nicht von Google, damit der Build ohne
+  Fremdserver auskommt.
 - **Export**: eine Quelle antwortet nicht (Yahoo, Shiller). Der Lauf am naechsten Tag holt es nach; der Zustand in
   `data/state.json` bleibt erhalten.
 - **Deploy**: "Get Pages site failed" heisst, Pages ist nicht auf "GitHub Actions" gestellt (Settings, Pages).

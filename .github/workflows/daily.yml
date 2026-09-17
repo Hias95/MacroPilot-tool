@@ -70,11 +70,24 @@ jobs:
         env:
           NEXT_PUBLIC_DATA_MODE: static
           NEXT_PUBLIC_DATA_URL: /data
-          NEXT_PUBLIC_BASE_PATH: ${{ vars.BASE_PATH }}
+          BASE_PATH_VAR: ${{ vars.BASE_PATH }}
           NEXT_TELEMETRY_DISABLED: "1"
         run: |
           set -o pipefail
-          echo "BASE_PATH='${NEXT_PUBLIC_BASE_PATH}' Node $(node --version) npm $(npm --version)"
+          # Eine Projektseite liegt unter <nutzer>.github.io/<repo>/. Ohne diesen Praefix zeigen alle Asset- und
+          # Datenpfade auf den Domain-Root und laufen ins Leere (HTML laedt, CSS/JS/JSON antworten mit 404).
+          # Nur die Nutzerseite <nutzer>.github.io selbst braucht keinen Praefix. Die Repository-Variable
+          # BASE_PATH ueberschreibt die Herleitung; "/" oder "none" bedeutet ausdruecklich kein Praefix
+          # (eigene Domain). Die Datenadresse bekommt den Praefix in src/lib/api.ts, deshalb bleibt sie /data.
+          repo="${GITHUB_REPOSITORY#*/}"
+          lower() { printf '%s' "$1" | tr '[:upper:]' '[:lower:]'; }
+          base="$BASE_PATH_VAR"
+          if [ -z "$base" ] && [ "$(lower "$repo")" != "$(lower "$GITHUB_REPOSITORY_OWNER").github.io" ]; then
+            base="/$repo"
+          fi
+          case "$base" in /|none|NONE) base="" ;; esac
+          export NEXT_PUBLIC_BASE_PATH="$base"
+          echo "BASE_PATH='${NEXT_PUBLIC_BASE_PATH}' (Variable: '${BASE_PATH_VAR}') Node $(node --version) npm $(npm --version)"
           npm ci --no-audit --no-fund 2>&1 | tee install.log || {
             echo "## npm ci fehlgeschlagen, Rueckfall auf npm install (Lock-Datei lokal mit derselben npm-Version neu erzeugen)" >> "$GITHUB_STEP_SUMMARY"
             tail -20 install.log >> "$GITHUB_STEP_SUMMARY"
@@ -82,6 +95,14 @@ jobs:
           }
           npm run build 2>&1 | tee build.log || { echo "## next build fehlgeschlagen" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; tail -80 build.log >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; exit 1; }
           test -f .next-static/index.html || { echo "## Export fehlt: .next-static/index.html nicht gefunden" >> "$GITHUB_STEP_SUMMARY"; ls -la >> "$GITHUB_STEP_SUMMARY"; exit 1; }
+          # Abnahme: mit Praefix darf keine Asset-Adresse mehr auf dem Domain-Root stehen, sonst laedt die
+          # Seite zwar, bleibt aber ohne Stil, ohne Skripte und ohne Daten.
+          if [ -n "$NEXT_PUBLIC_BASE_PATH" ] && grep -q '"/_next/' .next-static/index.html; then
+            echo "## Basispfad nicht angewandt: index.html verweist auf /_next statt auf ${NEXT_PUBLIC_BASE_PATH}/_next" >> "$GITHUB_STEP_SUMMARY"
+            grep -o '"/_next/[^"]*"' .next-static/index.html | head -5 >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          test -f .next-static/data/dashboard.json || { echo "## Daten fehlen im Export: .next-static/data/dashboard.json" >> "$GITHUB_STEP_SUMMARY"; exit 1; }
           touch .next-static/.nojekyll
           echo "## Frontend gebaut: $(find .next-static -type f | wc -l) Dateien" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-pages-artifact@v3
