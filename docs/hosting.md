@@ -52,9 +52,14 @@ Was der taegliche Lauf tut (`.github/workflows/daily.yml`, 07:40 MESZ, auch von 
 Die Zusammenfassung des Laufs (Actions, der Lauf, Reiter "Summary") zeigt seit dem 16.09.2026 das Ende der
 Ausgabe des gescheiterten Schritts, auch ohne Login. Typische Ursachen:
 
+- **`npm ci` meldet "package.json and package-lock.json are not in sync"**, obwohl die Lock-Datei frisch ist:
+  npm-Hauptversion lokal und im Runner verschieden. Node 22 bringt npm 10, lokal laeuft npm 11; npm 10 verlangt
+  Eintraege (`@emnapi/core`, `@emnapi/runtime` unter den wasm32-Fallbacks von Tailwind), die npm 11 nicht mehr in
+  die Lock-Datei schreibt. Der Workflow nagelt npm deshalb auf Version 11 fest (`npm install -g npm@11`). Regel:
+  lokal und im Workflow dieselbe npm-Hauptversion (`npm --version`), dann bleibt `npm ci` deterministisch.
 - **Frontend-Build**: die Variable `BASE_PATH` muss zum Repository passen (`/<repo>`); jede Schreibweise wird
-  jetzt normalisiert. Schriften kommen aus dem npm-Paket `geist`, nicht mehr von Google, damit der Build ohne
-  Fremdserver auskommt.
+  normalisiert. Schriften kommen aus dem npm-Paket `geist`, nicht von Google, damit der Build ohne Fremdserver
+  auskommt.
 - **Export**: eine Quelle antwortet nicht (Yahoo, Shiller). Der Lauf am naechsten Tag holt es nach; der Zustand in
   `data/state.json` bleibt erhalten.
 - **Deploy**: "Get Pages site failed" heisst, Pages ist nicht auf "GitHub Actions" gestellt (Settings, Pages).

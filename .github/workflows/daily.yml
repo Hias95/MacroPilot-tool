@@ -60,6 +60,11 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+      # Node 22 bringt npm 10 mit. Die Lock-Datei entsteht lokal mit npm 11, und npm 10 verlangt Eintraege
+      # (@emnapi/core, @emnapi/runtime unter den wasm32-Fallbacks), die npm 11 nicht mehr schreibt: "npm ci"
+      # meldet dann "not in sync". Deshalb hier dieselbe npm-Hauptversion wie lokal.
+      - name: npm auf Version 11 festnageln (wie lokal)
+        run: npm install -g npm@11 && npm --version
       - name: Frontend statisch bauen
         working-directory: frontend
         env:
@@ -70,7 +75,11 @@ jobs:
         run: |
           set -o pipefail
           echo "BASE_PATH='${NEXT_PUBLIC_BASE_PATH}' Node $(node --version) npm $(npm --version)"
-          npm ci --no-audit --no-fund 2>&1 | tee install.log || { echo "## npm ci fehlgeschlagen" >> "$GITHUB_STEP_SUMMARY"; tail -40 install.log >> "$GITHUB_STEP_SUMMARY"; exit 1; }
+          npm ci --no-audit --no-fund 2>&1 | tee install.log || {
+            echo "## npm ci fehlgeschlagen, Rueckfall auf npm install (Lock-Datei lokal mit derselben npm-Version neu erzeugen)" >> "$GITHUB_STEP_SUMMARY"
+            tail -20 install.log >> "$GITHUB_STEP_SUMMARY"
+            npm install --no-audit --no-fund 2>&1 | tee install.log || { tail -40 install.log >> "$GITHUB_STEP_SUMMARY"; exit 1; }
+          }
           npm run build 2>&1 | tee build.log || { echo "## next build fehlgeschlagen" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; tail -80 build.log >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; exit 1; }
           test -f .next-static/index.html || { echo "## Export fehlt: .next-static/index.html nicht gefunden" >> "$GITHUB_STEP_SUMMARY"; ls -la >> "$GITHUB_STEP_SUMMARY"; exit 1; }
           touch .next-static/.nojekyll
