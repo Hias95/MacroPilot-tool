@@ -153,6 +153,13 @@ Phase D: Betrieb
   Regime-Flags, Marktbestaetigung, Vetos) per ntfy.sh (kostenlos, ohne Konto) und/oder SMTP-E-Mail; im Dashboard
   die Liste "Was hat sich geaendert?" in beiden Modi.
 
+Phase E (Vorschlag, noch nicht entschieden, docs/mehrwert-konzept.md)
+- Befund 17.09.2026: Das Tool beschreibt den Zustand vollstaendig, beantwortet aber nicht, was gerade passiert
+  ist, was historisch darauf folgte und woran ein Wechsel zu erkennen waere. Das Konzept arbeitet dazu acht
+  Bausteine aus (Erwartungssatz mit Bezugsklasse, Ergebnisstreifen, Bewegung der Woche, Kippschwelle,
+  Terminkalender, aehnlichste Wochen, Kalibriertafel, aufgeloester Tacho-Widerspruch) samt Reihenfolge,
+  Datenlage und Quellen aus der Risikokommunikation. Alles mit den vorhandenen kostenlosen Quellen machbar.
+
 ## 5. Offene Punkte und Risiken
 
 - FRED-Key ist hinterlegt. Der High-Yield-Spread (ICE BofA) ist auf FRED auch per API auf 3 Jahre
