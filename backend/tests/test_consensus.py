@@ -120,3 +120,29 @@ def test_market_confirmation_and_stress_flag():
     c = build_consensus(drivers_, overlays)
     assert c.market_confirmation_key == "market_lagging" and c.market_confirmation == "Markt zögert"
     assert "Marktsignale 25" in c.why and "Rückschläge" in c.why or "Marktstress" in c.why
+
+
+def test_pending_zone_reports_streak_and_confirmation_date():
+    """Der Widerspruch zwischen Nadel und Zonenwort wird zur Vorschau: wie lange schon, und ab wann es gilt."""
+    drivers_ = [pillar("liquidity", 54, 53, -1.0), pillar("cycle", 93, 95, 20.0), pillar("structure", 44)]
+    overlays = [pillar("valuation", 14, regime_active=True), pillar("mechanics", 49)]
+    window = [35.0 + i * 0.1 for i in range(300)]
+    base = dict(window=window, zone_key="neutral", weeks_in_zone=9, phase_key="late", weeks_in_phase=6,
+                last_date=date(2026, 9, 13))
+
+    # Zweite Woche in Folge: noch eine fehlt, Bestaetigung eine Woche nach dem letzten Rastertag.
+    c = build_consensus(drivers_, overlays, ConsensusState(zone_pending_key="positive", zone_pending_weeks=2, **base))
+    assert c.zone_key == "neutral" and c.zone_pending_key == "positive"
+    assert c.zone_pending_weeks == 2 and c.zone_confirm_weeks == 3
+    assert c.zone_change_date == date(2026, 9, 20)
+    assert "die 2. Woche in Folge" in c.why and "20.09.2026" in c.why
+
+    # Die Historie kennt einen anderen Kandidaten: der Lauf beginnt mit dieser Woche neu.
+    # Der letzte Rastertag ist dann selbst die erste Woche, es fehlen noch zwei.
+    fresh = build_consensus(drivers_, overlays, ConsensusState(zone_pending_key="negative", zone_pending_weeks=2, **base))
+    assert fresh.zone_pending_weeks == 1 and fresh.zone_change_date == date(2026, 9, 27)
+
+    # Stimmt die Zone mit der bestaetigten ueberein, schwebt nichts.
+    quiet = build_consensus(drivers_, overlays, ConsensusState(zone_pending_key=None, zone_pending_weeks=0,
+                                                              **{**base, "zone_key": "positive"}))
+    assert quiet.zone_pending_key is None and quiet.zone_change_date is None and quiet.zone_pending_weeks == 0

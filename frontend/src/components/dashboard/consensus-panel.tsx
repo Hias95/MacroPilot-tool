@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { ConsensusHistoryPoint, ConsensusResponse, PhaseKey, PillarResponse } from "@/lib/api";
 import { PILLAR_UI } from "@/lib/pillars";
 import { availableRanges, filterByRange, useRange } from "@/lib/range";
-import { MARKET_CONFIRM, PHASES, ZONES } from "@/lib/score";
+import { MARKET_CONFIRM, PHASES, ZONES, pendingZoneOf, zoneChangeNote } from "@/lib/score";
 import { cn } from "@/lib/utils";
 import { ConsensusGauge } from "./consensus-gauge";
 import { ConsensusHistoryChart } from "./consensus-history-chart";
@@ -36,6 +36,7 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
   const [range, setRange] = useRange("consensus-pro", "max");
   const shown = history ? filterByRange(history, range) : history;
   const unconfirmed = consensus.zone_raw_key !== consensus.zone_key;
+  const pendingZone = pendingZoneOf(consensus);
   const score = consensus.score ?? 50;
   const regimes = [...pillars, ...overlays].map((p) => p.regime).filter((r): r is NonNullable<typeof r> => !!r && r.active);
   const v2 = consensus.method.startsWith("macropilot-v2");
@@ -61,7 +62,7 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
               </Badge>
             ))}
           </div>
-          <ConsensusGauge score={score} zone={{ label: zone.label, color: zone.color }} />
+          <ConsensusGauge score={score} zone={zone} pending={pendingZone} />
           {v2 ? (
             <div className="mx-auto mt-2 flex max-w-[440px] justify-center gap-6 text-xs text-muted-foreground">
               <Direction label="Liquidität" dir={consensus.liquidity_direction} />
@@ -85,7 +86,7 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
             <p className="mt-2 max-w-md text-sm text-muted-foreground text-pretty">{zone.hint}</p>
             {unconfirmed ? (
               <p className="mt-2 text-xs text-amber-300/90 text-pretty">
-                Diese Woche zeigt bereits <span style={{ color: zoneRaw.color }}>{zoneRaw.label}</span>. Die Zone wechselt erst nach drei Wochen in Folge.
+                Diese Woche zeigt bereits <span style={{ color: zoneRaw.color }}>{zoneRaw.label}</span>, {zoneChangeNote(consensus)}
               </p>
             ) : null}
             {confirm ? (

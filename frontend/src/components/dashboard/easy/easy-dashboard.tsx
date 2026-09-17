@@ -4,8 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ConsensusResponse, HistoryResponse, PillarResponse } from "@/lib/api";
 import { availableRanges, filterByRange, useRange } from "@/lib/range";
-import { MARKET_CONFIRM, PHASES, ZONES } from "@/lib/score";
+import { MARKET_CONFIRM, PHASES, ZONES, pendingZoneOf, zoneChangeNote } from "@/lib/score";
 import { ConsensusGauge } from "../consensus-gauge";
+import { OutlookPanel } from "../outlook-panel";
 import { ConsensusHistoryChart } from "../consensus-history-chart";
 import { RangeSelect } from "../range-select";
 import { EasyPillarCard } from "./easy-pillar-card";
@@ -23,6 +24,7 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
   const zone = ZONES[consensus.zone_key];
   const zoneRaw = ZONES[consensus.zone_raw_key];
   const unconfirmed = consensus.zone_raw_key !== consensus.zone_key;
+  const pendingZone = pendingZoneOf(consensus);
   const phase = consensus.phase_key ? PHASES[consensus.phase_key] : null;
   const confirm = consensus.market_confirmation_key ? MARKET_CONFIRM[consensus.market_confirmation_key] : null;
   const regimes = [...pillars, ...overlays].map((p) => p.regime).filter((r): r is NonNullable<typeof r> => !!r && r.active);
@@ -38,7 +40,7 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
         <CardContent className="grid gap-6 py-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center lg:gap-10">
           <div>
             <div className="mb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Gesamtlage</div>
-            <ConsensusGauge score={consensus.score ?? 50} zone={{ label: zone.label, color: zone.color }} />
+            <ConsensusGauge score={consensus.score ?? 50} zone={zone} pending={pendingZone} />
           </div>
           <div className="flex flex-col gap-4">
             <div>
@@ -52,7 +54,7 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
               <p className="mt-1.5 max-w-lg text-sm leading-relaxed text-muted-foreground text-pretty">{zone.hint}</p>
               {unconfirmed ? (
                 <p className="mt-1.5 text-xs text-amber-300/90 text-pretty">
-                  Diese Woche zeigt bereits <span style={{ color: zoneRaw.color }}>{zoneRaw.label}</span>, die Zone wechselt erst nach drei Wochen in Folge.
+                  Diese Woche zeigt bereits <span style={{ color: zoneRaw.color }}>{zoneRaw.label}</span>, {zoneChangeNote(consensus)}
                 </p>
               ) : null}
               {phase ? (
@@ -91,6 +93,8 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
           </div>
         </CardContent>
       </Card>
+
+      <OutlookPanel zoneKey={consensus.zone_key} zoneLabel={zone.label} zoneColor={zone.color} />
 
       <section aria-label="Die drei Treiber" className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">

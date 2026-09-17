@@ -15,8 +15,12 @@ Zyklusphase: Richtung Liquiditaet x Konjunktur, bestaetigt nach PHASE_CONFIRM_WE
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 
-from .model_config import CONSENSUS_WEIGHTS, MARKET_CONFIRM_THRESHOLD, MECHANICS_RANGE, PHASE_MATRIX, VALUATION_CAP, VETOES, ZONE_BANDS
+from .model_config import (
+    CONSENSUS_WEIGHTS, MARKET_CONFIRM_THRESHOLD, MECHANICS_RANGE, PHASE_MATRIX, VALUATION_CAP, VETOES,
+    ZONE_BANDS, ZONE_CONFIRM_WEEKS,
+)
 from .schemas import ConsensusResponse, PillarResponse
 from .scoring import percentile_rank
 
@@ -159,6 +163,11 @@ class ConsensusState:
     weeks_in_zone: int
     phase_key: str
     weeks_in_phase: int
+    # Zone, die aktuell auf Bestaetigung wartet, und wie viele Wochen in Folge sie schon anliegt.
+    zone_pending_key: str | None = None
+    zone_pending_weeks: int = 0
+    #: Letzter Rastertag der Historie, Bezugspunkt fuer das Datum der Bestaetigung.
+    last_date: date | None = None
 
 
 DRIVER_NAMES = {"liquidity": "Liquidität", "cycle": "Konjunktur", "structure": "Struktur & Fiskus"}
@@ -189,7 +198,8 @@ def _fallback(scores: dict[str, int | None], overlay_scores: dict[str, int | Non
 
 
 def _why(r: CoreResult, by: dict[str, PillarResponse], ov: dict[str, PillarResponse], phase_key: str, weeks: int | None,
-         rank: int, zone: str, zone_raw: str, weeks_in_zone: int | None) -> str:
+         rank: int, zone: str, zone_raw: str, weeks_in_zone: int | None,
+         pending_weeks: int = 0, change_date: date | None = None) -> str:
     from .pillars.valuation import fallhoehe_label
 
     strongest = max(DRIVER_NAMES, key=lambda k: by[k].score.score if by[k].score else 0)
@@ -197,7 +207,14 @@ def _why(r: CoreResult, by: dict[str, PillarResponse], ov: dict[str, PillarRespo
     first = f"{zone}: Die Lage ist besser als in {rank} Prozent der Wochen der letzten zehn Jahre (Rohwert {r.score})"
     first += f", seit {weeks_in_zone} Wochen in dieser Zone." if weeks_in_zone else "."
     if zone_raw != zone:
-        first += f" Diese Woche zeigt bereits {zone_raw}, noch unbestätigt."
+        # Aus dem Widerspruch zwischen Nadel und Wort wird eine Vorschau mit Datum.
+        first += f" Diese Woche zeigt bereits {zone_raw}"
+        if pending_weeks >= 2:  # "die 1. Woche in Folge" waere umstaendlich
+            first += f", die {pending_weeks}. Woche in Folge"
+        if change_date:
+            first += f"; bestätigt wäre der Wechsel am {change_date.strftime('%d.%m.%Y')}, wenn es so bleibt."
+        else:
+            first += ", noch unbestätigt."
     parts = [
         first,
         f"Am stärksten stützt {DRIVER_NAMES[strongest]} ({by[strongest].score.score}), "
@@ -263,16 +280,30 @@ def build_consensus(
     weeks_in_zone = state.weeks_in_zone if state else None
     phase_key = state.phase_key if state else r.phase_raw_key
     weeks = state.weeks_in_phase if state else None
+    # Schwebender Zonenwechsel: Wie viele Wochen liegt die abweichende Zone schon an, und wann waere sie
+    # bestaetigt? Die Historie zaehlt den Lauf mit; stimmt der Live-Rohwert nicht mit ihrem Kandidaten
+    # ueberein, beginnt der Lauf mit dieser Woche neu.
+    pending_key = zone_raw_key if zone_raw_key != zone_key else None
+    if pending_key is None:
+        pending_weeks, change_date = 0, None
+    else:
+        same = state is not None and state.zone_pending_key == pending_key and state.zone_pending_weeks > 0
+        pending_weeks = state.zone_pending_weeks if same and state else 1  # type: ignore[union-attr]
+        remaining = max(0, ZONE_CONFIRM_WEEKS - pending_weeks)
+        change_date = state.last_date + timedelta(weeks=remaining) if state and state.last_date else None
     mk = ov.get("markets")
     confirm_key = market_confirmation(rank, mk.score.score if mk and mk.score else None)
     return ConsensusResponse(
         score=rank, composite=r.score, zone_key=zone_key, zone=zone, zone_raw_key=zone_raw_key, weeks_in_zone=weeks_in_zone,  # type: ignore[arg-type]
+        zone_pending_key=pending_key, zone_pending_weeks=pending_weeks, zone_confirm_weeks=ZONE_CONFIRM_WEEKS,  # type: ignore[arg-type]
+        zone_change_date=change_date,
         market_confirmation_key=confirm_key, market_confirmation=MARKET_CONFIRM_LABEL.get(confirm_key) if confirm_key else None,  # type: ignore[arg-type]
         phase_key=phase_key, phase=PHASE_LABEL[phase_key], phase_raw_key=r.phase_raw_key, weeks_in_phase=weeks,  # type: ignore[arg-type]
         liquidity_direction=r.liquidity_direction, growth_direction=r.growth_direction, confidence=r.confidence,  # type: ignore[arg-type]
         method="macropilot-v2-rank",
         note="Rohwert aus drei gewichteten Treibern, Marktmechanik als Kontra-Korrektur, Bewertung als Deckel, Marktsignale als Bestätigung, Vetos bei Systemkrisen. Angezeigt wird der Rang des Rohwerts in den letzten zehn Jahren; Zone und Zyklusphase wechseln erst nach Bestätigung.",
-        why=_why(r, by, ov, phase_key, weeks, rank, zone, zone_raw, weeks_in_zone), pillar_scores=scores, overlay_scores=overlay_scores,
+        why=_why(r, by, ov, phase_key, weeks, rank, zone, zone_raw, weeks_in_zone, pending_weeks, change_date),
+        pillar_scores=scores, overlay_scores=overlay_scores,
         core=round(r.core, 1), mechanics_adjustment=round(r.mechanics_adjustment, 1), valuation_cap=round(r.valuation_cap, 1) if r.valuation_cap is not None else None,
         vetoes=r.vetoes, cap=round(r.cap, 1) if r.cap is not None else None, adjusted=round(r.adjusted, 1),
     )

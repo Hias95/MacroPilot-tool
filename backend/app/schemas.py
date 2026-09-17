@@ -130,6 +130,10 @@ class ConsensusResponse(BaseModel):
     zone: str
     zone_raw_key: ZoneKey | None = Field(None, description="Zone dieser Woche, falls noch nicht bestaetigt")
     weeks_in_zone: int | None = None
+    zone_pending_key: ZoneKey | None = Field(None, description="Zone, die auf Bestaetigung wartet; None, wenn nichts schwebt")
+    zone_pending_weeks: int = Field(0, description="Wochen in Folge, die die schwebende Zone schon anliegt")
+    zone_confirm_weeks: int = Field(0, description="Wochen in Folge, die fuer einen Zonenwechsel noetig sind")
+    zone_change_date: date | None = Field(None, description="Tag, an dem der Wechsel bestaetigt waere, wenn die Zone bestehen bleibt")
     market_confirmation_key: MarketConfirmKey | None = Field(None, description="Bestaetigt der Marktsignal-Score den Rang?")
     market_confirmation: str | None = None
     phase_key: PhaseKey | None = Field(None, description="Bestaetigte Zyklusphase (Hysterese)")

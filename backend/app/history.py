@@ -142,6 +142,8 @@ async def _compute() -> HistoryResponse:
     global _last_state
     _last_state = ConsensusState(
         window=list(composites), zone_key=zone_conf, weeks_in_zone=weeks_in_zone, phase_key=confirmed, weeks_in_phase=weeks_in_phase,
+        zone_pending_key=zone_cand, zone_pending_weeks=zone_cand_weeks,
+        last_date=consensus[-1].date if consensus else None,
     ) if confirmed and zone_conf else None
     return HistoryResponse(
         start=grid[0], end=grid[-1], pillars=pillars, consensus=consensus, generated_at=datetime.now(tz=timezone.utc)

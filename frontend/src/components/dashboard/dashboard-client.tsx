@@ -7,8 +7,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchDashboard, fetchHistory, type DashboardResponse, type HistoryResponse } from "@/lib/api";
 import { useViewMode } from "@/lib/mode";
+import { ZONES } from "@/lib/score";
 import { BenchmarkPanel } from "./benchmark-panel";
 import { ChangesPanel } from "./changes-panel";
+import { OutlookPanel } from "./outlook-panel";
 import { EasyDashboard } from "./easy/easy-dashboard";
 import { ConsensusPanel } from "./consensus-panel";
 import { PillarTile } from "./pillar-tile";
@@ -105,6 +107,7 @@ export function DashboardClient() {
   return (
     <>
       <ConsensusPanel consensus={consensus} pillars={pillars} overlays={overlays} history={history ? history.consensus : history} />
+      <OutlookPanel zoneKey={consensus.zone_key} zoneLabel={consensus.zone} zoneColor={ZONES[consensus.zone_key].color} />
       <ChangesPanel days={365} />
       <section aria-label="Die drei Treiber" className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {pillars.map((p) => (

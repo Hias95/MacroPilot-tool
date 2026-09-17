@@ -53,3 +53,27 @@ export function toneForChange(pct: number | null | undefined, threshold = 0.1): 
   if (pct < -threshold) return "bearish";
   return "neutral";
 }
+
+/** Zone dieser Woche, solange sie von der bestaetigten abweicht. Sonst null. */
+export function pendingZoneOf(c: { zone_key: ZoneKey; zone_pending_key?: ZoneKey | null; zone_raw_key?: ZoneKey }): Zone | null {
+  const key = c.zone_pending_key ?? (c.zone_raw_key !== c.zone_key ? c.zone_raw_key : null);
+  return key && key !== c.zone_key ? ZONES[key] : null;
+}
+
+/**
+ * Aus dem Widerspruch "Nadel im gruenen Feld, Wort noch gelb" wird eine Vorschau mit Datum.
+ * Ohne Datum vom Backend bleibt der allgemeine Hinweis auf die Bestaetigungsdauer.
+ */
+export function zoneChangeNote(c: {
+  zone_pending_weeks?: number;
+  zone_confirm_weeks?: number;
+  zone_change_date?: string | null;
+}): string {
+  const need = c.zone_confirm_weeks ?? 3;
+  const date = c.zone_change_date;
+  if (!date) return `Die Zone wechselt erst nach ${need} Wochen in Folge.`;
+  const when = new Date(date).toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" });
+  const weeks = c.zone_pending_weeks ?? 1;
+  const streak = weeks >= 2 ? `die ${weeks}. Woche in Folge, ` : "";
+  return `${streak}bestätigt wäre der Wechsel am ${when}, wenn es so bleibt.`;
+}

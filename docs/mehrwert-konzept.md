@@ -258,9 +258,9 @@ sind zusammen ueberschaubar.
 
 | Schritt | Baustein | Aufwand | Wirkung |
 |---|---|---|---|
-| 1 | D2 Tacho-Widerspruch aufloesen, mit Wechseldatum | klein | beseitigt aktive Verwirrung |
-| 2 | A1 und A3 Erwartungssatz mit Bezugsklasse und Zeitraum | klein, plus Perzentile im Backtest | beantwortet erstmals "was kommt" |
-| 3 | A2 Ergebnisstreifen aus zwanzig Punkten | klein, reines Frontend | macht die Erwartung abzaehlbar |
+| 1 | D2 Tacho-Widerspruch aufloesen, mit Wechseldatum | klein | **erledigt 17.09.2026** |
+| 2 | A1 und A3 Erwartungssatz mit Bezugsklasse und Zeitraum | klein, plus Perzentile im Backtest | **erledigt 17.09.2026** |
+| 3 | A2 Ergebnisstreifen aus zehn Punkten | klein, reines Frontend | **erledigt 17.09.2026** |
 | 4 | B1 und B3 Bewegung der Woche mit Ursache und Wochensatz | mittel | beantwortet "was ist passiert" |
 | 5 | C1 Kippschwelle | mittel | macht die Mechanik begreifbar |
 | 6 | C2 Terminkalender ueber die FRED-Release-API | mittel, neuer Client | gibt einen Grund wiederzukommen |
@@ -270,6 +270,21 @@ sind zusammen ueberschaubar.
 Die Schritte 1 bis 3 sind fachlich unabhaengig voneinander und koennten in einem Zug umgesetzt werden. Alles
 ist mit den vorhandenen kostenlosen Quellen machbar; nur C2 braucht einen zusaetzlichen, ebenfalls kostenlosen
 Endpunkt derselben FRED-Schnittstelle.
+
+## 7a. Was davon steht (17.09.2026)
+
+Schritt 1 bis 3 sind umgesetzt und im Browser geprueft.
+
+- **Tacho (D2):** Die bestaetigte Zone ist als farbiges Feld im Bogen sichtbar, darunter steht bei Abweichung
+  "diese Woche <Zone>". Der Satz nennt jetzt das Datum: "bestätigt wäre der Wechsel am 27. September 2026,
+  wenn es so bleibt." Backend: `ConsensusState` fuehrt die schwebende Zone mit, `ConsensusResponse` liefert
+  `zone_pending_key`, `zone_pending_weeks`, `zone_confirm_weeks` und `zone_change_date`.
+- **Erwartungssatz (A1, A3):** `frontend/src/components/dashboard/outlook-panel.tsx`, in beiden Modi direkt
+  unter dem Tacho. Der Zeitraum steht im Satz, nicht in einer Legende.
+- **Ergebnisstreifen (A2):** Zehn Punkte statt zwanzig, damit er eins zu eins zum Satz passt.
+- **Ehrlichkeit bei duenner Datenlage:** `backtest.py` zaehlt jetzt `episodes`, also zusammenhaengende
+  Aufenthalte je Zone, und liefert `p10/p50/p90`. Unter zehn Episoden faerbt sich der Grundlagensatz bernstein
+  und nennt die Unsicherheit ausdruecklich. Das trifft "Stark positiv": 53 Wochen, aber nur vier Phasen.
 
 ## 8. Quellen
 

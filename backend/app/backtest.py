@@ -25,6 +25,27 @@ EXPOSURE_DEFENSIVE = {"very_negative": 0.0, "negative": 0.25, "neutral": 0.5, "p
 EXPOSURE_BASE = {"very_negative": 0.5, "negative": 0.7, "neutral": 0.85, "positive": 1.0, "very_positive": 1.0}
 
 
+def _quantile(values: list[float], q: float) -> float | None:
+    """Perzentil einer Renditeliste in Prozent, lineare Interpolation. Leere Liste ergibt None."""
+    if not values:
+        return None
+    xs = sorted(values)
+    if len(xs) == 1:
+        return round(100 * xs[0], 2)
+    pos = q * (len(xs) - 1)
+    lo = int(pos)
+    hi = min(lo + 1, len(xs) - 1)
+    val = xs[lo] + (xs[hi] - xs[lo]) * (pos - lo)
+    return round(100 * val, 2)
+
+
+def _episodes(indices: list[int]) -> int:
+    """Zusammenhaengende Aufenthalte in einer Zone. Zwei benachbarte Wochen zaehlen als eine Episode."""
+    if not indices:
+        return 0
+    return 1 + sum(1 for a, b in zip(indices, indices[1:]) if b != a + 1)
+
+
 @dataclass
 class BandStat:
     key: str
@@ -34,6 +55,14 @@ class BandStat:
     mean_fwd_13w: float | None
     mean_fwd_52w: float | None
     hit_rate_13w: float | None
+    # Spannweite statt nur Mittelwert: p10 ist das schlechteste Zehntel, p90 das beste.
+    p10_fwd_13w: float | None = None
+    p50_fwd_13w: float | None = None
+    p90_fwd_13w: float | None = None
+    # Wochen ueberlappen sich stark. `episodes` zaehlt zusammenhaengende Aufenthalte in der Zone und ist das
+    # ehrlichere Mass fuer die Belastbarkeit: 53 Wochen koennen fuenf Episoden sein.
+    episodes: int = 0
+    n_13w: int = 0
 
 
 @dataclass
@@ -185,6 +214,8 @@ def evaluate_series(name: str, points: list[tuple[date, float]], prices: PriceIn
             mean_fwd_13w=round(100 * sum(f13) / len(f13), 2) if f13 else None,
             mean_fwd_52w=round(100 * sum(f52) / len(f52), 2) if f52 else None,
             hit_rate_13w=round(100 * sum(1 for f in f13 if f > 0) / len(f13), 1) if f13 else None,
+            p10_fwd_13w=_quantile(f13, 0.10), p50_fwd_13w=_quantile(f13, 0.50), p90_fwd_13w=_quantile(f13, 0.90),
+            episodes=_episodes(idx), n_13w=len(f13),
         ))
     order = sorted(range(len(rows)), key=lambda i: rows[i][1])
     deciles = []

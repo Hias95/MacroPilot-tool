@@ -24,14 +24,24 @@ const ARC = (() => {
 /* Zonengrenzen (Quantile des Rangs), nicht gleichmaessig. */
 const TICKS = [0, 10, 30, 70, 90, 100];
 
+/** Bogenstueck zwischen zwei Score-Werten, gleiche Drehrichtung wie die Nadel. */
+function arcBetween(from: number, to: number, r: number) {
+  const s = polar(180 - from * 1.8, r);
+  const e = polar(180 - to * 1.8, r);
+  return `M ${s.x} ${s.y} A ${r} ${r} 0 0 1 ${e.x} ${e.y}`;
+}
+
 interface Props {
   score: number;
   /** Bestaetigte Zone vom Backend; ohne Angabe wird sie aus dem Score abgeleitet. */
-  zone?: { label: string; color: string };
+  zone?: { label: string; color: string; min?: number; max?: number };
+  /** Zone dieser Woche, solange sie von der bestaetigten abweicht. Loest den Widerspruch auf,
+   *  dass die Nadel im gruenen Feld steht, waehrend darunter noch das alte Zonenwort haengt. */
+  pending?: { label: string; color: string } | null;
   className?: string;
 }
 
-export function ConsensusGauge({ score, zone: zoneProp, className }: Props) {
+export function ConsensusGauge({ score, zone: zoneProp, pending, className }: Props) {
   const target = clampScore(score);
   const [shown, setShown] = useState(0);
   const fromRef = useRef(0);
@@ -59,10 +69,13 @@ export function ConsensusGauge({ score, zone: zoneProp, className }: Props) {
   return (
     <div className={cn("relative mx-auto w-full max-w-[440px]", className)}>
       <svg
-        viewBox="-8 0 256 184"
+        viewBox="-8 0 256 196"  /* Hoehe reicht bis unter die Zeile der schwebenden Zone (y = CY + 64) */
         className="w-full"
         role="img"
-        aria-label={`Consensus Score ${target} von 100, Zone ${zone.label}`}
+        aria-label={
+          `Consensus Score ${target} von 100, bestätigte Zone ${zone.label}` +
+          (pending ? `, diese Woche bereits ${pending.label}` : "")
+        }
       >
         <defs>
           <linearGradient id="gauge-grad" x1="0" y1="0" x2="1" y2="0">
@@ -93,6 +106,19 @@ export function ConsensusGauge({ score, zone: zoneProp, className }: Props) {
           strokeDashoffset={dashOffset}
           filter="url(#gauge-glow)"
         />
+
+        {/* Feld der bestaetigten Zone, innen gezeichnet: zeigt, worauf sich das Zonenwort bezieht, und macht
+            sichtbar, dass die Nadel bereits daneben steht. Aussen waere es vom Hauptbogen verdeckt. */}
+        {zone.min != null && zone.max != null ? (
+          <path
+            d={arcBetween(zone.min, zone.max, R - 13)}
+            fill="none"
+            stroke={zone.color}
+            strokeWidth={3}
+            strokeLinecap="butt"
+            opacity={0.85}
+          />
+        ) : null}
 
         {/* Skala */}
         {TICKS.map((t) => {
@@ -163,6 +189,18 @@ export function ConsensusGauge({ score, zone: zoneProp, className }: Props) {
         >
           {zone.label}
         </text>
+        {pending ? (
+          <text
+            x={CX}
+            y={CY + 64}
+            textAnchor="middle"
+            fontSize={7.5}
+            fill={pending.color}
+            style={{ letterSpacing: "0.1em", textTransform: "uppercase" }}
+          >
+            {`diese Woche ${pending.label}`}
+          </text>
+        ) : null}
       </svg>
     </div>
   );

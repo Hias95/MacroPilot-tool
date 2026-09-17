@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { ChartNoAxesColumn } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { fetchBacktest, type BacktestPerformance, type BacktestResponse, type BacktestVariant, type ZoneKey } from "@/lib/api";
+import type { BacktestPerformance, BacktestResponse, BacktestVariant, ZoneKey } from "@/lib/api";
+import { liveVariant, loadBacktest } from "@/lib/backtest";
 import { formatDateDe } from "@/lib/format";
 import { ZONES } from "@/lib/score";
 import { cn } from "@/lib/utils";
@@ -13,12 +14,6 @@ const pct = (n: number, digits = 1) => `${n > 0 ? "+" : ""}${n.toFixed(digits)} 
 /** Der Backtest rechnet mit Kursen des ETF, gemeint ist der Index dahinter. */
 const BENCHMARK_NAMES: Record<string, string> = { SPY: "S&P 500", QQQ: "Nasdaq 100", GLD: "Gold", IBIT: "Bitcoin" };
 const benchmarkName = (ticker?: string) => (ticker ? (BENCHMARK_NAMES[ticker] ?? ticker) : "S&P 500");
-
-/** Die Variante, die auch live laeuft: Rang ueber zehn Jahre. Sonst die erste. */
-function liveVariant(data: BacktestResponse): BacktestVariant | null {
-  if (!data.variants?.length) return null;
-  return data.variants.find((v) => v.name.toLowerCase().includes("live")) ?? data.variants[0];
-}
 
 const STRATEGIES: { key: keyof Pick<BacktestVariant, "buy_hold" | "strategy_base" | "strategy">; label: string; hint: string }[] = [
   { key: "buy_hold", label: "Immer voll investiert", hint: "Der Index ohne jede Regel, zum Vergleich." },
@@ -42,13 +37,13 @@ export function BenchmarkPanel({ currentZone }: { currentZone?: ZoneKey }) {
   const [data, setData] = useState<BacktestResponse | null | undefined>(undefined);
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetchBacktest(controller.signal)
-      .then(setData)
-      .catch(() => {
-        if (!controller.signal.aborted) setData(null);
-      });
-    return () => controller.abort();
+    let alive = true;
+    loadBacktest()
+      .then((res) => alive && setData(res))
+      .catch(() => alive && setData(null));
+    return () => {
+      alive = false;
+    };
   }, []);
 
   if (data === null) return null;

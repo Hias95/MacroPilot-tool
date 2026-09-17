@@ -110,6 +110,12 @@ export interface ConsensusResponse {
   /** Zone der aktuellen Woche, noch ohne Bestaetigung. */
   zone_raw_key: ZoneKey;
   weeks_in_zone: number | null;
+  /** Zone, die auf Bestaetigung wartet; null, wenn nichts schwebt. */
+  zone_pending_key?: ZoneKey | null;
+  zone_pending_weeks?: number;
+  zone_confirm_weeks?: number;
+  /** Tag, an dem der Wechsel bestaetigt waere, wenn die Zone bestehen bleibt. */
+  zone_change_date?: string | null;
   /** Bestaetigt der Marktsignal-Score den Rang? */
   market_confirmation_key: MarketConfirmKey | null;
   market_confirmation: string | null;
@@ -322,6 +328,13 @@ export interface BacktestBand {
   mean_fwd_52w: number;
   /** Anteil der Faelle mit positiver 13-Wochen-Rendite, in Prozent. */
   hit_rate_13w: number;
+  /** Spannweite der 13-Wochen-Rendite: schlechtestes Zehntel, Mitte, bestes Zehntel. */
+  p10_fwd_13w: number | null;
+  p50_fwd_13w: number | null;
+  p90_fwd_13w: number | null;
+  /** Zusammenhaengende Aufenthalte in der Zone. Ehrlicheres Mass als die Zahl der Wochen, weil die sich ueberlappen. */
+  episodes: number;
+  n_13w: number;
 }
 export interface BacktestPerformance {
   cagr_pct: number;
