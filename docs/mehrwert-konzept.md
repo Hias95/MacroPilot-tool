@@ -286,6 +286,32 @@ Schritt 1 bis 3 sind umgesetzt und im Browser geprueft.
   Aufenthalte je Zone, und liefert `p10/p50/p90`. Unter zehn Episoden faerbt sich der Grundlagensatz bernstein
   und nennt die Unsicherheit ausdruecklich. Das trifft "Stark positiv": 53 Wochen, aber nur vier Phasen.
 
+## 7b. Nachtrag 17.09.2026: einfacher statt mehr
+
+Rueckmeldung nach dem ersten Durchgang: Die Richtung stimmt, aber der Erwartungsblock war wieder zu technisch,
+und die Saeulentexte sagten zu wenig. Zwei Korrekturen, beide in Richtung weniger statt mehr.
+
+**Der Erwartungsblock verliert die Perzentile.** "Typisch / schlechtestes Zehntel / bestes Zehntel" als
+dreispaltige Tabelle war Fachsprache in Tabellenform. Stattdessen steht dort jetzt ein Satz: "Meistens ging es
+um 5 Prozent nach oben, in den schlechten Faellen um 4 Prozent nach unten." Gerundet auf ganze Prozent, weil
+die zweite Nachkommastelle eine Genauigkeit vortaeuscht, die die Daten nicht haben. Der Grundlagensatz nennt
+nur noch die Zahl der Phasen, nicht zusaetzlich die der Wochen.
+
+**Die Saeulentexte bekommen Substanz, nicht Laenge.** Aus einem Satz werden drei kurze Zeilen, die je eine
+Frage beantworten:
+
+| Zeile | Frage | Beispiel |
+|---|---|---|
+| `easy_summary` | Wie ist die Lage, und wohin laeuft sie? | "Der Geldzufluss ist ausgeglichen. Seit einem halben Jahr hat sich daran wenig geaendert." |
+| `easy_drivers` | Woran haengt das gerade? | "Am meisten Schub gibt gerade der Anteil kurzlaufender Staatsschulden, am wenigsten die Bilanzen der grossen Notenbanken zusammen." |
+| `easy_role` | Was macht das mit dem Gesamtscore? | "Zaehlt 55 von 100 Punkten im Gesamtscore. Sie wiegt damit schwerer als alle anderen." |
+
+Drei Regeln dabei: Bestandteile bekommen Alltagsnamen statt ihrer technischen Labels, jede Saeule hat einen
+eigenen Satzrahmen (bei der Liquiditaet "gibt Schub", bei der Bewertung "ist guenstig"), und liegen die
+Bestandteile dicht beieinander, sagt der Satz das, statt Extreme herauszugreifen. Der Zeitraum wird
+ausgesprochen ("seit einem halben Jahr") statt als "Trend" offen zu bleiben. Die Rollenzeile steht auch in der
+Profi-Kachel, weil dort bisher nirgends stand, was eine Kachel fuer die Gesamtzahl bedeutet.
+
 ## 8. Quellen
 
 - Fernandes, Walls, Munson, Hullman, Kay: *Uncertainty Displays Using Quantile Dotplots or CDFs Improve

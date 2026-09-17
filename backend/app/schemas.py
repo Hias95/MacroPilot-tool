@@ -111,7 +111,9 @@ class PillarResponse(BaseModel):
     history: list[Point] = []
     regime: RegimeFlag | None = None
     easy_label: str = Field("", description="Ein Wort fuer den Easy-Modus")
-    easy_summary: str = Field("", description="Ein Satz fuer den Easy-Modus, ohne Zahlen")
+    easy_summary: str = Field("", description="Lage und Richtung fuer den Easy-Modus, ohne Fachbegriffe")
+    easy_drivers: str = Field("", description="Welcher Bestandteil die Saeule gerade traegt und welcher sie bremst")
+    easy_role: str = Field("", description="Was die Saeule im Gesamtscore bewirkt: Gewicht oder Aufgabe als Overlay")
     source: str
     fetched_at: datetime
     fingerprint: str = Field(description="Aendert sich nur, wenn sich die Daten aendern; Cache-Schluessel fuer Erklaerungen")

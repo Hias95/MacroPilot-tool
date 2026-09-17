@@ -1,14 +1,21 @@
-"""Easy-Modus: je Baustein ein Wort und ein Satz, ohne Zahlen ausser dem Score.
+"""Easy-Modus: je Baustein ein Wort und drei kurze Saetze in Alltagssprache.
 
-Das Label folgt dem Score (Treiber: Gegenwind / Neutral / Rueckenwind; Bewertung: Fallhoehe-Stufe;
-Marktmechanik: ruhig / unauffaellig / angespannt / Panik-Zone; Marktsignale: Risiko gesucht / gemischt /
-Rueckzug / Marktstress / Kapitulation). Der Satz kombiniert Lage und Trend.
+Bis 17.09.2026 stand hier ein Satz aus zwei Bausteinen ("Der Geldzufluss ist ausgeglichen. Der Trend ist
+unauffaellig."). Das beschrieb den Zustand, sagte aber nicht, woran er gerade liegt und was die Saeule fuer den
+Gesamtscore ueberhaupt bedeutet. Seitdem entstehen drei getrennte Zeilen:
+
+  easy_summary  Lage und Richtung, mit ausgesprochenem Zeitraum.
+  easy_drivers  Welcher Bestandteil die Saeule gerade traegt und welcher sie bremst, in Alltagsworten.
+  easy_role     Was die Saeule im Gesamtscore bewirkt: Gewicht bei den Treibern, Aufgabe bei den Overlays.
+
+Grundsatz: keine Fachbegriffe, keine Perzentile, hoechstens eine Zahl pro Satz.
 """
 
 from __future__ import annotations
 
+from .model_config import CONSENSUS_WEIGHTS
 from .pillars.valuation import fallhoehe_label
-from .schemas import PillarResponse
+from .schemas import Component, PillarResponse
 
 TONE_LABEL = {"bearish": "Gegenwind", "neutral": "Neutral", "bullish": "Rückenwind"}
 
@@ -24,6 +31,88 @@ VALUATION_INTRO = {
     "teuer": "Der Markt ist teuer, die Fallhöhe ist hoch.",
     "extrem teuer": "Der Markt ist extrem teuer, die Fallhöhe ist maximal.",
 }
+
+# Alltagsnamen der Bestandteile. Die technischen Labels stehen weiter im Profi-Modus.
+PART_NAMES: dict[str, dict[str, str]] = {
+    "liquidity": {
+        "net": "das Geld, das die US-Notenbank netto im System lässt",
+        "global": "die Bilanzen der großen Notenbanken zusammen",
+        "tbill": "der Anteil kurzlaufender Staatsschulden",
+    },
+    "cycle": {"phi": "rund um Philadelphia", "ny": "rund um New York", "dal": "in Texas"},
+    "structure": {
+        "curve": "die Zinskurve",
+        "real": "der Zins nach Abzug der Inflation",
+        "cpi": "die Kerninflation",
+        "dsr": "die Schuldenlast der Haushalte",
+        "interest": "die Zinslast des Staates",
+    },
+    "markets": {
+        "breadth": "die Breite der Kursgewinne",
+        "risk": "die Risikofreude am Devisenmarkt",
+        "real": "das Verhältnis von Kupfer zu Gold",
+        "credit": "der Markt für riskante Unternehmensanleihen",
+    },
+    "mechanics": {
+        "vix": "die erwartete Schwankung der nächsten Wochen",
+        "term": "das Verhältnis von kurzfristigem zu längerfristigem Stress",
+        "skew": "der Preis einer Versicherung gegen einen Absturz",
+    },
+    "valuation": {
+        "cape": "der Preis gemessen an zehn Jahren Gewinn",
+        "ecy": "der Vorsprung von Aktien gegenüber Anleihen",
+        "buffett": "der Börsenwert gemessen an der Wirtschaftsleistung",
+    },
+}
+
+# Je Baustein ein passender Satzrahmen. {high} ist der beste, {low} der schwaechste Bestandteil.
+PART_FRAME = {
+    "liquidity": "Am meisten Schub gibt gerade {high}, am wenigsten {low}.",
+    "cycle": "Am besten läuft es {high}, am schwächsten {low}.",
+    "structure": "Den meisten Spielraum gibt {high}, den geringsten {low}.",
+    "markets": "Am stärksten stützt gerade {high}, am schwächsten {low}.",
+    "mechanics": "Am ruhigsten ist {high}, am angespanntesten {low}.",
+    "valuation": "Noch am günstigsten ist {high}, am teuersten {low}.",
+}
+
+DRIVER_ROLE_EXTRA = {
+    "liquidity": " Sie wiegt damit schwerer als alle anderen.",
+    "cycle": " Sie wiegt am wenigsten, weil sie kurzfristig wenig über die Kurse sagt.",
+    "structure": "",
+}
+OVERLAY_ROLE = {
+    "valuation": "Zählt nicht in den Gesamtscore. Sie begrenzt ihn nach oben: Je teurer der Markt, desto tiefer der Deckel.",
+    "mechanics": "Zählt nicht in den Gesamtscore. Sie verschiebt ihn um wenige Punkte gegen die Stimmung, weil Panik historisch eher eine Kaufzone war.",
+    "markets": "Zählt nicht in den Gesamtscore. Sie sagt nur, ob der Markt das Makrobild bestätigt.",
+}
+
+
+def _span_words(weeks: int, unit: str) -> str:
+    """Fenster in Alltagssprache. 26 Wochen sind 'ein halbes Jahr', nicht '26 Wochen'."""
+    months = weeks if unit == "months" else max(1, round(weeks / 4.33))
+    return {1: "einem Monat", 3: "drei Monaten", 6: "einem halben Jahr", 12: "einem Jahr"}.get(months, f"{months} Monaten")
+
+
+def _direction(momentum: int, span: str) -> str:
+    """Richtung aus dem Momentum-Perzentil, ohne die Zahl zu nennen."""
+    if momentum >= 75:
+        return f"Seit {span} geht es deutlich aufwärts."
+    if momentum >= 58:
+        return f"Seit {span} geht es leicht aufwärts."
+    if momentum > 42:
+        return f"Seit {span} hat sich daran wenig geändert."
+    if momentum > 25:
+        return f"Seit {span} geht es leicht abwärts."
+    return f"Seit {span} geht es deutlich abwärts."
+
+
+def _ranked(p: PillarResponse) -> list[tuple[Component, float]]:
+    """Bestandteile mit einer vergleichbaren Zahl: Teil-Score, sonst der Rohwert (Konjunktur-Umfragen)."""
+    scored = [(c, float(c.score)) for c in p.components if c.score is not None]
+    if scored:
+        return sorted(scored, key=lambda x: x[1])
+    named = PART_NAMES.get(p.id, {})
+    return sorted(((c, c.value) for c in p.components if c.id in named), key=lambda x: x[1])
 
 
 def easy_label(p: PillarResponse) -> str:
@@ -44,25 +133,53 @@ def easy_label(p: PillarResponse) -> str:
 
 
 def easy_summary(p: PillarResponse) -> str:
+    """Lage und Richtung. Der Zeitraum wird ausgesprochen, damit 'Trend' nicht in der Luft haengt."""
     if p.score is None:
         return "Noch kein Score verfügbar."
-    momentum = p.score.momentum
-    trend = "Der Trend zeigt klar nach oben." if momentum >= 70 else "Der Trend zeigt nach unten." if momentum <= 30 else "Der Trend ist unauffällig."
+    direction = _direction(p.score.momentum, _span_words(p.score.momentum_window, p.score.unit))
     if p.id == "valuation":
-        return VALUATION_INTRO.get(easy_label(p), "Bewertung ohne Einordnung.")
+        return f"{VALUATION_INTRO.get(easy_label(p), 'Bewertung ohne Einordnung.')} {direction}"
     if p.id == "mechanics":
-        label = easy_label(p)
         intro = {
             "Panik-Zone": "Panik am Markt, historisch eher Kaufzone als Verkaufszeitpunkt.",
             "ruhig": "Die Markttechnik ist ruhig, Rückschläge werden gekauft.",
             "angespannt": "Die Markttechnik ist angespannt, Rückschläge können sich verstärken.",
-        }.get(label, "Die Markttechnik ist unauffällig.")
-        return intro
+        }.get(easy_label(p), "Die Markttechnik ist unauffällig.")
+        return f"{intro} {direction}"
     if p.id == "markets" and p.regime and p.regime.active:
-        return p.regime.hint
-    intro = DRIVER_INTRO.get(p.id, {}).get(p.tone, "")
-    return f"{intro} {trend}".strip()
+        return f"{p.regime.hint} {direction}"
+    return f"{DRIVER_INTRO.get(p.id, {}).get(p.tone, '')} {direction}".strip()
+
+
+def easy_drivers(p: PillarResponse) -> str:
+    """Woran die Saeule gerade haengt: staerkster und schwaechster Bestandteil mit Alltagsnamen.
+
+    Liegen alle Bestandteile dicht beieinander, waere das Herausgreifen von Extremen irrefuehrend. Dann sagt
+    der Satz genau das.
+    """
+    names = PART_NAMES.get(p.id, {})
+    ranked = [(c, v) for c, v in _ranked(p) if c.id in names]
+    if len(ranked) < 2:
+        return ""
+    (low, low_v), (high, high_v) = ranked[0], ranked[-1]
+    if high_v - low_v < 15:
+        return "Die Bestandteile liegen dicht beieinander, keiner sticht heraus."
+    frame = PART_FRAME.get(p.id, "Am stärksten wirkt gerade {high}, am schwächsten {low}.")
+    return frame.format(high=names[high.id], low=names[low.id])
+
+
+def easy_role(p: PillarResponse) -> str:
+    """Was die Saeule fuer den Gesamtscore tut. Ohne diesen Satz bleibt unklar, warum die Kachel da ist."""
+    if p.kind == "overlay":
+        return OVERLAY_ROLE.get(p.id, "")
+    weight = CONSENSUS_WEIGHTS.get(p.id)
+    if weight is None:
+        return ""
+    return f"Zählt {round(weight * 100)} von 100 Punkten im Gesamtscore.{DRIVER_ROLE_EXTRA.get(p.id, '')}"
 
 
 def annotate(p: PillarResponse) -> PillarResponse:
-    return p.model_copy(update={"easy_label": easy_label(p), "easy_summary": easy_summary(p)})
+    return p.model_copy(update={
+        "easy_label": easy_label(p), "easy_summary": easy_summary(p),
+        "easy_drivers": easy_drivers(p), "easy_role": easy_role(p),
+    })

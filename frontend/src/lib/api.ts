@@ -95,6 +95,10 @@ export interface PillarResponse {
   regime: RegimeFlag | null;
   easy_label: string;
   easy_summary: string;
+  /** Welcher Bestandteil die Saeule gerade traegt und welcher sie bremst. */
+  easy_drivers?: string;
+  /** Was die Saeule im Gesamtscore bewirkt: Gewicht bei Treibern, Aufgabe bei Overlays. */
+  easy_role?: string;
   source: string;
   fetched_at: string;
   fingerprint: string;

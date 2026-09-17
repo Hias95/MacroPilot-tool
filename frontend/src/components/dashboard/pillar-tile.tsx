@@ -67,6 +67,10 @@ export function PillarTile({ pillar }: { pillar: PillarResponse }) {
         </span>
       }
     >
+      {/* Was die Kachel fuer den Gesamtscore tut. Ohne diesen Satz bleibt unklar, warum sie da ist. */}
+      {pillar.easy_role ? (
+        <p className="text-[11px] leading-relaxed text-muted-foreground/70 text-pretty">{pillar.easy_role}</p>
+      ) : null}
       <MetricBlock
         label={pillar.headline.label}
         value={formatValue(value, fmt)}

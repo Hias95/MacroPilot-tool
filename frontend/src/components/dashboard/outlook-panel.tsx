@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 // Genau zehn Punkte, damit der Streifen eins zu eins zum Satz "X von 10" passt. Eine feinere Aufloesung
 // waere genauer, aber der Leser muesste zwischen zwei Zahlen umrechnen, und genau das soll er nicht.
 const DOTS = 10;
-const pct = (n: number, digits = 1) => `${n > 0 ? "+" : ""}${n.toFixed(digits)} %`;
 
 interface Loaded {
   band: BacktestBand;
@@ -92,38 +91,26 @@ function Outlook({ band, benchmark, startYear, zoneLabel, zoneColor }: Loaded & 
           ))}
         </div>
         <p className="text-[11px] text-muted-foreground/80">
-          Jeder Punkt steht für eine von zehn vergleichbaren Wochen. Grün: Der Index stand {OUTLOOK_LABEL} später höher.
-          Tatsächlich waren es {hit.toFixed(0)} Prozent.
+          Ein Punkt steht für eine von zehn vergleichbaren Wochen. Grün heißt: Der Index stand {OUTLOOK_LABEL} später höher.
         </p>
       </div>
 
       {band.p50_fwd_13w != null ? (
-        <dl className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
-          <div>
-            <dt className="text-[11px] uppercase tracking-wider text-muted-foreground">Typisch</dt>
-            <dd className="tabular-nums">{pct(band.p50_fwd_13w)}</dd>
-          </div>
-          {band.p10_fwd_13w != null ? (
-            <div>
-              <dt className="text-[11px] uppercase tracking-wider text-muted-foreground">Schlechtestes Zehntel</dt>
-              <dd className="tabular-nums">{pct(band.p10_fwd_13w)}</dd>
-            </div>
-          ) : null}
-          {band.p90_fwd_13w != null ? (
-            <div>
-              <dt className="text-[11px] uppercase tracking-wider text-muted-foreground">Bestes Zehntel</dt>
-              <dd className="tabular-nums">{pct(band.p90_fwd_13w)}</dd>
-            </div>
-          ) : null}
-        </dl>
+        <p className="max-w-3xl text-base leading-relaxed text-pretty">
+          Meistens ging es um {Math.abs(Math.round(band.p50_fwd_13w))} Prozent nach{" "}
+          {band.p50_fwd_13w >= 0 ? "oben" : "unten"}
+          {band.p10_fwd_13w != null && band.p10_fwd_13w < 0
+            ? `, in den schlechten Fällen um ${Math.abs(Math.round(band.p10_fwd_13w))} Prozent nach unten`
+            : ""}
+          .
+        </p>
       ) : null}
 
       <p className={cn("max-w-3xl text-[11px] leading-relaxed text-pretty", thin ? "text-amber-300/90" : "text-muted-foreground/80")}>
-        Grundlage: {band.n_13w} vergleichbare Wochen aus {band.episodes} getrennten Phasen seit {startYear}.
         {thin
-          ? ` Das sind wenige unabhängige Phasen. Die Zahlen sind entsprechend unsicher und können auf Zufall beruhen.`
-          : ""}{" "}
-        Rückblick, keine Prognose: Die Zukunft muss sich nicht an die Vergangenheit halten.
+          ? `So etwas gab es seit ${startYear} aber nur ${band.episodes} Mal. Das ist zu selten, um daraus viel abzuleiten.`
+          : `Gezählt über ${band.episodes} solcher Phasen seit ${startYear}.`}{" "}
+        Das ist ein Rückblick, keine Vorhersage.
       </p>
     </>
   );
