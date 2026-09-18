@@ -146,3 +146,25 @@ def test_pending_zone_reports_streak_and_confirmation_date():
     quiet = build_consensus(drivers_, overlays, ConsensusState(zone_pending_key=None, zone_pending_weeks=0,
                                                               **{**base, "zone_key": "positive"}))
     assert quiet.zone_pending_key is None and quiet.zone_change_date is None and quiet.zone_pending_weeks == 0
+
+
+def test_weighting_note_ranks_timing_against_fall_height():
+    """Widersprueche bekommen eine Rangfolge: Zone und Marktbestaetigung fuer den Zeitpunkt, Bewertung fuer die Fallhoehe."""
+    drivers_ = [pillar("liquidity", 54, 53, -1.0), pillar("cycle", 93, 95, 20.0), pillar("structure", 44)]
+    overlays = [pillar("valuation", 14, regime_active=True), pillar("mechanics", 49), pillar("markets", 52)]
+    window = [35.0 + i * 0.1 for i in range(300)]
+    state = ConsensusState(window=window, zone_key="neutral", weeks_in_zone=9, phase_key="late", weeks_in_phase=6)
+    c = build_consensus(drivers_, overlays, state)
+    assert "halten sich stützende und bremsende Kräfte die Waage" in c.weighting
+    assert "nicht im Zeitpunkt, sondern in der Fallhöhe" in c.weighting
+    # Bewusst ohne die Einzelheiten zur Bewertung: die stehen im Regime-Hinweis darunter.
+    assert "extrem teuer" not in c.weighting and len(c.weighting) < 300
+
+    # Faire Bewertung: kein Satz zur Fallhoehe.
+    fair = build_consensus(drivers_, [pillar("valuation", 60), pillar("mechanics", 49), pillar("markets", 52)], state)
+    assert "Fallhöhe" not in fair.weighting
+
+    # Ein Veto ueberlagert alles.
+    weak = [pillar("liquidity", 8, 10, -5.0), pillar("cycle", 93, 95, 20.0), pillar("structure", 44)]
+    veto = build_consensus(weak, overlays, state)
+    assert veto.vetoes and veto.weighting.startswith("Ein Veto überlagert alles andere")

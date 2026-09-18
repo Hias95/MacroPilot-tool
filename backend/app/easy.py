@@ -76,10 +76,22 @@ PART_FRAME = {
 }
 
 DRIVER_ROLE_EXTRA = {
-    "liquidity": " Sie wiegt damit schwerer als alle anderen.",
-    "cycle": " Sie wiegt am wenigsten, weil sie kurzfristig wenig über die Kurse sagt.",
+    "liquidity": " Damit wiegt sie schwerer als alle anderen.",
+    "cycle": " Damit wiegt sie am wenigsten, weil sie kurzfristig wenig über die Kurse sagt.",
     "structure": "",
 }
+
+# Das Gewicht als Zahl zu nennen, war eine Falle: Bei der Liquiditaet stand "55 von 100 Punkten" direkt unter
+# dem Score 55, rein zufaellig dieselbe Zahl. Ein Anteil in Worten kann damit nicht verwechselt werden.
+WEIGHT_WORDS = [
+    (0.62, "mehr als drei Fünftel"), (0.52, "gut die Hälfte"), (0.45, "etwa die Hälfte"),
+    (0.36, "gut ein Drittel"), (0.28, "knapp ein Drittel"), (0.22, "ein knappes Viertel"),
+    (0.17, "ein knappes Fünftel"), (0.12, "etwa ein Siebtel"), (0.0, "einen kleinen Teil"),
+]
+
+
+def weight_words(weight: float) -> str:
+    return next(words for threshold, words in WEIGHT_WORDS if weight >= threshold)
 OVERLAY_ROLE = {
     "valuation": "Zählt nicht in den Gesamtscore. Sie begrenzt ihn nach oben: Je teurer der Markt, desto tiefer der Deckel.",
     "mechanics": "Zählt nicht in den Gesamtscore. Sie verschiebt ihn um wenige Punkte gegen die Stimmung, weil Panik historisch eher eine Kaufzone war.",
@@ -175,7 +187,7 @@ def easy_role(p: PillarResponse) -> str:
     weight = CONSENSUS_WEIGHTS.get(p.id)
     if weight is None:
         return ""
-    return f"Zählt {round(weight * 100)} von 100 Punkten im Gesamtscore.{DRIVER_ROLE_EXTRA.get(p.id, '')}"
+    return f"Macht {weight_words(weight)} des Gesamtscores aus.{DRIVER_ROLE_EXTRA.get(p.id, '')}"
 
 
 def annotate(p: PillarResponse) -> PillarResponse:

@@ -4,8 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ConsensusResponse, HistoryResponse, PillarResponse } from "@/lib/api";
 import { availableRanges, filterByRange, useRange } from "@/lib/range";
-import { MARKET_CONFIRM, PHASES, ZONES, pendingZoneOf, zoneChangeNote } from "@/lib/score";
+import { MARKET_CONFIRM, PHASES, ZONES, isValuationExtreme, marketConfirmedOf, pendingZoneOf, zoneChangeNote } from "@/lib/score";
 import { ConsensusGauge } from "../consensus-gauge";
+import { LimitsPanel } from "../limits-panel";
+import { ReadingHelp } from "../reading-help";
 import { OutlookPanel } from "../outlook-panel";
 import { ConsensusHistoryChart } from "../consensus-history-chart";
 import { RangeSelect } from "../range-select";
@@ -41,6 +43,7 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
           <div>
             <div className="mb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Gesamtlage</div>
             <ConsensusGauge score={consensus.score ?? 50} zone={zone} pending={pendingZone} />
+            <ReadingHelp className="mt-2" />
           </div>
           <div className="flex flex-col gap-4">
             <div>
@@ -51,7 +54,11 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
                 Besser als <span className="font-mono tabular-nums">{consensus.score ?? "—"} %</span> der Wochen der letzten zehn Jahre
                 {consensus.weeks_in_zone ? `, seit ${consensus.weeks_in_zone} Wochen in dieser Zone` : ""}.
               </p>
-              <p className="mt-1.5 max-w-lg text-sm leading-relaxed text-muted-foreground text-pretty">{zone.hint}</p>
+              {/* B3: Der Gewichtungssatz bringt Zone, Marktbestaetigung und Bewertung in eine Rangfolge und
+                  ersetzt damit den allgemeinen Zonentext. Beides nebeneinander waere dieselbe Aussage zweimal. */}
+              <p className="mt-1.5 max-w-lg text-sm leading-relaxed text-foreground/90 text-pretty">
+                {consensus.weighting || zone.hint}
+              </p>
               {unconfirmed ? (
                 <p className="mt-1.5 text-xs text-amber-300/90 text-pretty">
                   Diese Woche zeigt bereits <span style={{ color: zoneRaw.color }}>{zoneRaw.label}</span>, {zoneChangeNote(consensus)}
@@ -63,12 +70,12 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
                   {consensus.weeks_in_phase ? `, seit ${consensus.weeks_in_phase} Wochen` : ""}. {phase.hint}
                 </p>
               ) : null}
+              {/* Nur noch das Etikett: Was die Marktbestaetigung bedeutet, steht bereits im Gewichtungssatz oben. */}
               {confirm ? (
-                <p className="mt-2 text-sm text-muted-foreground text-pretty">
+                <p className="mt-2 text-sm">
                   <span className={confirm.tone === "good" ? "font-medium text-emerald-300" : confirm.tone === "warn" ? "font-medium text-amber-300" : "font-medium text-rose-300"}>
-                    {confirm.label}:
-                  </span>{" "}
-                  {confirm.hint}
+                    {confirm.label}
+                  </span>
                 </p>
               ) : null}
               {regimes.length > 0 ? (
@@ -94,7 +101,13 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
         </CardContent>
       </Card>
 
-      <OutlookPanel zoneKey={consensus.zone_key} zoneLabel={zone.label} zoneColor={zone.color} />
+      <OutlookPanel
+        zoneKey={consensus.zone_key}
+        zoneLabel={zone.label}
+        zoneColor={zone.color}
+        valuationExtreme={isValuationExtreme(overlays)}
+        marketConfirmed={marketConfirmedOf(consensus)}
+      />
 
       <section aria-label="Die drei Treiber" className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -124,6 +137,7 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
           </div>
         </section>
       ) : null}
+      <LimitsPanel />
     </>
   );
 }

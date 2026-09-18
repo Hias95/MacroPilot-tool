@@ -7,9 +7,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchDashboard, fetchHistory, type DashboardResponse, type HistoryResponse } from "@/lib/api";
 import { useViewMode } from "@/lib/mode";
-import { ZONES } from "@/lib/score";
+import { ZONES, isValuationExtreme, marketConfirmedOf } from "@/lib/score";
 import { BenchmarkPanel } from "./benchmark-panel";
 import { ChangesPanel } from "./changes-panel";
+import { LimitsPanel } from "./limits-panel";
 import { OutlookPanel } from "./outlook-panel";
 import { EasyDashboard } from "./easy/easy-dashboard";
 import { ConsensusPanel } from "./consensus-panel";
@@ -107,7 +108,13 @@ export function DashboardClient() {
   return (
     <>
       <ConsensusPanel consensus={consensus} pillars={pillars} overlays={overlays} history={history ? history.consensus : history} />
-      <OutlookPanel zoneKey={consensus.zone_key} zoneLabel={consensus.zone} zoneColor={ZONES[consensus.zone_key].color} />
+      <OutlookPanel
+        zoneKey={consensus.zone_key}
+        zoneLabel={consensus.zone}
+        zoneColor={ZONES[consensus.zone_key].color}
+        valuationExtreme={isValuationExtreme(overlays)}
+        marketConfirmed={marketConfirmedOf(consensus)}
+      />
       <ChangesPanel days={365} />
       <section aria-label="Die drei Treiber" className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {pillars.map((p) => (
@@ -128,6 +135,7 @@ export function DashboardClient() {
         </section>
       ) : null}
       <BenchmarkPanel currentZone={consensus.zone_key} />
+      <LimitsPanel />
     </>
   );
 }

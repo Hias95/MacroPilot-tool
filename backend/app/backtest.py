@@ -15,8 +15,10 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 
 from . import fred, market
+from .consensus import market_confirmation
 from .history import build_history
 from .model_config import CONSENSUS_WEIGHTS, ZONE_BANDS
+from .pillars.valuation import fallhoehe_label
 from .scoring import RollingPercentile
 
 HORIZONS = (4, 13, 26, 52)
@@ -63,6 +65,26 @@ class BandStat:
     # ehrlichere Mass fuer die Belastbarkeit: 53 Wochen koennen fuenf Episoden sein.
     episodes: int = 0
     n_13w: int = 0
+
+
+@dataclass
+class ConditionalBand:
+    """Vorwaertsrendite einer Zone unter einer zusaetzlichen Bedingung.
+
+    Die unbedingte Aussage ("nach neutralen Wochen ging es meist hoch") laesst offen, ob das auch galt, als der
+    Markt gleichzeitig extrem teuer war. Genau das ist die Frage, die ein Leser mit Erfahrung zuerst stellt.
+    """
+
+    zone: str
+    condition: str
+    label: str
+    weeks: int
+    episodes: int
+    n_13w: int
+    hit_rate_13w: float | None
+    mean_fwd_13w: float | None
+    p10_fwd_13w: float | None
+    p50_fwd_13w: float | None
 
 
 @dataclass
@@ -238,7 +260,8 @@ class BacktestReport:
     start: date
     end: date
     variants: list[VariantResult]
-    generated_at: float
+    conditional: list[ConditionalBand] = field(default_factory=list)
+    generated_at: float = 0.0
 
 
 _cache: tuple[float, BacktestReport] | None = None
@@ -265,6 +288,61 @@ def vote_score(driver_scores: dict[str, float], high: float = 60, low: float = 4
     total = sum(CONSENSUS_WEIGHTS.values())
     v = sum(CONSENSUS_WEIGHTS[k] * (1 if s >= high else -1 if s <= low else 0) for k, s in driver_scores.items()) / total
     return 50 + 50 * v
+
+
+# Zusatzbedingungen, unter denen dieselbe Zone sehr verschieden ausgehen kann. Die Schwellen sind dieselben
+# wie in der Oberflaeche (VALUATION_LABELS, MARKET_CONFIRM_THRESHOLD), damit "extrem teuer" hier und dort
+# dasselbe heisst.
+CONDITION_LABELS = {
+    "valuation_extreme": "bei extrem teurem Markt",
+    "valuation_other": "wenn der Markt nicht extrem teuer war",
+    "market_confirmed": "wenn der Markt das Bild bestätigte",
+    "market_other": "wenn der Markt das Bild nicht bestätigte",
+}
+
+
+def conditional_bands(rows: list[tuple[date, float]], fwd13: list[float | None],
+                      valuation: dict[date, float], markets: dict[date, float]) -> list[ConditionalBand]:
+    """Je Zone und Zusatzbedingung dieselben Kennzahlen wie in den Zonen-Baendern.
+
+    Zur Zaehlung der Episoden: Eine Bedingung springt innerhalb desselben Zonenaufenthalts hin und her, etwa
+    wenn der Markt in einer neutralen Phase mal bestaetigt und mal nicht. Zusammenhaengende Abschnitte der
+    Teilmenge zu zaehlen ergaebe dann mehr "Episoden" als die Zone insgesamt hat, was Unabhaengigkeit
+    vortaeuschen wuerde. Gezaehlt wird deshalb, wie viele **Zonenaufenthalte** ueberhaupt betroffen sind.
+    """
+    # Zonenaufenthalte durchnummerieren: aufeinanderfolgende Wochen derselben Zone gehoeren zusammen.
+    stay_of: list[int] = []
+    prev_zone, stay = None, -1
+    for _, score in rows:
+        zone = band_of(score)[0]
+        if zone != prev_zone:
+            stay += 1
+            prev_zone = zone
+        stay_of.append(stay)
+
+    groups: dict[tuple[str, str], list[int]] = {}
+    for i, (d, score) in enumerate(rows):
+        zone = band_of(score)[0]
+        val = valuation.get(d)
+        if val is not None:
+            key = "valuation_extreme" if fallhoehe_label(int(round(val))) == "extrem teuer" else "valuation_other"
+            groups.setdefault((zone, key), []).append(i)
+        mkt = markets.get(d)
+        if mkt is not None:
+            confirmed = market_confirmation(int(round(score)), int(round(mkt))) == "confirmed"
+            groups.setdefault((zone, "market_confirmed" if confirmed else "market_other"), []).append(i)
+
+    out: list[ConditionalBand] = []
+    for (zone, cond), idx in sorted(groups.items()):
+        f13 = [fwd13[i] for i in idx if fwd13[i] is not None]
+        out.append(ConditionalBand(
+            zone=zone, condition=cond, label=CONDITION_LABELS[cond], weeks=len(idx),
+            episodes=len({stay_of[i] for i in idx}), n_13w=len(f13),
+            hit_rate_13w=round(100 * sum(1 for f in f13 if f > 0) / len(f13), 1) if f13 else None,
+            mean_fwd_13w=round(100 * sum(f13) / len(f13), 2) if f13 else None,
+            p10_fwd_13w=_quantile(f13, 0.10), p50_fwd_13w=_quantile(f13, 0.50),
+        ))
+    return out
 
 
 async def run_backtest(force: bool = False) -> BacktestReport:
@@ -295,7 +373,10 @@ async def run_backtest(force: bool = False) -> BacktestReport:
     ]
     for k, pts in history.pillars.items():
         variants.append(evaluate_series(f"Nur {k}", [(pt.date, float(pt.score)) for pt in pts], prices, cash))
-    report = BacktestReport(benchmark="SPY", start=raw[0][0], end=raw[-1][0], variants=variants, generated_at=now)
+    fwd13 = [forward_return(prices, d, 13) for d, _ in ranked]
+    conditional = conditional_bands(ranked, fwd13, by_date.get("valuation", {}), by_date.get("markets", {}))
+    report = BacktestReport(benchmark="SPY", start=raw[0][0], end=raw[-1][0], variants=variants,
+                            conditional=conditional, generated_at=now)
     _cache = (now, report)
     return report
 

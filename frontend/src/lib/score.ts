@@ -83,3 +83,19 @@ export function zoneChangeNote(c: {
   const streak = weeks >= 2 ? `die ${weeks}. Woche in Folge, ` : "";
   return `${streak}bestätigt wäre der Wechsel am ${when}, wenn es so bleibt.`;
 }
+
+/**
+ * Schwelle fuer "extrem teuer", identisch mit VALUATION_LABELS im Backend. Weicht sie ab, zeigt die
+ * Oberflaeche eine andere Bedingung an, als der Backtest gezaehlt hat.
+ */
+export const VALUATION_EXTREME_BELOW = 25;
+
+export function isValuationExtreme(overlays: { id: string; score?: { score: number } | null }[]): boolean {
+  const score = overlays.find((o) => o.id === "valuation")?.score?.score;
+  return score != null && score < VALUATION_EXTREME_BELOW;
+}
+
+/** true / false / null, wenn die Marktbestaetigung fehlt. */
+export function marketConfirmedOf(c: { market_confirmation_key?: MarketConfirmKey | null }): boolean | null {
+  return c.market_confirmation_key ? c.market_confirmation_key === "confirmed" : null;
+}

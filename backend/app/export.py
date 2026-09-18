@@ -29,6 +29,24 @@ def _dump(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
 
 
+def _stated_outlook(dashboard, report, stated_on: str) -> dict | None:
+    """Was das Tool an diesem Tag behauptet hat, in der Form, in der es spaeter pruefbar ist.
+
+    `stated_on` ist der Tag der Aussage, `data_through` das letzte Kursdatum des Backtests. Beide werden
+    gebraucht: Die Trefferbilanz zaehlt ab dem Tag der Aussage, der Kursvergleich braucht den Stichtag.
+    """
+    zone = dashboard.consensus.zone_key
+    live = next((v for v in report.variants if "live" in v.name.lower()), None)
+    band = next((b for b in live.bands if b.key == zone), None) if live else None
+    if not band or band.hit_rate_13w is None:
+        return None
+    return {
+        "stated_on": stated_on, "data_through": str(report.end), "zone": zone, "rank": dashboard.consensus.score,
+        "horizon_weeks": 13, "hit_rate_13w": band.hit_rate_13w, "median_13w": band.p50_fwd_13w,
+        "p10_13w": band.p10_fwd_13w, "episodes": band.episodes, "benchmark": report.benchmark,
+    }
+
+
 async def run(out: Path, state_file: Path | None, with_backtest: bool = True, with_explanations: bool = True, log=print) -> dict:
     if state_file and state_file.exists():
         store.import_state(json.loads(state_file.read_text(encoding="utf-8")))
@@ -48,7 +66,15 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
                                  "recording_since": store.first_snapshot_date()})
     _dump(out / "snapshots.json", {"days": 3650, "snapshots": store.list_snapshots(3650)})
     if with_backtest:
-        _dump(out / "backtest.json", asdict(await backtest.run_backtest(force=True)))
+        report = await backtest.run_backtest(force=True)
+        _dump(out / "backtest.json", asdict(report))
+        # Die ausgesprochene Erwartung des Tages festhalten. Ohne dieses Protokoll laesst sich spaeter nie
+        # pruefen, wie oft "8 von 10" tatsaechlich eingetroffen ist, und jede nicht gespeicherte Woche ist
+        # endgueltig verloren. Der Rohwert des Index kommt dazu, damit der Abgleich ohne Fremddaten geht.
+        stated = _stated_outlook(dashboard, report, result.date)
+        if stated:
+            store.set_meta(f"outlook:{result.date}", json.dumps(stated, ensure_ascii=False))
+            log(f"Erwartung protokolliert: Zone {stated['zone']}, {stated['hit_rate_13w']} % auf 13 Wochen")
     quality = await data_quality.run_audit()
     _dump(out / "data-quality.json", data_quality.to_dict(quality))
     provider = await resolve_provider()

@@ -286,6 +286,46 @@ def _why(r: CoreResult, by: dict[str, PillarResponse], ov: dict[str, PillarRespo
     return " ".join(parts)
 
 
+ZONE_LEAD = {
+    "very_negative": "Aktuell bremst deutlich mehr, als stützt.",
+    "negative": "Aktuell bremst mehr, als stützt.",
+    "neutral": "Aktuell halten sich stützende und bremsende Kräfte die Waage.",
+    "positive": "Aktuell stützt mehr, als bremst.",
+    "very_positive": "Aktuell stützt fast alles.",
+}
+CONFIRM_LEAD = {
+    "confirmed": "Der Markt bestätigt das, historisch die verlässlichste Konstellation.",
+    "market_ahead": "Der Markt ist dabei optimistischer als das Makrobild, historisch die schwächste Kombination.",
+    "market_lagging": "Der Markt zögert dabei noch: historisch gleiche Rendite, aber häufiger Rückschläge.",
+}
+
+
+def weighting_note(r: CoreResult, ov: dict[str, PillarResponse], zone_key: str, confirm_key: str | None) -> str:
+    """Ein Satzpaar, das die widersprüchlichen Hinweise in eine Rangfolge bringt.
+
+    Ohne das stehen "Markt bestätigt" (gut), "Extreme Bewertung" (schlecht) und die Erwartung gleichrangig
+    untereinander, und der Leser hat kein Mittel, sie zu gewichten. Die Rangfolge folgt dem Modell selbst:
+    Ein Veto schlaegt alles, danach zaehlt die Zone fuer den Zeitpunkt, die Marktbestaetigung fuer deren
+    Verlaesslichkeit, und die Bewertung sagt nichts ueber den Zeitpunkt, sondern ueber die Fallhoehe.
+    """
+    if r.vetoes:
+        parts = [f"Ein Veto überlagert alles andere: {', '.join(VETO_LABEL[v] for v in r.vetoes)}. "
+                 f"Solange es gilt, ist der Score nach oben gedeckelt, unabhängig vom übrigen Bild."]
+    else:
+        parts = [ZONE_LEAD.get(zone_key, "")]
+        if confirm_key:
+            parts.append(CONFIRM_LEAD[confirm_key])
+
+    val = ov.get("valuation")
+    val_score = val.score.score if val and val.score else None
+    if val_score is not None and val_score < 25:
+        # Bewusst kurz: Die Einzelheiten stehen im Regime-Hinweis darunter. Hier zaehlt nur die Rangfolge.
+        parts.append("Das Risiko liegt dabei nicht im Zeitpunkt, sondern in der Fallhöhe.")
+    elif val_score is not None and val_score < 45:
+        parts.append("Die Bewertung sagt nichts über den Zeitpunkt, erhöht aber die Fallhöhe.")
+    return " ".join(x for x in parts if x)
+
+
 def build_consensus(
     pillars: list[PillarResponse], overlays: list[PillarResponse] | None = None, state: ConsensusState | None = None
 ) -> ConsensusResponse:
@@ -330,6 +370,7 @@ def build_consensus(
         method="macropilot-v2-rank",
         note="Rohwert aus drei gewichteten Treibern, Marktmechanik als Kontra-Korrektur, Bewertung als Deckel, Marktsignale als Bestätigung, Vetos bei Systemkrisen. Angezeigt wird der Rang des Rohwerts in den letzten zehn Jahren; Zone und Zyklusphase wechseln erst nach Bestätigung.",
         why=_why(r, by, ov, phase_key, weeks, rank, zone, zone_raw, weeks_in_zone, pending_weeks, change_date),
+        weighting=weighting_note(r, ov, zone_key, confirm_key),
         pillar_scores=scores, overlay_scores=overlay_scores,
         core=round(r.core, 1), mechanics_adjustment=round(r.mechanics_adjustment, 1), valuation_cap=round(r.valuation_cap, 1) if r.valuation_cap is not None else None,
         vetoes=r.vetoes, cap=round(r.cap, 1) if r.cap is not None else None, adjusted=round(r.adjusted, 1),

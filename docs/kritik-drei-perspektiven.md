@@ -238,6 +238,27 @@ Abstufung (`consensus.direction_words`, gleiche Schwellen wie `easy.py`), und ei
 `format.ts` mit festem Bezugszeitpunkt pro Seitenaufruf. Abgerundet statt gerundet, sonst waere eine Zahl vom
 1. am Nachmittag des 18. als achtzehn Tage alt ausgewiesen worden.
 
+## 5b. Stufe B erledigt (18.09.2026)
+
+| # | Was jetzt dasteht |
+|---|---|
+| B1 | Die Erwartung nennt die heutigen Besonderheiten: "War der Markt dabei extrem teuer, wie jetzt: 8 von 10, das hat historisch wenig geaendert (17 Phasen)" und "Bestaetigte der Markt dabei das Bild, wie jetzt: 8 von 10 statt 7 von 10 sonst (45 Phasen)". Verglichen wird gegen das Gegenstueck, nicht gegen den Durchschnitt. |
+| B2 | Neuer Block "Worueber dieses Tool nichts sagt": einzelne Anlagen, andere Regionen, Waehrung, eigene Lage, die naechsten Tage. In beiden Modi. |
+| B3 | Ein Gewichtungssatz ordnet die Hinweise: "Aktuell halten sich stuetzende und bremsende Kraefte die Waage. Der Markt bestaetigt das ... Das Risiko liegt dabei nicht im Zeitpunkt, sondern in der Fallhoehe." Ein Veto ueberlagert alles. |
+| B4 | Die ausgesprochene Erwartung wird taeglich unter `outlook:<Datum>` protokolliert und wandert mit `data/state.json` ins Repository. Tag der Aussage und Datenstichtag getrennt. |
+| B5, B6 | Eine eingeklappte Lesehilfe unter dem Tacho erklaert Rang statt Rendite, "hoch ist guenstig", die ungleiche Quantilsskala und die Drei-Wochen-Regel. |
+| B7 | Das Gewicht steht als Anteil in Worten ("Macht gut die Haelfte des Gesamtscores aus") und kann nicht mehr mit dem Score verwechselt werden. |
+
+**Wichtiger Befund aus B1:** Die extreme Bewertung aendert in der neutralen Zone fast nichts (78,3 gegen 80,0
+Prozent Trefferquote), die Marktbestaetigung dagegen deutlich (84,3 gegen 72,6). Die Bewertung wirkt also
+tatsaechlich auf die Fallhoehe und nicht auf den Zeitpunkt, genau wie das Modell es unterstellt. Beim Zaehlen
+der Episoden fiel ausserdem ein Fehler auf: Zusammenhaengende Abschnitte einer Teilmenge zu zaehlen ergab mehr
+Episoden als die Zone insgesamt hatte. Gezaehlt werden jetzt die betroffenen Zonenaufenthalte.
+
+Beim Einbauen von B3 zeigte sich, dass der Gewichtungssatz drei Zeilen darunter fast wortgleich wiederholte.
+Er ersetzt deshalb den allgemeinen Zonentext und die Erklaerung zur Marktbestaetigung, statt sie zu ergaenzen.
+Unter dem Strich steht weniger Text als vorher.
+
 ## 6. Ein Satz zu jeder Perspektive
 
 **Einsteiger:** Er versteht nach dem Besuch mehr ueber den Markt als vorher, aber nicht mehr ueber seine

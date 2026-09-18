@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { Telescope } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import type { BacktestBand, ZoneKey } from "@/lib/api";
-import { OUTLOOK_LABEL, THIN_EVIDENCE_EPISODES, bandFor, liveVariant, loadBacktest } from "@/lib/backtest";
+import type { BacktestBand, ConditionalBand, ZoneKey } from "@/lib/api";
+import { CONDITION_MATTERS_PP, OUTLOOK_LABEL, THIN_EVIDENCE_EPISODES, bandFor, conditionalFor, liveVariant, loadBacktest } from "@/lib/backtest";
 import { cn } from "@/lib/utils";
 
 // Genau zehn Punkte, damit der Streifen eins zu eins zum Satz "X von 10" passt. Eine feinere Aufloesung
@@ -15,6 +15,8 @@ interface Loaded {
   band: BacktestBand;
   benchmark: string;
   startYear: number;
+  /** Paare aus heutiger Bedingung und ihrem Gegenstueck, fuer den Vergleich "mit gegen ohne". */
+  conditions: { now: ConditionalBand; other: ConditionalBand | null; intro: string }[];
 }
 
 /**
@@ -25,7 +27,17 @@ interface Loaded {
  * und ein abzaehlbarer Streifen statt einer glatten Kurve. Alle Zahlen stammen aus abgezaehlter Historie,
  * nichts ist modelliert.
  */
-export function OutlookPanel({ zoneKey, zoneLabel, zoneColor }: { zoneKey: ZoneKey; zoneLabel: string; zoneColor: string }) {
+interface Props {
+  zoneKey: ZoneKey;
+  zoneLabel: string;
+  zoneColor: string;
+  /** Ist der Markt heute extrem teuer? Dann zaehlt nur, wie solche Wochen ausgingen. */
+  valuationExtreme?: boolean;
+  /** Bestaetigt der Markt heute das Makrobild? null, wenn unbekannt. */
+  marketConfirmed?: boolean | null;
+}
+
+export function OutlookPanel({ zoneKey, zoneLabel, zoneColor, valuationExtreme, marketConfirmed }: Props) {
   const [data, setData] = useState<Loaded | null | undefined>(undefined);
 
   useEffect(() => {
@@ -35,13 +47,21 @@ export function OutlookPanel({ zoneKey, zoneLabel, zoneColor }: { zoneKey: ZoneK
         const variant = liveVariant(res);
         const band = variant ? bandFor(variant, zoneKey) : null;
         if (!alive) return;
-        setData(band && variant ? { band, benchmark: res.benchmark, startYear: new Date(variant.start).getFullYear() } : null);
+        // Nur die Bedingungen, die heute zutreffen. Was waere, wenn der Markt guenstig waere, interessiert nicht.
+        const wanted: [ConditionalBand["condition"], ConditionalBand["condition"], string][] = [];
+        if (valuationExtreme) wanted.push(["valuation_extreme", "valuation_other", "War der Markt dabei extrem teuer, wie jetzt"]);
+        if (marketConfirmed === true) wanted.push(["market_confirmed", "market_other", "Bestätigte der Markt dabei das Bild, wie jetzt"]);
+        if (marketConfirmed === false) wanted.push(["market_other", "market_confirmed", "Bestätigte der Markt dabei das Bild nicht, wie jetzt"]);
+        const conditions = wanted
+          .map(([now, other, intro]) => ({ now: conditionalFor(res, zoneKey, now), other: conditionalFor(res, zoneKey, other), intro }))
+          .filter((c): c is { now: ConditionalBand; other: ConditionalBand | null; intro: string } => c.now != null && c.now.hit_rate_13w != null);
+        setData(band && variant ? { band, benchmark: res.benchmark, startYear: new Date(variant.start).getFullYear(), conditions } : null);
       })
       .catch(() => alive && setData(null));
     return () => {
       alive = false;
     };
-  }, [zoneKey]);
+  }, [zoneKey, valuationExtreme, marketConfirmed]);
 
   if (data === null) return null;
 
@@ -62,7 +82,7 @@ export function OutlookPanel({ zoneKey, zoneLabel, zoneColor }: { zoneKey: ZoneK
   );
 }
 
-function Outlook({ band, benchmark, startYear, zoneLabel, zoneColor }: Loaded & { zoneLabel: string; zoneColor: string }) {
+function Outlook({ band, benchmark, startYear, conditions, zoneLabel, zoneColor }: Loaded & { zoneLabel: string; zoneColor: string }) {
   const hit = band.hit_rate_13w;
   if (hit == null || !band.n_13w) {
     return <p className="text-sm text-muted-foreground text-pretty">Für diese Zone liegen noch zu wenige Vergleichswochen vor.</p>;
@@ -106,6 +126,14 @@ function Outlook({ band, benchmark, startYear, zoneLabel, zoneColor }: Loaded & 
         </p>
       ) : null}
 
+      {conditions.length > 0 ? (
+        <div className="flex flex-col gap-1.5">
+          {conditions.map((c) => (
+            <ConditionLine key={c.now.condition} {...c} />
+          ))}
+        </div>
+      ) : null}
+
       <p className={cn("max-w-3xl text-[11px] leading-relaxed text-pretty", thin ? "text-amber-300/90" : "text-muted-foreground/80")}>
         {thin
           ? `So etwas gab es seit ${startYear} aber nur ${band.episodes} Mal. Das ist zu selten, um daraus viel abzuleiten.`
@@ -113,5 +141,33 @@ function Outlook({ band, benchmark, startYear, zoneLabel, zoneColor }: Loaded & 
         Das ist ein Rückblick, keine Vorhersage.
       </p>
     </>
+  );
+}
+
+/**
+ * Was die heutige Zusatzbedingung an der Erwartung ändert.
+ *
+ * Verglichen wird nicht gegen den Durchschnitt aller Wochen, sondern gegen das Gegenstück: mit Bestätigung
+ * gegen ohne. Nur so beantwortet der Satz die Frage, die er stellt. Ändert sich wenig, sagt er auch das,
+ * denn "die Bewertung hat daran historisch nichts geändert" ist eine Information und keine Leerstelle.
+ */
+function ConditionLine({ now, other, intro }: { now: ConditionalBand; other: ConditionalBand | null; intro: string }) {
+  const hit = now.hit_rate_13w;
+  if (hit == null) return null;
+  const mine = Math.round(hit / 10);
+  const theirs = other?.hit_rate_13w != null ? Math.round(other.hit_rate_13w / 10) : null;
+  const matters = other?.hit_rate_13w != null && Math.abs(hit - other.hit_rate_13w) >= CONDITION_MATTERS_PP;
+  const thin = now.episodes > 0 && now.episodes < THIN_EVIDENCE_EPISODES;
+
+  return (
+    <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground text-pretty">
+      {intro}:{" "}
+      <span className="font-medium text-foreground">{mine} von 10</span>
+      {matters && theirs != null ? ` statt ${theirs} von 10 sonst.` : ", das hat historisch wenig geändert."}{" "}
+      <span className={cn("text-[11px]", thin ? "text-amber-300/90" : "text-muted-foreground/70")}>
+        {now.episodes} {now.episodes === 1 ? "Phase" : "Phasen"}
+        {thin ? ", zu wenige für eine belastbare Aussage" : ""}
+      </span>
+    </p>
   );
 }

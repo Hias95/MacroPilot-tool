@@ -136,6 +136,8 @@ export interface ConsensusResponse {
   method: string;
   note: string;
   why: string;
+  /** Rangfolge der widersprechenden Hinweise: Zeitpunkt gegen Fallhöhe. */
+  weighting?: string;
   pillar_scores: Record<string, number | null>;
   overlay_scores: Record<string, number | null>;
   core: number | null;
@@ -374,11 +376,27 @@ export interface BacktestVariant {
   strategy: BacktestPerformance;
   strategy_base: BacktestPerformance;
 }
+/** Dieselbe Zone unter einer Zusatzbedingung: Wie ging es aus, als der Markt dabei extrem teuer war? */
+export interface ConditionalBand {
+  zone: ZoneKey;
+  condition: "valuation_extreme" | "valuation_other" | "market_confirmed" | "market_other";
+  label: string;
+  weeks: number;
+  /** Betroffene Zonenaufenthalte, nicht zusammenhaengende Abschnitte der Teilmenge. */
+  episodes: number;
+  n_13w: number;
+  hit_rate_13w: number | null;
+  mean_fwd_13w: number | null;
+  p10_fwd_13w: number | null;
+  p50_fwd_13w: number | null;
+}
+
 export interface BacktestResponse {
   benchmark: string;
   start: string;
   end: string;
   variants: BacktestVariant[];
+  conditional?: ConditionalBand[];
   generated_at: number;
 }
 export const fetchBacktest = (signal?: AbortSignal) => request<BacktestResponse>("/api/v1/backtest", signal);

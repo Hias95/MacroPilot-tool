@@ -8,6 +8,7 @@ import { availableRanges, filterByRange, useRange } from "@/lib/range";
 import { MARKET_CONFIRM, PHASES, ZONES, pendingZoneOf, zoneChangeNote } from "@/lib/score";
 import { cn } from "@/lib/utils";
 import { ConsensusGauge } from "./consensus-gauge";
+import { ReadingHelp } from "./reading-help";
 import { ConsensusHistoryChart } from "./consensus-history-chart";
 import { RangeSelect } from "./range-select";
 
@@ -63,6 +64,7 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
             ))}
           </div>
           <ConsensusGauge score={score} zone={zone} pending={pendingZone} />
+          <ReadingHelp className="mt-2" />
           {v2 ? (
             <div className="mx-auto mt-2 flex max-w-[440px] justify-center gap-6 text-xs text-muted-foreground">
               <Direction label="Liquidität" dir={consensus.liquidity_direction} move={consensus.liquidity_move} />
@@ -83,7 +85,11 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
             <p className="mt-1 text-sm text-foreground/90">
               Besser als <span className="font-mono tabular-nums">{consensus.score ?? "—"} %</span> der Wochen der letzten zehn Jahre.
             </p>
-            <p className="mt-2 max-w-md text-sm text-muted-foreground text-pretty">{zone.hint}</p>
+            {/* B3: Der Gewichtungssatz ordnet Zone, Marktbestaetigung und Bewertung und ersetzt den
+                allgemeinen Zonentext, der sonst dasselbe in unspezifischer Form sagen wuerde. */}
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-foreground/90 text-pretty">
+              {consensus.weighting || zone.hint}
+            </p>
             {unconfirmed ? (
               <p className="mt-2 text-xs text-amber-300/90 text-pretty">
                 Diese Woche zeigt bereits <span style={{ color: zoneRaw.color }}>{zoneRaw.label}</span>, {zoneChangeNote(consensus)}

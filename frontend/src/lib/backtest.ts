@@ -1,4 +1,4 @@
-import { fetchBacktest, type BacktestBand, type BacktestResponse, type BacktestVariant, type ZoneKey } from "./api";
+import { fetchBacktest, type BacktestBand, type BacktestResponse, type BacktestVariant, type ConditionalBand, type ZoneKey } from "./api";
 
 /** Der Backtest ist eine grosse Datei und wird von zwei Panels gebraucht. Einmal laden, beide bedienen. */
 let pending: Promise<BacktestResponse> | null = null;
@@ -29,3 +29,18 @@ export const THIN_EVIDENCE_EPISODES = 10;
 /** Der Horizont, auf den sich der Erwartungssatz bezieht. Das Modell ist auf 13 bis 26 Wochen am staerksten. */
 export const OUTLOOK_WEEKS = 13;
 export const OUTLOOK_LABEL = "drei Monate";
+
+/** Die Zeile zu einer Zone unter einer Zusatzbedingung, falls es sie gibt. */
+export function conditionalFor(
+  data: BacktestResponse,
+  zone: ZoneKey,
+  condition: ConditionalBand["condition"],
+): ConditionalBand | null {
+  return data.conditional?.find((c) => c.zone === zone && c.condition === condition) ?? null;
+}
+
+/**
+ * Ab wie vielen Prozentpunkten Unterschied eine Zusatzbedingung erwaehnenswert ist. Darunter lautet die
+ * ehrliche Aussage "hat historisch wenig geaendert", und die ist genauso wertvoll wie ein Unterschied.
+ */
+export const CONDITION_MATTERS_PP = 5;

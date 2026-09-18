@@ -150,6 +150,7 @@ class ConsensusResponse(BaseModel):
     method: str
     note: str
     why: str
+    weighting: str = Field("", description="Rangfolge der widersprechenden Hinweise: Zeitpunkt gegen Fallhoehe")
     pillar_scores: dict[str, int | None]
     overlay_scores: dict[str, int | None] = Field(default_factory=dict)
     core: float | None = None
