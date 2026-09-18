@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Component, Frequency, PillarResponse, Point, RegimeFlag } from "@/lib/api";
-import { formatChange, formatPeriod, formatSignedPct, formatSpan, formatValue } from "@/lib/format";
+import { ageText, formatChange, formatPeriod, formatSignedPct, formatSpan, formatValue } from "@/lib/format";
 import { PILLAR_UI } from "@/lib/pillars";
 import { availableRanges, filterByRange, useRange } from "@/lib/range";
 import { toneForChange } from "@/lib/score";
@@ -62,7 +62,9 @@ export function PillarTile({ pillar }: { pillar: PillarResponse }) {
       info={{ explainer: ui.explainer, reading: ui.reading }}
       footer={
         <span>
-          Stand {formatPeriod(pillar.headline.date, freq)} &middot; Quelle{" "}
+          {/* Nicht nur wann, sondern wie alt: Die Saeulen melden in sehr unterschiedlichem Takt, und der
+              Gesamtscore mischt sie, ohne dass man das sonst saehe. */}
+          Stand {formatPeriod(pillar.headline.date, freq)}, {ageText(pillar.headline.date)} &middot; Quelle{" "}
           {sourceLabel(pillar.source)}
         </span>
       }
@@ -151,8 +153,10 @@ function RegimeBlock({ regime }: { regime: RegimeFlag }) {
           Regime-Check: {regime.label}{" "}
           <span className={regime.active ? "text-amber-300" : "text-muted-foreground"}>{regime.active ? "aktiv" : "nicht aktiv"}</span>
         </span>
-        <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
-          {regime.met_count} von {regime.needed}
+        {/* Zwei verschiedene Zahlen: wie viele der Kriterien erfuellt sind, und ab wie vielen das Regime gilt.
+            Frueher stand hier "2 von 2", waehrend drei Kriterien darunter aufgelistet waren. */}
+        <span className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground">
+          {regime.met_count} von {regime.criteria.length} erfüllt, nötig {regime.needed}
         </span>
       </div>
       <ul className="space-y-1 text-muted-foreground">

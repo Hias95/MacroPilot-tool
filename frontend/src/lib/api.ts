@@ -128,6 +128,9 @@ export interface ConsensusResponse {
   phase_raw_key: PhaseKey | null;
   weeks_in_phase: number | null;
   liquidity_direction: "up" | "down" | null;
+  /** Abgestufte Kurzform derselben Bewegung, z. B. "kaum verändert". Verhindert, dass Badge und Text auseinanderlaufen. */
+  liquidity_move?: string | null;
+  growth_move?: string | null;
   growth_direction: "up" | "down" | null;
   confidence: "klar" | "knapp";
   method: string;
@@ -140,6 +143,8 @@ export interface ConsensusResponse {
   valuation_cap: number | null;
   vetoes: string[];
   cap: number | null;
+  /** Greift der Deckel gerade wirklich, senkt er den Wert also? */
+  cap_binding?: boolean;
   adjusted: number | null;
 }
 
@@ -203,6 +208,9 @@ export interface HealthResponse {
   snapshot_date?: string | null;
   auto_refresh?: boolean;
   alert_channels?: string[];
+  /** Aeltester Eingang ueber alle Saeulen. Der Gesamtscore mischt Daten unterschiedlichen Alters. */
+  oldest_input?: string | null;
+  recording_since?: string | null;
   mode?: "static";
   generated_at?: string;
 }
@@ -318,6 +326,8 @@ export interface ChangesResponse {
   events: ChangeEvent[];
   last_refresh: string | null;
   snapshot_date: string | null;
+  /** Tag des aeltesten Tagesbilds: Seit wann wird ueberhaupt aufgezeichnet? */
+  recording_since?: string | null;
 }
 export const fetchChanges = (days: number, signal?: AbortSignal) => request<ChangesResponse>(`/api/v1/changes?days=${days}`, signal);
 

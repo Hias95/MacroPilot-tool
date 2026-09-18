@@ -92,6 +92,26 @@ def _direction(s: Snapshot) -> str:
     return "up" if s.momentum >= 50 else "down"
 
 
+# Die Zyklusphase braucht eine binaere Richtung, der Text nicht. Eine Veraenderung von +0,85 % ueber 26 Wochen
+# ist "up", historisch aber unauffaellig (Momentum im 53. Perzentil). Stand frueher "Liquiditaet steigt",
+# waehrend die Saeule daneben "wenig geaendert" sagte. Dieselben Schwellen wie in easy.py.
+DIRECTION_WORDS = [
+    (75, "legt deutlich zu", "steigt deutlich"),
+    (58, "legt leicht zu", "steigt leicht"),
+    (42, "verändert sich kaum", "kaum verändert"),
+    (25, "gibt leicht nach", "fällt leicht"),
+    (0, "gibt deutlich nach", "fällt deutlich"),
+]
+
+
+def direction_words(momentum: int) -> tuple[str, str]:
+    """Satzform und Kurzform derselben Abstufung, damit Badge und Fliesstext nie auseinanderlaufen."""
+    for threshold, sentence, short in DIRECTION_WORDS:
+        if momentum >= threshold:
+            return sentence, short
+    return DIRECTION_WORDS[-1][1], DIRECTION_WORDS[-1][2]
+
+
 def _clamp(x: float) -> int:
     return int(min(100, max(0, round(x))))
 
@@ -220,8 +240,8 @@ def _why(r: CoreResult, by: dict[str, PillarResponse], ov: dict[str, PillarRespo
         f"Am stärksten stützt {DRIVER_NAMES[strongest]} ({by[strongest].score.score}), "
         f"am meisten bremst {DRIVER_NAMES[weakest]} ({by[weakest].score.score}).",  # type: ignore[union-attr]
     ]
-    growth = "beschleunigt" if r.growth_direction == "up" else "bremst"
-    liq = "wächst" if r.liquidity_direction == "up" else "schrumpft"
+    growth = direction_words(by["cycle"].score.momentum)[0] if by.get("cycle") and by["cycle"].score else "bewegt sich"
+    liq = direction_words(by["liquidity"].score.momentum)[0] if by.get("liquidity") and by["liquidity"].score else "bewegt sich"
     since = f", seit {weeks} Wochen" if weeks else ""
     phase_text = f"Zyklusphase {PHASE_LABEL[phase_key]}{since}: die Konjunktur {growth}, die Liquidität {liq}."
     if phase_key != r.phase_raw_key:
@@ -235,6 +255,9 @@ def _why(r: CoreResult, by: dict[str, PillarResponse], ov: dict[str, PillarRespo
         text = f"Bewertung {fallhoehe_label(val.score.score)} (Score {val.score.score}): Deckel bei {r.valuation_cap:.0f}."
         if r.cap is not None and r.adjusted > r.cap and abs(r.cap - r.valuation_cap) < 0.5:
             text += f" Der Deckel greift und drückt den Wert von {r.adjusted:.0f} auf {r.score}."
+        else:
+            # Ein Deckel, der nicht greift, ist keine Bremse. Vorher blieb das offen und las sich wie eine.
+            text += f" Er greift derzeit nicht, der Rohwert liegt mit {r.adjusted:.0f} darunter."
         parts.append(text)
     mech = ov.get("mechanics")
     if mech and mech.score:
@@ -258,6 +281,8 @@ def _why(r: CoreResult, by: dict[str, PillarResponse], ov: dict[str, PillarRespo
             parts.append(f"Der Markt bestätigt das Bild (Marktsignale {mk.score.score}).")
     if r.vetoes:
         parts.append(f"Veto aktiv: {', '.join(VETO_LABEL[v] for v in r.vetoes)}, Deckel bei {r.cap:.0f}.")
+    else:
+        parts.append("Kein Veto aktiv.")
     return " ".join(parts)
 
 
@@ -300,10 +325,15 @@ def build_consensus(
         market_confirmation_key=confirm_key, market_confirmation=MARKET_CONFIRM_LABEL.get(confirm_key) if confirm_key else None,  # type: ignore[arg-type]
         phase_key=phase_key, phase=PHASE_LABEL[phase_key], phase_raw_key=r.phase_raw_key, weeks_in_phase=weeks,  # type: ignore[arg-type]
         liquidity_direction=r.liquidity_direction, growth_direction=r.growth_direction, confidence=r.confidence,  # type: ignore[arg-type]
+        liquidity_move=direction_words(by["liquidity"].score.momentum)[1] if by["liquidity"].score else None,
+        growth_move=direction_words(by["cycle"].score.momentum)[1] if by["cycle"].score else None,
         method="macropilot-v2-rank",
         note="Rohwert aus drei gewichteten Treibern, Marktmechanik als Kontra-Korrektur, Bewertung als Deckel, Marktsignale als Bestätigung, Vetos bei Systemkrisen. Angezeigt wird der Rang des Rohwerts in den letzten zehn Jahren; Zone und Zyklusphase wechseln erst nach Bestätigung.",
         why=_why(r, by, ov, phase_key, weeks, rank, zone, zone_raw, weeks_in_zone, pending_weeks, change_date),
         pillar_scores=scores, overlay_scores=overlay_scores,
         core=round(r.core, 1), mechanics_adjustment=round(r.mechanics_adjustment, 1), valuation_cap=round(r.valuation_cap, 1) if r.valuation_cap is not None else None,
         vetoes=r.vetoes, cap=round(r.cap, 1) if r.cap is not None else None, adjusted=round(r.adjusted, 1),
+        # Ein Deckel ueber dem Wert aendert nichts. Ohne diese Angabe wirkte "Bewertung extrem teuer, Deckel
+        # bei 66" wie eine aktive Bremse, obwohl der Rohwert mit 56 klar darunter lag.
+        cap_binding=r.cap is not None and r.adjusted > r.cap,
     )

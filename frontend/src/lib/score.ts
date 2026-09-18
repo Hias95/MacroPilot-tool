@@ -20,11 +20,17 @@ export const ZONES: Record<ZoneKey, Zone> = {
   very_positive: { key: "very_positive", label: "Stark positiv", hint: "Nur in etwa jeder zehnten Woche sah es besser aus. Fast alles stützt; Überhitzung und Bewertung im Blick behalten.", color: "oklch(0.76 0.19 150)", min: 90, max: 100 },
 };
 
+/**
+ * Die Hinweise beschreiben, was die Phase bedeutet, nicht wie stark sich die Treiber heute bewegen. Ohne das
+ * "heisst" las sich "Liquiditaet und Konjunktur ziehen gemeinsam an" wie eine Aussage ueber diese Woche und
+ * widersprach dann dem Badge daneben, das "kaum veraendert" zeigt. Die Phase kennt nur die Richtung, nicht die
+ * Staerke.
+ */
 export const PHASES: Record<PhaseKey, { label: string; hint: string; order: number }> = {
-  recovery: { label: "Erholung", hint: "Liquidität kommt zurück, die Konjunktur hinkt noch. Historisch beginnen hier Erholungen.", order: 0 },
-  expansion: { label: "Aufschwung", hint: "Liquidität und Konjunktur ziehen gemeinsam an.", order: 1 },
-  late: { label: "Spätzyklus", hint: "Die Konjunktur läuft noch, aber die Liquidität wird knapper.", order: 2 },
-  downturn: { label: "Abschwung", hint: "Liquidität und Konjunktur fallen. Auf die Liquiditätswende warten.", order: 3 },
+  recovery: { label: "Erholung", hint: "Erholung heißt: Die Liquidität dreht nach oben, die Konjunktur hinkt noch hinterher. Historisch beginnen hier Erholungen.", order: 0 },
+  expansion: { label: "Aufschwung", hint: "Aufschwung heißt: Liquidität und Konjunktur zeigen beide nach oben. Wie stark, steht bei den Treibern.", order: 1 },
+  late: { label: "Spätzyklus", hint: "Spätzyklus heißt: Die Konjunktur zeigt noch nach oben, die Liquidität bereits nach unten.", order: 2 },
+  downturn: { label: "Abschwung", hint: "Abschwung heißt: Liquidität und Konjunktur zeigen beide nach unten. Auf die Liquiditätswende warten.", order: 3 },
 };
 
 /** Marktbestaetigung: Marktsignale gegen den Consensus-Rang. Kein Treiber, sondern ein Risiko-Hinweis. */

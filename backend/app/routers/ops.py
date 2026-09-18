@@ -28,7 +28,7 @@ async def trigger_refresh(x_refresh_token: str | None = Header(default=None), fo
 @router.get("/changes", summary="Erkannte Wechsel (Zone, Phase, Regime, Marktbestaetigung, Vetos)")
 async def changes(days: int = Query(90, ge=1, le=3650), limit: int = Query(100, ge=1, le=500)) -> dict:
     return {"days": days, "events": store.list_events(days, limit), "last_refresh": store.get_meta("last_refresh"),
-            "snapshot_date": store.get_meta("last_snapshot_date")}
+            "snapshot_date": store.get_meta("last_snapshot_date"), "recording_since": store.first_snapshot_date()}
 
 
 @router.get("/snapshots", summary="Tagesbilder des Dashboards (Point-in-time)")

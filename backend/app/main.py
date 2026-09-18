@@ -72,4 +72,6 @@ async def health() -> dict:
         "snapshot_date": store.get_meta("last_snapshot_date"),
         "auto_refresh": settings.auto_refresh,
         "alert_channels": [c for c in ("ntfy", "email") if (settings.ntfy_topic if c == "ntfy" else settings.smtp_host and settings.alert_email_to)],
+        "oldest_input": store.get_meta("oldest_input"),
+        "recording_since": store.first_snapshot_date(),
     }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ChartNoAxesColumn } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { BacktestPerformance, BacktestResponse, BacktestVariant, ZoneKey } from "@/lib/api";
-import { liveVariant, loadBacktest } from "@/lib/backtest";
+import { THIN_EVIDENCE_EPISODES, liveVariant, loadBacktest } from "@/lib/backtest";
 import { formatDateDe } from "@/lib/format";
 import { ZONES } from "@/lib/score";
 import { cn } from "@/lib/utils";
@@ -71,8 +71,8 @@ export function BenchmarkPanel({ currentZone }: { currentZone?: ZoneKey }) {
           <>
             <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground text-pretty">
               Rückblick, keine Prognose: So hat sich der Index nach Wochen in der jeweiligen Ampelzone entwickelt. Jede Woche kannte
-              dabei nur ihre eigene Vergangenheit. Wie oft eine Zone vorkam, steht daneben, denn die seltenen Zonen beruhen auf
-              wenigen Wochen.
+              dabei nur ihre eigene Vergangenheit. Daneben steht, aus wie vielen getrennten Phasen eine Zone stammt. Weniger als
+              zehn heißt: Die Zahlen beruhen auf einer Handvoll Fälle und können Zufall sein.
             </p>
             <ZoneTable variant={variant} currentZone={currentZone} />
             <StrategyTable variant={variant} />
@@ -98,7 +98,7 @@ function ZoneTable({ variant, currentZone }: { variant: BacktestVariant; current
         <thead>
           <tr className="text-[11px] uppercase tracking-wider text-muted-foreground">
             <th scope="col" className="py-1.5 text-left font-medium">Ampelzone</th>
-            <th scope="col" className="py-1.5 text-right font-medium">Anteil der Wochen</th>
+            <th scope="col" className="py-1.5 text-right font-medium">Anteil, getrennte Phasen</th>
             <th scope="col" className="py-1.5 pl-5 text-left font-medium">Danach 13 Wochen</th>
             <th scope="col" className="py-1.5 text-right font-medium">davon positiv</th>
             <th scope="col" className="py-1.5 text-right font-medium">Danach 52 Wochen</th>
@@ -119,7 +119,11 @@ function ZoneTable({ variant, currentZone }: { variant: BacktestVariant; current
                 </th>
                 <td className="py-2 text-right tabular-nums text-muted-foreground">
                   {b.share_pct.toFixed(0)} %
-                  <span className="ml-1 text-[11px] text-muted-foreground/70">{b.weeks} W.</span>
+                  {/* Wochen ueberlappen sich. Getrennte Phasen sind das ehrlichere Mass und zeigen sofort,
+                      dass die seltenen Zonen auf einer Handvoll Faelle beruhen. */}
+                  <span className={cn("ml-1 text-[11px]", b.episodes > 0 && b.episodes < THIN_EVIDENCE_EPISODES ? "text-amber-300/90" : "text-muted-foreground/70")}>
+                    {b.episodes} {b.episodes === 1 ? "Phase" : "Phasen"}
+                  </span>
                 </td>
                 <td className="py-2 pl-5">
                   <span className="flex items-center gap-2">

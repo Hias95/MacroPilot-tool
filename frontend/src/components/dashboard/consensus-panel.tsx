@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,7 +40,7 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
   const score = consensus.score ?? 50;
   const regimes = [...pillars, ...overlays].map((p) => p.regime).filter((r): r is NonNullable<typeof r> => !!r && r.active);
   const v2 = consensus.method.startsWith("macropilot-v2");
-  const capBinds = consensus.cap != null && consensus.adjusted != null && consensus.adjusted > consensus.cap;
+  const capBinds = consensus.cap_binding ?? (consensus.cap != null && consensus.adjusted != null && consensus.adjusted > consensus.cap);
 
   return (
     <Card className="bg-card ring-white/8">
@@ -65,8 +65,8 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
           <ConsensusGauge score={score} zone={zone} pending={pendingZone} />
           {v2 ? (
             <div className="mx-auto mt-2 flex max-w-[440px] justify-center gap-6 text-xs text-muted-foreground">
-              <Direction label="Liquidität" dir={consensus.liquidity_direction} />
-              <Direction label="Konjunktur" dir={consensus.growth_direction} />
+              <Direction label="Liquidität" dir={consensus.liquidity_direction} move={consensus.liquidity_move} />
+              <Direction label="Konjunktur" dir={consensus.growth_direction} move={consensus.growth_move} />
             </div>
           ) : null}
         </div>
@@ -127,7 +127,7 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
                 key={p.id}
                 label={
                   p.id === "valuation"
-                    ? `${p.name} · Deckel ${num(consensus.valuation_cap)}`
+                    ? `${p.name} · Deckel ${num(consensus.valuation_cap)} ${capBinds ? "greift" : "greift nicht"}`
                     : p.id === "mechanics"
                       ? `${p.name} · ${signed(consensus.mechanics_adjustment)}`
                       : `${p.name} · ${consensus.market_confirmation ?? "Bestätigung"}`
@@ -211,13 +211,18 @@ function PhaseTrack({ phase, raw, weeks, knapp }: { phase: PhaseKey; raw: PhaseK
   );
 }
 
-function Direction({ label, dir }: { label: string; dir: "up" | "down" | null }) {
+/**
+ * Richtung der Phase. `move` ist die abgestufte Kurzform aus dem Backend ("kaum verändert"); ohne sie bliebe
+ * nur steigt/faellt, und das behauptete mehr, als eine Veraenderung im mittleren Perzentil hergibt.
+ */
+function Direction({ label, dir, move }: { label: string; dir: "up" | "down" | null; move?: string | null }) {
   if (!dir) return null;
   const up = dir === "up";
+  const flat = move?.startsWith("kaum") ?? false;
   return (
-    <span className={cn("inline-flex items-center gap-1", up ? "text-emerald-300/90" : "text-rose-300/90")}>
-      {up ? <ArrowUpRight className="size-3.5" /> : <ArrowDownRight className="size-3.5" />}
-      {label} {up ? "steigt" : "fällt"}
+    <span className={cn("inline-flex items-center gap-1", flat ? "text-muted-foreground" : up ? "text-emerald-300/90" : "text-rose-300/90")}>
+      {flat ? <ArrowRight className="size-3.5" /> : up ? <ArrowUpRight className="size-3.5" /> : <ArrowDownRight className="size-3.5" />}
+      {label} {move ?? (up ? "steigt" : "fällt")}
     </span>
   );
 }

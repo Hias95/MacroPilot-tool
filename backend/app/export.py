@@ -44,7 +44,8 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
     history = await build_history()
     _dump(out / "history.json", history.model_dump(mode="json"))
     _dump(out / "changes.json", {"days": 365, "events": store.list_events(365, 500), "last_refresh": store.get_meta("last_refresh"),
-                                 "snapshot_date": store.get_meta("last_snapshot_date")})
+                                 "snapshot_date": store.get_meta("last_snapshot_date"),
+                                 "recording_since": store.first_snapshot_date()})
     _dump(out / "snapshots.json", {"days": 3650, "snapshots": store.list_snapshots(3650)})
     if with_backtest:
         _dump(out / "backtest.json", asdict(await backtest.run_backtest(force=True)))
@@ -67,6 +68,8 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
         "explain_model": {"anthropic": settings.explain_model, "gemini": settings.gemini_model, "ollama": settings.ollama_model, "template": "regelbasiert"}.get(provider),
         "cache_ttl_seconds": settings.cache_ttl_seconds, "last_refresh": store.get_meta("last_refresh"),
         "snapshot_date": store.get_meta("last_snapshot_date"), "auto_refresh": False,
+        "oldest_input": store.get_meta("oldest_input"),
+        "recording_since": store.first_snapshot_date(),
         # Eingerichtete Kanaele, nicht die benutzten: ohne neue Ereignisse verschickt ein Lauf nichts, das sagt
         # aber nichts ueber die Konfiguration. Was wirklich rausging, steht daneben.
         "alert_channels": notify.configured_channels(),

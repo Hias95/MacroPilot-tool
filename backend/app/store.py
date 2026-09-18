@@ -158,6 +158,14 @@ def set_meta(key: str, value: str) -> None:
         conn.execute("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", (key, value))
 
 
+def first_snapshot_date() -> str | None:
+    """Tag des aeltesten Tagesbilds. Die Aenderungsliste darf nicht "letzte 365 Tage" behaupten, wenn erst
+    seit drei Tagen aufgezeichnet wird."""
+    with _lock, _connect() as conn:
+        row = conn.execute("SELECT MIN(date) FROM snapshots").fetchone()
+    return row[0] if row and row[0] else None
+
+
 def export_state() -> dict:
     """Tagesbilder, Ereignisse und Meta als JSON-faehiges Dict (fuer den Export in ein Repository)."""
     with _lock, _connect() as conn:

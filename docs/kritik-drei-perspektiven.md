@@ -218,6 +218,26 @@ alles andere lebt. Diese Punkte sind klein im Aufwand und gross in der Wirkung.
 | D5 | Aussagen ausserhalb von Aktien: Duration, Kredit, Waehrung, Rohstoffe | F | gross |
 | D6 | Modellversion und Parameterstand neben den Zahlen sichtbar machen | F | klein |
 
+## 5a. Stand der Umsetzung: Stufe A erledigt (18.09.2026)
+
+Alle sieben Punkte der Stufe A sind umgesetzt und im Browser geprueft, in beiden Modi und auf Handybreite.
+
+| # | Vorher | Nachher |
+|---|---|---|
+| A1 | "2 von 2" bei drei Kriterien | "2 von 3 erfuellt, noetig 2"; inaktive Flags "0 von 2 erfuellt, noetig 1" |
+| A2 | "Letzte 365 Tage: Keine Wechsel erkannt" | "Aufgezeichnet seit 16.09.2026, 3 Tage" und "Seit Beginn der Aufzeichnung ... hat sich nichts geaendert" |
+| A3 | "Bewertung · Deckel 66" | "Deckel 66 greift nicht", im Warum-Text "Er greift derzeit nicht, der Rohwert liegt mit 56 darunter", dazu "Kein Veto aktiv" |
+| A4 | "Liquiditaet steigt" neben "wenig geaendert" | abgestufte Kurzform aus einer Quelle: "Liquiditaet kaum veraendert", "Konjunktur steigt deutlich"; der Phasentext beschreibt jetzt die Phase ("Aufschwung heisst: ...") statt die Woche |
+| A5 | nur "Stand 18.9.2026" | Kopfzeile "aelteste Zahl 17 Tage alt", je Kachel "Stand 09.09.2026, 9 Tage alt" |
+| A6 | "156 W." | "25 Phasen", bei Stark positiv "4 Phasen" in Bernstein |
+| A7 | tote Schaltflaeche, "Erklaerung: Ollama gemma3:12b" | Hinweis statt Schaltflaeche im statischen Betrieb; die Engine-Angabe ist dem Datenalter gewichen |
+
+Technisch dahinter: `store.first_snapshot_date()` fuer den Aufzeichnungsbeginn, `oldest_input` als Meta-Wert
+beim Refresh, `ConsensusResponse.cap_binding`, `liquidity_move` / `growth_move` aus einer gemeinsamen
+Abstufung (`consensus.direction_words`, gleiche Schwellen wie `easy.py`), und ein zentraler Alters-Helfer in
+`format.ts` mit festem Bezugszeitpunkt pro Seitenaufruf. Abgerundet statt gerundet, sonst waere eine Zahl vom
+1. am Nachmittag des 18. als achtzehn Tage alt ausgewiesen worden.
+
 ## 6. Ein Satz zu jeder Perspektive
 
 **Einsteiger:** Er versteht nach dem Besuch mehr ueber den Markt als vorher, aber nicht mehr ueber seine

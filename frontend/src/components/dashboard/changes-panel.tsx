@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { fetchChanges, type ChangeEvent } from "@/lib/api";
-import { formatDateDe } from "@/lib/format";
+import { ageInDays, formatDateDe } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const KIND_LABEL: Record<ChangeEvent["kind"], string> = {
@@ -25,14 +25,14 @@ const KIND_TONE: Record<ChangeEvent["kind"], string> = {
 /** Was hat sich geaendert? Erkannte Wechsel aus den Tagesbildern (D1/D3), gleiche Liste wie die Benachrichtigungen. */
 export function ChangesPanel({ days = 90, compact = false }: { days?: number; compact?: boolean }) {
   const [events, setEvents] = useState<ChangeEvent[] | null | undefined>(undefined);
-  const [meta, setMeta] = useState<{ snapshot_date: string | null; last_refresh: string | null } | null>(null);
+  const [meta, setMeta] = useState<{ snapshot_date: string | null; last_refresh: string | null; recording_since?: string | null } | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
     fetchChanges(days, controller.signal)
       .then((c) => {
         setEvents(c.events);
-        setMeta({ snapshot_date: c.snapshot_date, last_refresh: c.last_refresh });
+        setMeta({ snapshot_date: c.snapshot_date, last_refresh: c.last_refresh, recording_since: c.recording_since });
       })
       .catch(() => {
         if (!controller.signal.aborted) setEvents(null);
@@ -42,6 +42,12 @@ export function ChangesPanel({ days = 90, compact = false }: { days?: number; co
 
   if (events === null) return null;
   const shown = compact ? (events ?? []).slice(0, 5) : (events ?? []);
+  // Die Ueberschrift darf keinen Zeitraum behaupten, den es noch gar nicht gibt: Die Aufzeichnung begann mit
+  // dem ersten Tagesbild, nicht vor 365 Tagen.
+  const since = meta?.recording_since ?? null;
+  const recorded = since ? ageInDays(since) + 1 : null;
+  const covered = recorded != null ? Math.min(recorded, days) : days;
+  const recordedText = since ? `am ${formatDateDe(since)}` : "";
 
   return (
     <Card className="bg-card ring-white/8">
@@ -49,10 +55,11 @@ export function ChangesPanel({ days = 90, compact = false }: { days?: number; co
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             <Bell className="size-3.5" />
-            Was hat sich geändert? Letzte {days} Tage
+            Was hat sich geändert?
           </h2>
           {meta?.snapshot_date ? (
             <span className="text-[11px] text-muted-foreground/80">
+              {since ? `Aufgezeichnet seit ${formatDateDe(since)}, ${covered} ${covered === 1 ? "Tag" : "Tage"} · ` : ""}
               Tagesbild vom {formatDateDe(meta.snapshot_date)}
               {meta.last_refresh ? ` · Refresh ${new Date(meta.last_refresh).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })}` : ""}
             </span>
@@ -61,7 +68,10 @@ export function ChangesPanel({ days = 90, compact = false }: { days?: number; co
         {events === undefined ? <p className="text-xs text-muted-foreground">Lade Änderungen ...</p> : null}
         {events && events.length === 0 ? (
           <p className="text-sm text-muted-foreground text-pretty">
-            Keine Wechsel erkannt. Das Tool merkt sich jeden Tag ein Bild des Dashboards und meldet hier, wenn Zone, Zyklusphase, ein Regime-Flag, die Marktbestätigung oder ein Veto wechselt.
+            {recorded != null && recorded <= days
+              ? `Seit Beginn der Aufzeichnung ${recordedText} hat sich nichts geändert. `
+              : "Keine Wechsel erkannt. "}
+            Das Tool merkt sich jeden Tag ein Bild des Dashboards und meldet hier, wenn Zone, Zyklusphase, ein Regime-Flag, die Marktbestätigung oder ein Veto wechselt.
           </p>
         ) : null}
         {shown.length > 0 ? (

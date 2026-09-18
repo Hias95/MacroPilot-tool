@@ -68,6 +68,11 @@ async def refresh(force_network: bool = True, today: date | None = None) -> Refr
         finished = datetime.now(tz=timezone.utc)
         store.set_meta("last_refresh", finished.isoformat(timespec="seconds"))
         store.set_meta("last_snapshot_date", snap["date"])
+        # Aeltester Eingang ueber alle Saeulen: Der Gesamtscore mischt Daten von einem bis siebzehn Tagen Alter.
+        # Ohne diese Angabe wirkt die Kopfzeile ("Stand heute") frischer als die Grundlage tatsaechlich ist.
+        dates = [p.headline.date for p in (*dashboard.pillars, *dashboard.overlays) if p.headline]
+        if dates:
+            store.set_meta("oldest_input", min(dates).isoformat())
         log.info("Refresh %s: %d Ereignisse, gemeldet %s", snap["date"], len(events), notified.get("sent"))
         return RefreshResult(date=snap["date"], started_at=started.isoformat(timespec="seconds"),
                              finished_at=finished.isoformat(timespec="seconds"), events=events, notified=notified, forced=force_network)

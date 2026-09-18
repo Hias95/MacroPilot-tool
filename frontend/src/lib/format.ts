@@ -94,3 +94,28 @@ export function formatDateTimeDe(iso: string): string {
     minute: "2-digit",
   }).format(d);
 }
+
+/**
+ * Zeitpunkt des Seitenaufrufs, einmal beim Laden festgehalten.
+ *
+ * Das Alter einer Kennzahl direkt aus Date.now() zu rechnen, macht das Rendern unrein (eslint
+ * react-hooks/purity) und kann bei zwei Renderdurchlaeufen zwei verschiedene Werte liefern. Ein fester
+ * Bezugspunkt pro Seitenaufruf ist genau genug: Die Seite wird taeglich neu gebaut.
+ */
+const LOADED_AT = Date.now();
+
+/**
+ * Alter in ganzen Tagen, nie negativ. Abgerundet, nicht gerundet: Eine Zahl vom 1. ist am 18. siebzehn Tage
+ * alt, nicht achtzehn. Aufrunden haette das Alter am Nachmittag um einen Tag ueberschaetzt.
+ */
+export function ageInDays(iso: string): number {
+  return Math.max(0, Math.floor((LOADED_AT - new Date(iso).getTime()) / 86_400_000));
+}
+
+/** Alter in Alltagsworten: "von heute", "1 Tag alt", "9 Tage alt". */
+export function ageText(iso: string): string {
+  const days = ageInDays(iso);
+  if (days === 0) return "von heute";
+  if (days === 1) return "1 Tag alt";
+  return `${days} Tage alt`;
+}

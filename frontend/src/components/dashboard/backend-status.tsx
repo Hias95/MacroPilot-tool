@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchHealth, type HealthResponse } from "@/lib/api";
+import { ageText } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type Status = "checking" | "online" | "offline";
@@ -31,22 +32,23 @@ export function BackendStatus() {
   }, []);
 
   let label = "API prüfen ...";
+  let title: string | undefined;
   if (status === "offline") label = "API offline";
   if (status === "online" && health) {
-    const PROVIDER_LABEL: Record<string, string> = {
-      anthropic: "Claude",
-      gemini: "Gemini",
-      ollama: `Ollama ${health.explain_model ?? ""}`.trim(),
-      template: "regelbasiert",
-      none: "aus",
-    };
     const source = health.mode === "static" ? "Daten aus dem täglichen Export" : "API verbunden";
     const stand = health.snapshot_date ? ` · Stand ${new Date(health.snapshot_date).toLocaleDateString("de-DE")}` : "";
-    label = `${source}${stand} · Erklärung: ${PROVIDER_LABEL[health.explain_provider] ?? health.explain_provider}`;
+    // Statt des Namens der Erklaer-Engine, die den Leser nichts angeht: wie alt die aelteste Zahl ist, aus der
+    // der Gesamtscore gebildet wird. Die Saeulen melden in sehr unterschiedlichem Takt.
+    let age = "";
+    if (health.oldest_input) {
+      age = ` · älteste Zahl ${ageText(health.oldest_input)}`;
+      title = `Älteste Eingangsdaten: ${new Date(health.oldest_input).toLocaleDateString("de-DE")}. Die Säulen melden in unterschiedlichem Takt.`;
+    }
+    label = `${source}${stand}${age}`;
   }
 
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-white/3 px-2.5 py-1 text-[11px] text-muted-foreground">
+    <span title={title} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-white/3 px-2.5 py-1 text-[11px] text-muted-foreground">
       <span
         className={cn(
           "size-1.5 rounded-full",

@@ -144,6 +144,8 @@ class ConsensusResponse(BaseModel):
     weeks_in_phase: int | None = None
     liquidity_direction: Literal["up", "down"] | None = None
     growth_direction: Literal["up", "down"] | None = None
+    liquidity_move: str | None = Field(None, description="Abgestufte Kurzform, z. B. 'kaum veraendert'")
+    growth_move: str | None = Field(None, description="Abgestufte Kurzform, z. B. 'steigt deutlich'")
     confidence: Literal["klar", "knapp"] = "klar"
     method: str
     note: str
@@ -155,6 +157,7 @@ class ConsensusResponse(BaseModel):
     valuation_cap: float | None = None
     vetoes: list[str] = Field(default_factory=list)
     cap: float | None = Field(None, description="Wirksamer Deckel (Minimum aus Bewertung und Vetos)")
+    cap_binding: bool = Field(False, description="Greift der Deckel gerade, senkt er den Wert also wirklich?")
     adjusted: float | None = Field(None, description="Kern plus Mechanik, vor dem Deckel")
 
 

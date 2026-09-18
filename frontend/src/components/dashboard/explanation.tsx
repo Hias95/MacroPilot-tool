@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchExplanation, type ExplanationResponse, type PillarId } from "@/lib/api";
+import { DATA_MODE, fetchExplanation, type ExplanationResponse, type PillarId } from "@/lib/api";
 import { formatDateTimeDe } from "@/lib/format";
 
 type State =
@@ -74,11 +74,22 @@ export function Explanation({ pillarId, fingerprint, accent }: Props) {
 
       {state.status === "error" ? (
         <div className="text-xs text-muted-foreground">
-          <p className="text-pretty">{state.message}</p>
-          <Button variant="outline" size="sm" className="mt-2 h-7 gap-1.5 text-xs" onClick={retry}>
-            <RefreshCw className="size-3" />
-            Erneut versuchen
-          </Button>
+          {/* Im statischen Betrieb liegt die Erklaerung als Datei aus dem Tagesexport vor. Ein erneuter Versuch
+              laedt dieselbe Datei und kann deshalb nie zu einem anderen Ergebnis fuehren. */}
+          {DATA_MODE === "static" ? (
+            <p className="text-pretty">
+              Für diese Säule wurde beim Tagesexport keine Erklärung erzeugt. Der nächste Lauf versucht es erneut. Die
+              Zahlen und Texte oben sind davon nicht betroffen.
+            </p>
+          ) : (
+            <>
+              <p className="text-pretty">{state.message}</p>
+              <Button variant="outline" size="sm" className="mt-2 h-7 gap-1.5 text-xs" onClick={retry}>
+                <RefreshCw className="size-3" />
+                Erneut versuchen
+              </Button>
+            </>
+          )}
         </div>
       ) : null}
     </div>
