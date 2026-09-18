@@ -141,6 +141,18 @@ export interface ConsensusResponse {
   pillar_scores: Record<string, number | null>;
   /** Gewicht je Treiber im Kern, Summe 1. Grundlage der Beitragsrechnung. */
   weights?: Record<string, number>;
+  /** Wie stark jeder Bestandteil den Rohwert bewegen wuerde, wenn er auf einen mittleren Wert zurueckkehrt. */
+  sensitivity?: { id: string; pillar: string; label: string; score: number; points: number }[];
+  /** Naechste Zonengrenze nach oben und unten, und was je Treiber dafuer noetig waere. */
+  tipping?: {
+    boundary: number;
+    zone: ZoneKey;
+    label: string;
+    direction: "up" | "down";
+    rank_gap: number;
+    value_gap: number;
+    drivers: { id: string; name: string; points: number }[];
+  }[];
   overlay_scores: Record<string, number | null>;
   core: number | null;
   mechanics_adjustment: number;
@@ -217,6 +229,8 @@ export interface HealthResponse {
   recording_since?: string | null;
   /** Was das Modell ueber sich selbst sagt: Version, Parameter, Konzentration, Vergleichsfenster. */
   model?: ModelCard;
+  explain_stats?: ExplainStats;
+  calibration?: Calibration;
   mode?: "static";
   generated_at?: string;
 }
@@ -238,6 +252,28 @@ export interface ModelCard {
   concentration: ConcentrationRow[];
   /** Zusammen: wie viel des Scores an Notenbankbilanzen haengt. */
   central_bank_share: number;
+  /** Handgepflegtes Protokoll der Modellaenderungen, neueste zuerst. */
+  changes?: { date: string; what: string; why: string }[];
+  /** Die Historie wird bei jedem Lauf mit den heutigen Parametern nachgerechnet. */
+  history_recomputed?: boolean;
+}
+
+/** Trefferbilanz: Hat das Tool recht behalten? Laeuft an, sobald die erste Aussage 13 Wochen alt ist. */
+export interface Calibration {
+  logged: number;
+  matured: number;
+  hits: number;
+  stated_avg: number | null;
+  actual_rate: number | null;
+  due_from: string | null;
+}
+
+/** Was bei der Texterzeugung tatsaechlich herauskam, nicht was konfiguriert ist. */
+export interface ExplainStats {
+  ready: number;
+  fallback: number;
+  reason: string | null;
+  used_model: string | null;
 }
 
 export const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");

@@ -3,6 +3,7 @@
 import { TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ConsensusResponse, HistoryResponse, PillarResponse } from "@/lib/api";
+import { formatDe } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const WEEKS = 13;
@@ -14,7 +15,9 @@ const WEEKS = 13;
  * dreizehn Wochen sagt, wer den Gesamtwert getragen und wer ihn gebremst hat. Das steht sonst nirgends: Die
  * Kacheln zeigen jede Säule für sich, aber nicht ihren Anteil an der Bewegung.
  */
-export function AttributionPanel({ consensus, pillars, history }: { consensus: ConsensusResponse; pillars: PillarResponse[]; history: HistoryResponse | null }) {
+export function AttributionPanel({
+  consensus, pillars, history, compact = false,
+}: { consensus: ConsensusResponse; pillars: PillarResponse[]; history: HistoryResponse | null; compact?: boolean }) {
   const nameOf = (id: string) => pillars.find((p) => p.id === id)?.name ?? id;
   const weights = consensus.weights;
   if (!history || !weights || Object.keys(weights).length === 0) return null;
@@ -34,6 +37,24 @@ export function AttributionPanel({ consensus, pillars, history }: { consensus: C
   const max = Math.max(...moves.map((m) => Math.abs(m.delta)), 0.5);
   const sorted = [...moves].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
 
+  // H5: Im Einfach-Modus genuegt ein Satz. Ganz fehlen darf die Information nicht, sonst erfaehrt der
+  // Einsteiger nie, warum sich der Wert bewegt hat.
+  if (compact) {
+    const list = sorted.map((m) => `${m.name} ${formatDe(m.delta, 1, true)}`).join(", ");
+    return (
+      <Card className="bg-card ring-white/8">
+        <CardContent className="py-1">
+          <p className="text-sm leading-relaxed text-pretty">
+            <span className="font-medium">Was den Wert zuletzt bewegt hat:</span>{" "}
+            <span className="text-muted-foreground">
+              in {WEEKS} Wochen zusammen {formatDe(total, 1, true)} Punkte, verteilt auf {list}.
+            </span>
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="bg-card ring-white/8">
       <CardContent className="flex flex-col gap-3 py-1">
@@ -43,7 +64,7 @@ export function AttributionPanel({ consensus, pillars, history }: { consensus: C
             Wer hat den Rohwert bewegt? Letzte {WEEKS} Wochen
           </h2>
           <span className="text-[11px] tabular-nums text-muted-foreground/80">
-            zusammen {total >= 0 ? "+" : ""}{total.toFixed(1)} Punkte
+            zusammen {formatDe(total, 1, true)} Punkte
           </span>
         </div>
         <ul className="flex flex-col gap-1.5">
@@ -65,17 +86,52 @@ export function AttributionPanel({ consensus, pillars, history }: { consensus: C
                   />
                 </span>
                 <span className={cn("text-right tabular-nums", up ? "text-emerald-300" : "text-rose-300")}>
-                  {up ? "+" : ""}{m.delta.toFixed(1)}
+                  {formatDe(m.delta, 1, true)}
                 </span>
               </li>
             );
           })}
         </ul>
+        <Sensitivity consensus={consensus} />
         <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
           Beitrag heißt Score mal Gewicht. Eine Säule kann sich also stark bewegen und trotzdem wenig ausmachen,
           wenn ihr Gewicht klein ist. Die Summe ist die Veränderung des Rohwerts vor Overlays und Deckel.
         </p>
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * G1: Was den Wert am ehesten bewegen würde.
+ *
+ * Die Konzentrationsangabe sagt, woran der Score grundsätzlich hängt. Sie sagt nicht, welcher Bestandteil
+ * gerade an einem Extrem steht und deshalb das größte Bewegungspotenzial hat. Am 18.09.2026 war das der
+ * Realzins mit einem Teil-Score von 6: Eine Rückkehr auf einen mittleren Wert hätte den Rohwert um rund
+ * fünf Punkte gehoben, ohne dass sich sonst irgendetwas ändert.
+ */
+function Sensitivity({ consensus }: { consensus: ConsensusResponse }) {
+  const rows = (consensus.sensitivity ?? []).filter((r) => Math.abs(r.points) >= 1).slice(0, 3);
+  if (rows.length === 0) return null;
+  return (
+    <div className="flex flex-col gap-1.5 border-t border-border/60 pt-3">
+      <h3 className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        Was den Wert am ehesten bewegen würde
+      </h3>
+      <ul className="flex flex-col gap-1 text-sm">
+        {rows.map((r) => (
+          <li key={`${r.pillar}-${r.id}`} className="flex flex-wrap items-baseline gap-x-2 text-pretty">
+            <span className="font-medium">{r.label}</span>
+            <span className="text-muted-foreground">
+              steht bei {r.score} von 100. Zurück auf einen mittleren Wert wären das{" "}
+              <span className={cn("tabular-nums", r.points >= 0 ? "text-emerald-300" : "text-rose-300")}>
+                {formatDe(r.points, 1, true)}
+              </span>{" "}
+              Punkte.
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

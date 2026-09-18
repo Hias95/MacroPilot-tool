@@ -12,6 +12,7 @@ import { AttributionPanel } from "./attribution-panel";
 import { BenchmarkPanel } from "./benchmark-panel";
 import { ChangesPanel } from "./changes-panel";
 import { LimitsPanel } from "./limits-panel";
+import { SituationNote } from "./situation-note";
 import { ModelPanel } from "./model-panel";
 import { OutlookPanel } from "./outlook-panel";
 import { EasyDashboard } from "./easy/easy-dashboard";
@@ -111,6 +112,7 @@ export function DashboardClient() {
   return (
     <>
       <ConsensusPanel consensus={consensus} pillars={pillars} overlays={overlays} history={history ? history.consensus : history} />
+      <SituationNote zone={consensus.zone_key} />
       <OutlookPanel
         zoneKey={consensus.zone_key}
         zoneLabel={consensus.zone}

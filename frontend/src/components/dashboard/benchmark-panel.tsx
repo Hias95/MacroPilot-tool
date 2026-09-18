@@ -5,11 +5,11 @@ import { ChartNoAxesColumn } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { BacktestPerformance, BacktestResponse, BacktestVariant, BenchmarkResult, ZoneKey } from "@/lib/api";
 import { THIN_EVIDENCE_EPISODES, liveVariant, loadBacktest, zoneBandOf } from "@/lib/backtest";
-import { formatDateDe } from "@/lib/format";
+import { formatDateDe, formatDe } from "@/lib/format";
 import { ZONES } from "@/lib/score";
 import { cn } from "@/lib/utils";
 
-const pct = (n: number, digits = 1) => `${n > 0 ? "+" : ""}${n.toFixed(digits)} %`;
+const pct = (n: number, digits = 1) => `${formatDe(n, digits, true)} %`;
 
 /** Der Backtest rechnet mit Kursen des ETF, gemeint ist der Index dahinter. */
 const BENCHMARK_NAMES: Record<string, string> = { SPY: "S&P 500", QQQ: "Nasdaq 100", GLD: "Gold", IBIT: "Bitcoin" };
@@ -23,8 +23,8 @@ const STRATEGIES: { key: keyof Pick<BacktestVariant, "buy_hold" | "strategy_base
 
 const COLUMNS: { label: string; get: (p: BacktestPerformance) => string; hint: string }[] = [
   { label: "Rendite p. a.", get: (p) => pct(p.cagr_pct), hint: "Durchschnittlicher Wertzuwachs pro Jahr über den ganzen Zeitraum." },
-  { label: "Schwankung", get: (p) => `${p.vol_pct.toFixed(1)} %`, hint: "Wie stark der Wert um seinen Trend schwankt, pro Jahr." },
-  { label: "Größter Rückgang", get: (p) => `${p.max_drawdown_pct.toFixed(1)} %`, hint: "Der tiefste Absturz vom Höchststand bis zum Tiefpunkt." },
+  { label: "Schwankung", get: (p) => `${formatDe(p.vol_pct)} %`, hint: "Wie stark der Wert um seinen Trend schwankt, pro Jahr." },
+  { label: "Größter Rückgang", get: (p) => `${formatDe(p.max_drawdown_pct)} %`, hint: "Der tiefste Absturz vom Höchststand bis zum Tiefpunkt." },
   { label: "Zeit im Markt", get: (p) => `${Math.round(p.avg_exposure * 100)} %`, hint: "Wie viel des Geldes im Schnitt investiert war." },
 ];
 
@@ -75,6 +75,7 @@ export function BenchmarkPanel({ currentZone }: { currentZone?: ZoneKey }) {
               zehn heißt: Die Zahlen beruhen auf einer Handvoll Fälle und können Zufall sein.
             </p>
             <ZoneTable variant={variant} currentZone={currentZone} />
+            <ZoneTableNote variant={variant} />
             {data?.early_window && data?.test_window ? (
               <EraNote early={data.early_window} late={data.test_window} />
             ) : null}
@@ -108,7 +109,7 @@ function ZoneTable({ variant, currentZone }: { variant: BacktestVariant; current
             <th scope="col" className="py-1.5 text-left font-medium">Ampelzone</th>
             <th scope="col" className="py-1.5 text-right font-medium">Anteil, getrennte Phasen</th>
             <th scope="col" className="py-1.5 pl-5 text-left font-medium">Danach 13 Wochen</th>
-            <th scope="col" className="py-1.5 text-right font-medium">davon positiv</th>
+            <th scope="col" className="py-1.5 text-right font-medium">davon positiv, Spanne</th>
             <th scope="col" className="py-1.5 text-right font-medium">Danach 52 Wochen</th>
           </tr>
         </thead>
@@ -141,7 +142,16 @@ function ZoneTable({ variant, currentZone }: { variant: BacktestVariant; current
                     <span className="tabular-nums">{pct(b.mean_fwd_13w)}</span>
                   </span>
                 </td>
-                <td className="py-2 text-right tabular-nums text-muted-foreground">{b.hit_rate_13w.toFixed(0)} %</td>
+                <td className="py-2 text-right tabular-nums text-muted-foreground">
+                  {b.hit_rate_13w.toFixed(0)} %
+                  {/* F1: Ohne die Spanne liest sich jede Zeile wie eine Messung. Tatsaechlich ueberlappen
+                      sich die Zonen fast vollstaendig, und genau das ist die ehrlichste Aussage der Tabelle. */}
+                  {b.hit_low_13w != null && b.hit_high_13w != null ? (
+                    <span className="ml-1 whitespace-nowrap text-[11px] text-muted-foreground/70">
+                      {b.hit_low_13w.toFixed(0)} bis {b.hit_high_13w.toFixed(0)}
+                    </span>
+                  ) : null}
+                </td>
                 <td className="py-2 text-right tabular-nums text-muted-foreground">{pct(b.mean_fwd_52w)}</td>
               </tr>
             );
@@ -156,7 +166,7 @@ function ZoneTable({ variant, currentZone }: { variant: BacktestVariant; current
 function StrategyTable({ variant }: { variant: BacktestVariant }) {
   // "Praktisch nichts gespart" heisst: weniger als einen Prozentpunkt besser als schlichtes Halten.
   const baseSavedNothing = variant.strategy_base.max_drawdown_pct - variant.buy_hold.max_drawdown_pct < 1;
-  const fmtPct = (n: number) => `${n.toFixed(1)} %`;
+  const fmtPct = (n: number) => `${formatDe(n)} %`;
   return (
     <div className="flex flex-col gap-2">
       <h3 className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -273,7 +283,7 @@ function OtherAssets({ benchmarks, zone, zoneLabel }: { benchmarks: BenchmarkRes
 /** Die gemessene Trennschärfe einer Anlage, als knapper Einschub im Fließtext. */
 function rank(benchmarks: BenchmarkResult[], key: string): string {
   const ic = benchmarks.find((b) => b.key === key)?.ic_13w;
-  return ic == null ? "" : ` (${ic > 0 ? "+" : ""}${ic.toFixed(2)})`;
+  return ic == null ? "" : ` (${formatDe(ic, 2, true)})`;
 }
 
 /**
@@ -292,10 +302,35 @@ function EraNote({ early, late }: { early: BenchmarkResult; late: BenchmarkResul
     <p className="max-w-3xl rounded-lg border border-amber-400/20 bg-amber-400/5 p-3 text-xs leading-relaxed text-pretty">
       <span className="font-medium text-amber-200">Das Modell war nicht immer gleich gut.</span>{" "}
       Wie stark die Zonen den folgenden Ertrag überhaupt getrennt haben, unterscheidet sich stark nach Zeitraum: von{" "}
-      {earlyYear} bis {lateYear - 1} <strong>{word(early.ic_13w)}</strong> ({early.ic_13w.toFixed(2)}), ab {lateYear}{" "}
-      <strong>{word(late.ic_13w)}</strong> ({late.ic_13w.toFixed(2)}). Der größte Teil der Aussagekraft stammt aus den
+      {earlyYear} bis {lateYear - 1} <strong>{word(early.ic_13w)}</strong> ({formatDe(early.ic_13w, 2)}), ab {lateYear}{" "}
+      <strong>{word(late.ic_13w)}</strong> ({formatDe(late.ic_13w, 2)}). Der größte Teil der Aussagekraft stammt aus den
       späteren Jahren. Ob das am veränderten Umfeld liegt oder an Zufall, lässt sich mit einem einzigen Marktzyklus nicht
       entscheiden.
+    </p>
+  );
+}
+
+/**
+ * F1 und F2: Zwei Dinge, die die Tabelle selbst nicht sagen kann.
+ *
+ * Erstens überlappen sich die Spannen der Zonen fast vollständig. Die Leiter sieht ordentlich aus, ist
+ * statistisch aber nicht abgesichert. Zweitens fällt die 52-Wochen-Spalte aus der Reihe, und zwar aus einem
+ * nachvollziehbaren Grund: Auf Jahressicht passen in eine Zone kaum noch überschneidungsfreie Fenster.
+ */
+function ZoneTableNote({ variant }: { variant: BacktestVariant }) {
+  const withRange = variant.bands.filter((b) => b.hit_low_13w != null && b.hit_high_13w != null);
+  if (withRange.length < 2) return null;
+  const widest = Math.max(...withRange.map((b) => (b.hit_high_13w ?? 0) - (b.hit_low_13w ?? 0)));
+  // Wie viele überschneidungsfreie Ein-Jahres-Fenster stecken in der dünnsten Zone?
+  const thinnestYear = Math.min(...variant.bands.map((b) => Math.max(1, Math.floor(b.weeks / 52))));
+
+  return (
+    <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
+      <span className="text-amber-300/90">Die Zonen sind nicht so klar getrennt, wie die Tabelle aussieht.</span>{" "}
+      Die Spannen dahinter überlappen sich fast vollständig, die breiteste ist {widest.toFixed(0)} Punkte weit. Die Reihenfolge
+      der Zonen ist also plausibel, aber statistisch nicht abgesichert. Die letzte Spalte fällt zusätzlich aus der Reihe: Auf
+      Jahressicht passen in eine Zone teils nur {thinnestYear} überschneidungsfreie Zeiträume, dort ist praktisch alles Zufall.
+      Belastbar ist an dieser Tabelle die Spalte für 13 Wochen, und auch die nur mit ihrer Spanne.
     </p>
   );
 }

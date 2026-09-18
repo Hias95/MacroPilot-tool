@@ -158,6 +158,13 @@ def set_meta(key: str, value: str) -> None:
         conn.execute("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", (key, value))
 
 
+def meta_with_prefix(prefix: str) -> dict[str, str]:
+    """Alle Meta-Eintraege, deren Schluessel mit `prefix` beginnt. Grundlage der Trefferbilanz."""
+    with _lock, _connect() as conn:
+        rows = conn.execute("SELECT key, value FROM meta WHERE key LIKE ? ORDER BY key", (f"{prefix}%",)).fetchall()
+    return dict(rows)
+
+
 def first_snapshot_date() -> str | None:
     """Tag des aeltesten Tagesbilds. Die Aenderungsliste darf nicht "letzte 365 Tage" behaupten, wenn erst
     seit drei Tagen aufgezeichnet wird."""

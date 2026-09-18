@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from . import backtest, data_quality, model_card, notify, store
+from . import backtest, calibration, data_quality, model_card, notify, store
 from .config import get_settings
 from .explain import explain_pillar, resolve_provider
 from .history import build_history
@@ -95,12 +95,26 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
     _dump(out / "data-quality.json", data_quality.to_dict(quality))
     provider = await resolve_provider()
     explanations = {}
+    # Was tatsaechlich herauskam, nicht was konfiguriert ist. Ein stiller Rueckfall auf regelbasierte Texte
+    # blieb sonst wochenlang unbemerkt, waehrend die Kopfzeile weiter den konfigurierten Anbieter meldete.
+    explain_stats = {"ready": 0, "fallback": 0, "reason": None, "used_model": None}
     if with_explanations:
         for p in [*dashboard.pillars, *dashboard.overlays]:
             try:
-                explanations[p.id] = (await explain_pillar(p)).model_dump(mode="json")
+                result = await explain_pillar(p)
+                explanations[p.id] = result.model_dump(mode="json")
+                if result.status == "ready" and result.provider not in (None, "template"):
+                    explain_stats["ready"] += 1
+                    explain_stats["used_model"] = result.model
+                else:
+                    explain_stats["fallback"] += 1
+                    explain_stats["reason"] = explain_stats["reason"] or result.reason
             except Exception as exc:  # noqa: BLE001 - eine fehlende Erklaerung darf den Export nicht stoppen
+                explain_stats["fallback"] += 1
+                explain_stats["reason"] = explain_stats["reason"] or f"{type(exc).__name__}"
                 log(f"Erklaerung {p.id} fehlgeschlagen: {exc}")
+        log(f"Erklaerungen: {explain_stats['ready']} vom Anbieter, {explain_stats['fallback']} regelbasiert"
+            + (f" ({explain_stats['reason']})" if explain_stats["reason"] else ""))
     _dump(out / "explanations.json", explanations)
     settings = get_settings()
     meta = {
@@ -113,6 +127,9 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
         "oldest_input": store.get_meta("oldest_input"),
         # Was das Modell ueber sich selbst sagt: Version, Parameter, Konzentration, Vergleichsfenster.
         "model": model_card.model_card(),
+        "explain_stats": explain_stats,
+        # Trefferbilanz: laeuft automatisch an, sobald die erste Aussage dreizehn Wochen alt ist.
+        "calibration": await calibration.evaluate(),
         "recording_since": store.first_snapshot_date(),
         # Eingerichtete Kanaele, nicht die benutzten: ohne neue Ereignisse verschickt ein Lauf nichts, das sagt
         # aber nichts ueber die Konfiguration. Was wirklich rausging, steht daneben.

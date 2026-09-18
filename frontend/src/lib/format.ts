@@ -119,3 +119,12 @@ export function ageText(iso: string): string {
   if (days === 1) return "1 Tag alt";
   return `${days} Tage alt`;
 }
+
+/**
+ * Zahl mit deutschem Dezimalkomma. In den zuletzt gebauten Bausteinen stand "+11.3 Punkte" neben
+ * "+17,4 Pkt." aus der aelteren Formatierung; das sah nach Maschine aus statt nach Sorgfalt.
+ */
+export function formatDe(value: number, digits = 1, sign = false): string {
+  const text = value.toLocaleString("de-DE", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return sign && value > 0 ? `+${text}` : text;
+}

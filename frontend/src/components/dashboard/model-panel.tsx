@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Layers } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { fetchHealth, type ModelCard } from "@/lib/api";
+import { fetchHealth, type Calibration, type ExplainStats, type ModelCard } from "@/lib/api";
+import { formatDateDe } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /**
@@ -17,11 +18,18 @@ import { cn } from "@/lib/utils";
  */
 export function ModelPanel() {
   const [card, setCard] = useState<ModelCard | null | undefined>(undefined);
+  const [stats, setStats] = useState<ExplainStats | null>(null);
+  const [calib, setCalib] = useState<Calibration | null>(null);
 
   useEffect(() => {
     let alive = true;
     fetchHealth()
-      .then((h) => alive && setCard(h.model ?? null))
+      .then((h) => {
+        if (!alive) return;
+        setCard(h.model ?? null);
+        setStats(h.explain_stats ?? null);
+        setCalib(h.calibration ?? null);
+      })
       .catch(() => alive && setCard(null));
     return () => {
       alive = false;
@@ -72,11 +80,56 @@ export function ModelPanel() {
         </ul>
 
         <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
-          Der Rang vergleicht mit den vorangegangenen {years} Jahren. Dieser Maßstab wandert mit: Ein Rang von 71 wird heute
+          Der Rang vergleicht mit den vorangegangenen {years} Jahren. Dieser Maßstab wandert mit: Ein Rang wird heute
           gegen andere Jahre gemessen als vor fünf Jahren, und die enthielten Nullzinsen. Zonen wechseln erst nach{" "}
-          {card.zone_confirm_weeks} Wochen in Folge. Die Parameterkennung oben ändert sich, sobald an Gewichten oder Schwellen
-          etwas geändert wird.
+          {card.zone_confirm_weeks} Wochen in Folge.
         </p>
+
+        {/* F3: Ohne Datum steht die Parameterkennung in der Luft. Und der Verlauf oben zeigt nicht, was das
+            Werkzeug damals angezeigt hat, sondern was es mit den heutigen Parametern angezeigt hätte. */}
+        {card.changes?.length ? (
+          <div className="flex flex-col gap-1.5">
+            <h3 className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Was wann geändert wurde</h3>
+            <ul className="flex flex-col gap-1 text-xs">
+              {card.changes.map((c) => (
+                <li key={`${c.date}-${c.what}`} className="flex gap-3 text-pretty">
+                  <span className="w-20 shrink-0 font-mono tabular-nums text-muted-foreground">{formatDateDe(c.date)}</span>
+                  <span>
+                    <span className="text-foreground/90">{c.what}.</span>{" "}
+                    <span className="text-muted-foreground">{c.why}.</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {card.history_recomputed ? (
+              <p className="text-[11px] leading-relaxed text-amber-300/90 text-pretty">
+                Wichtig dabei: Der lange Verlauf oben ist mit den heutigen Parametern nachgerechnet. Er zeigt, was das Werkzeug
+                heute über die Vergangenheit sagt, nicht was es damals angezeigt hat. Erst die Tagesbilder halten das
+                tatsächlich Gezeigte fest.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        {/* G2: Die eigene Trefferbilanz. Solange nichts ausgewertet werden kann, sagt sie genau das,
+            statt die Lücke zu verschweigen. */}
+        {calib && calib.logged > 0 ? (
+          <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
+            <span className="text-foreground/90">Eigene Trefferbilanz:</span>{" "}
+            {calib.matured > 0 && calib.actual_rate != null && calib.stated_avg != null
+              ? `Von ${calib.matured} überprüfbaren Aussagen sind ${calib.hits} eingetroffen. Behauptet wurden im Schnitt ${calib.stated_avg} Prozent, tatsächlich waren es ${calib.actual_rate} Prozent.`
+              : `${calib.logged} ${calib.logged === 1 ? "Aussage ist" : "Aussagen sind"} protokolliert, aber noch keine alt genug. Jede Aussage gilt für 13 Wochen, die erste Auswertung ist ab dem ${calib.due_from ? new Date(calib.due_from).toLocaleDateString("de-DE") : "?"} möglich.`}
+          </p>
+        ) : null}
+
+        {/* F4: Ein stiller Rückfall auf regelbasierte Texte blieb sonst unbemerkt. */}
+        {stats && stats.ready + stats.fallback > 0 ? (
+          <p className={cn("text-[11px] leading-relaxed text-pretty", stats.ready === 0 ? "text-amber-300/90" : "text-muted-foreground/80")}>
+            Erklärtexte im letzten Lauf: {stats.ready} vom Sprachmodell, {stats.fallback} regelbasiert
+            {stats.ready > 0 && stats.used_model ? `, Modell ${stats.used_model}` : ""}
+            {stats.fallback > 0 && stats.reason ? `. Grund für den Rückfall: ${stats.reason}` : "."}
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   );

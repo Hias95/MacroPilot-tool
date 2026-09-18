@@ -159,11 +159,15 @@ def test_weighting_note_ranks_timing_against_fall_height():
     assert "halten sich stützende und bremsende Kräfte die Waage" in c.weighting
     assert "nicht im Zeitpunkt, sondern in der Fallhöhe" in c.weighting
     # Bewusst ohne die Einzelheiten zur Bewertung: die stehen im Regime-Hinweis darunter.
-    assert "extrem teuer" not in c.weighting and len(c.weighting) < 300
+    assert "extrem teuer" not in c.weighting
+    # Sagt auch, ob der Deckel ueberhaupt wirkt, und verweist fuer lange Horizonte auf die Bewertung.
+    assert "Der Deckel aus der Bewertung" in c.weighting
+    assert "über fünf Jahre" in c.weighting and "14 von 100" in c.weighting
 
     # Faire Bewertung: kein Satz zur Fallhoehe.
     fair = build_consensus(drivers_, [pillar("valuation", 60), pillar("mechanics", 49), pillar("markets", 52)], state)
     assert "Fallhöhe" not in fair.weighting
+    assert "60 von 100" in fair.weighting, "der Langfrist-Hinweis gilt unabhaengig von der Bewertungshoehe"
 
     # Ein Veto ueberlagert alles.
     weak = [pillar("liquidity", 8, 10, -5.0), pillar("cycle", 93, 95, 20.0), pillar("structure", 44)]
@@ -204,3 +208,41 @@ def test_wilson_interval_stays_wide_when_the_sample_is_thin():
     assert lo < 60 and hi == 100.0
     lo2, hi2 = wilson_interval(19, 24)
     assert 55 < lo2 < 65 and 85 < hi2 < 95
+
+
+def test_sensitivity_names_the_component_with_the_most_room():
+    """Welcher Bestandteil den Rohwert am staerksten bewegen wuerde, wenn er sich normalisiert."""
+    from datetime import date as _date
+
+    from app.schemas import Component
+
+    def comp(cid, score):
+        return Component(id=cid, label=cid, value=0.0, unit="x", format="index", date=_date(2026, 9, 1), score=score)
+
+    drivers_ = [
+        pillar("liquidity", 53).model_copy(update={"components": [comp("net", 55), comp("global", 38), comp("tbill", 72)]}),
+        pillar("cycle", 89),
+        pillar("structure", 42).model_copy(update={
+            "components": [comp("curve", 49), comp("real", 6), comp("cpi", 69), comp("dsr", 62), comp("interest", 41)]}),
+    ]
+    c = build_consensus(drivers_, [pillar("valuation", 60), pillar("mechanics", 49), pillar("markets", 52)])
+    top = c.sensitivity[0]
+    # Realzins: 0,45 Saeulengewicht mal 0,25 im Inneren mal 44 Punkte Abstand zur Mitte = knapp 5 Punkte.
+    assert top["id"] == "real" and 4.5 < top["points"] < 5.5
+    assert all(abs(a["points"]) >= abs(b["points"]) for a, b in zip(c.sensitivity, c.sensitivity[1:]))
+
+
+def test_fallback_and_full_path_both_stay_constructible():
+    """Beide Rueckgabewege muessen gueltig bleiben.
+
+    Zweimal ist ein Patch versehentlich in `_fallback` gelandet statt in `build_consensus`, weil beide
+    dieselbe Zeile mit `pillar_scores=` enthalten. Einmal fehlten die Gewichte im echten Pfad, einmal
+    stuerzte der Fallback ab. Dieser Test faengt beides.
+    """
+    full = build_consensus([pillar("liquidity", 54), pillar("cycle", 93), pillar("structure", 44)])
+    assert full.method == "macropilot-v2-rank" and full.weights
+
+    incomplete = [pillar("liquidity", 40), pillar("cycle", 60), pillar("structure", 50)]
+    incomplete[2].score = None
+    fb = build_consensus(incomplete)
+    assert fb.method == "mean-fallback" and fb.weights and fb.sensitivity == []

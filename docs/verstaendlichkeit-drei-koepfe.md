@@ -158,6 +158,38 @@ Zuerst, weil eine geschönte Einsteigerfassung jeden anderen Fortschritt entwert
 | K1 | Das Tool als Lernwerkzeug benennen, nicht als Lagebericht. Der Untertitel "Das Marktklima auf einen Blick" verspricht Signal, geliefert wird Verständnis | alle | sehr klein |
 | K2 | Handlungsdrang dämpfen statt bedienen: an geeigneter Stelle sagen, dass bei den meisten Privatanlegern der Nutzen im Nichtstun liegt | Lena, Bernd | klein |
 
+## 5a. Umgesetzt am 19.09.2026
+
+**Stufe E, sichtbar falsch.** Der Bedingungs-Satz vergleicht jetzt auf den gerundeten Werten, deshalb steht
+statt "8 von 10 statt 8 von 10 sonst" wieder "8 von 10, das hat historisch wenig geaendert". Alle Zahlen in
+den neuen Bausteinen tragen deutsches Komma. Die Gold-Behauptung im Regime-Hinweis ist durch die eigene
+Messung ersetzt. "-1 Punkte" heisst wieder "-1 Punkt".
+
+**Stufe F, Vertrauen.** Die Zonentabelle zeigt neben jeder Trefferquote ihre Spanne und sagt darunter, dass
+die Zonen sich fast vollstaendig ueberlappen und die 52-Wochen-Spalte auf zu wenigen Zeitraeumen beruht. Das
+Modell-Panel fuehrt ein datiertes Aenderungsprotokoll und sagt ausdruecklich, dass der lange Verlauf mit den
+heutigen Parametern nachgerechnet ist. Der Gemini-Client sucht bei einem 404 selbst ein verfuegbares Modell,
+und der Export weist aus, wie viele Texte tatsaechlich vom Sprachmodell kamen.
+
+**Stufe G, Substanz.** Die Empfindlichkeit steht neben der Attribution: Der Realzins mit einem Teil-Score von
+6 wuerde bei Rueckkehr auf einen mittleren Wert rund fuenf Punkte bringen. Die Trefferbilanz laeuft als
+Geruest mit und sagt heute, dass die erste Auswertung ab dem 18.12.2026 moeglich ist.
+
+**Stufe H, gleiches Bild.** Der Einfach-Modus hat jetzt eine eigene Karte "Was du ueber dieses Modell wissen
+solltest" mit drei Saetzen ohne Zahlen: das Modell funktionierte bis 2018 kaum, die Zonenregeln kosteten
+Rendite ohne den Absturz zu verhindern, und die Zahl gilt nur fuer US-Aktien auf drei Monate. Dazu die
+Kurzfassung der Attribution, der Hinweis auf den nicht greifenden Deckel im gemeinsamen Gewichtungssatz und
+derselbe Verlaufsausschnitt wie im Profi-Modus.
+
+**Stufe I, die richtige Frage.** Die Ueberschrift heisst "Umfeld fuer die naechsten drei Monate". Der
+Gewichtungssatz nennt fuer lange Zeitraeume die Bewertung als besseren Anhaltspunkt. Im Einfach-Modus steht
+der Satz vor dem Tacho, nicht daneben. Und neu: eine Situationswahl mit drei Lagen, die dieselben Daten
+unterschiedlich einordnet, ohne eine Empfehlung zu geben.
+
+**Stufe J, Wiederkommen.** Die Zahl hat einen Vergleich bekommen ("vor einem Monat 45, vor einem Jahr 66"),
+und die Kippschwelle sagt, was bis zur naechsten Zone fehlt, je Treiber gerechnet. Offen bleibt J3, die
+aehnlichsten Wochen der Geschichte, und J5, ein eigener Einstiegspfad; die Lesehilfe deckt davon einen Teil.
+
 ## 6. Was das für Stufe E bedeutet
 
 Nichts wird hinfällig, aber zwei Punkte werden wichtiger und einer wächst:

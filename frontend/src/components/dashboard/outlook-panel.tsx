@@ -173,7 +173,12 @@ function ConditionLine({ now, other, intro }: { now: ConditionalBand; other: Con
   if (hit == null) return null;
   const mine = Math.round(hit / 10);
   const theirs = other?.hit_rate_13w != null ? Math.round(other.hit_rate_13w / 10) : null;
-  const matters = other?.hit_rate_13w != null && Math.abs(hit - other.hit_rate_13w) >= CONDITION_MATTERS_PP;
+  // Verglichen wird auf den gerundeten Werten, nicht auf den Rohwerten. Sonst entstand der Satz
+  // "8 von 10 statt 8 von 10 sonst": 84,0 gegen 78,3 ueberschritt die Schwelle, beide rundeten auf 8.
+  const matters =
+    other?.hit_rate_13w != null &&
+    Math.abs(hit - other.hit_rate_13w) >= CONDITION_MATTERS_PP &&
+    theirs !== mine;
   const thin = now.episodes > 0 && now.episodes < THIN_EVIDENCE_EPISODES;
 
   return (

@@ -64,6 +64,18 @@ def parameters_hash() -> str:
     return hashlib.sha256(payload.encode()).hexdigest()[:10]
 
 
+# Handgepflegtes Protokoll der Modellaenderungen. Ohne das steht die Parameterkennung ohne Datum da, und
+# der Leser kann nicht wissen, ab wann welche Zahlen galten. Neueste Aenderung zuerst.
+MODEL_CHANGES = [
+    {"date": "2026-09-18", "what": "Treibergewichte von 55/15/30 auf 40/15/45",
+     "why": "Die Konzentration auf die Liquiditaet war durch die Daten nicht gedeckt"},
+    {"date": "2026-09-16", "what": "Marktsignale vom Treiber zum Overlay",
+     "why": "Als Treiber verschlechterten sie den Score, als Bestaetigung sind sie aussagekraeftig"},
+    {"date": "2026-09-16", "what": "Anzeige auf Rang mit Ampelzonen umgestellt",
+     "why": "Der Rohwert war komprimiert und trennte kaum"},
+]
+
+
 def model_card() -> dict:
     top = concentration()
     central_bank = sum(r["share"] for r in top if r["label"].startswith(("Net Liquidity", "Notenbankbilanzen")))
@@ -76,4 +88,8 @@ def model_card() -> dict:
         "zone_confirm_weeks": ZONE_CONFIRM_WEEKS,
         "concentration": top,
         "central_bank_share": round(central_bank, 4),
+        "changes": MODEL_CHANGES,
+        #: Die Historie wird bei jedem Lauf mit den heutigen Parametern nachgerechnet. Der Verlauf zeigt also
+        #: nicht, was das Werkzeug damals angezeigt hat. Ab dem ersten Tagesbild gilt das nicht mehr.
+        "history_recomputed": True,
     }

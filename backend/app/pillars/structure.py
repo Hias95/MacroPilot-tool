@@ -105,7 +105,10 @@ def fiscal_regime(interest_pct: float, tbill_pct: float, repression_pp: float) -
     return RegimeFlag(
         id="fiscal_dominance", label="Fiskalische Dominanz", active=met >= f["needed"], met_count=met, needed=f["needed"],
         criteria=criteria,
-        hint="Der Staat finanziert sich kurz und teuer; die Notenbank kann die Zinsen kaum frei setzen. Historisch profitieren Sachwerte und Gold, Anleihen verlieren real.",
+        # Bis 18.09.2026 stand hier "Historisch profitieren Sachwerte und Gold". Der eigene Vergleich im
+        # Profi-Modus misst fuer Gold eine Trennschaerfe von +0,03 und fuer Anleihen -0,05, also praktisch
+        # nichts. Eine Behauptung, die die eigenen Daten widerlegen, gehoert nicht ins Werkzeug.
+        hint="Der Staat finanziert sich kurz und teuer; die Notenbank kann die Zinsen kaum frei setzen. Was daraus für einzelne Anlageklassen folgt, misst dieses Modell nicht: Für Gold und Anleihen hat es kaum Aussagekraft.",
     )
 
 

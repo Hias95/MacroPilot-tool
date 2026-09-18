@@ -262,12 +262,14 @@ def _why(r: CoreResult, by: dict[str, PillarResponse], ov: dict[str, PillarRespo
     mech = ov.get("mechanics")
     if mech and mech.score:
         adj = "±0" if abs(r.mechanics_adjustment) < 0.5 else f"{r.mechanics_adjustment:+.0f}"
+        # "-1 Punkte" war Einzahl mit Pluralwort.
+        unit = "Punkt" if abs(round(r.mechanics_adjustment)) == 1 else "Punkte"
         if mech.regime and mech.regime.active:
-            parts.append(f"Marktmechanik in der Panik-Zone ({adj} Punkte): extreme Angst war historisch eher Kaufzone.")
+            parts.append(f"Marktmechanik in der Panik-Zone ({adj} {unit}): extreme Angst war historisch eher Kaufzone.")
         else:
             mood = "ruhig" if mech.score.score > 60 else "angespannt" if mech.score.score < 40 else "unauffällig"
             reason = " Sorglosigkeit kostet etwas Rohwert." if r.mechanics_adjustment <= -1 else " Stress zählt als Kontra-Signal leicht positiv." if r.mechanics_adjustment >= 1 else ""
-            parts.append(f"Marktmechanik {mood} ({adj} Punkte).{reason}")
+            parts.append(f"Marktmechanik {mood} ({adj} {unit}).{reason}")
     mk = ov.get("markets")
     if mk and mk.score:
         key = market_confirmation(rank, mk.score.score)
@@ -308,6 +310,7 @@ def weighting_note(r: CoreResult, ov: dict[str, PillarResponse], zone_key: str, 
     Ein Veto schlaegt alles, danach zaehlt die Zone fuer den Zeitpunkt, die Marktbestaetigung fuer deren
     Verlaesslichkeit, und die Bewertung sagt nichts ueber den Zeitpunkt, sondern ueber die Fallhoehe.
     """
+    binding = r.cap is not None and r.adjusted > r.cap
     if r.vetoes:
         parts = [f"Ein Veto überlagert alles andere: {', '.join(VETO_LABEL[v] for v in r.vetoes)}. "
                  f"Solange es gilt, ist der Score nach oben gedeckelt, unabhängig vom übrigen Bild."]
@@ -320,10 +323,94 @@ def weighting_note(r: CoreResult, ov: dict[str, PillarResponse], zone_key: str, 
     val_score = val.score.score if val and val.score else None
     if val_score is not None and val_score < 25:
         # Bewusst kurz: Die Einzelheiten stehen im Regime-Hinweis darunter. Hier zaehlt nur die Rangfolge.
-        parts.append("Das Risiko liegt dabei nicht im Zeitpunkt, sondern in der Fallhöhe.")
+        # "sie" liess offen, ob die Fallhoehe oder der Deckel gemeint ist. Jetzt steht das Subjekt da.
+        tail = (" Der Deckel aus der Bewertung greift dabei gerade nicht." if not binding
+                else " Der Deckel aus der Bewertung drückt den Wert gerade aktiv.")
+        parts.append("Das Risiko liegt dabei nicht im Zeitpunkt, sondern in der Fallhöhe." + tail)
     elif val_score is not None and val_score < 45:
         parts.append("Die Bewertung sagt nichts über den Zeitpunkt, erhöht aber die Fallhöhe.")
+    if val_score is not None:
+        # Bernds Frage: Er entscheidet auf zehn Jahre, das Tool spricht ueber drei Monate. Die Bewertung ist
+        # die einzige Kennzahl hier, die auf seinem Horizont etwas taugt, und genau die stuft das Tool sonst
+        # als ohne Timing-Wert ein. Richtig, aber ohne diesen Hinweis irrefuehrend.
+        parts.append(f"Für Zeiträume über fünf Jahre sagt dieser Score wenig; dafür ist die Bewertung der "
+                     f"bessere Anhaltspunkt, und die steht bei {val_score} von 100.")
     return " ".join(x for x in parts if x)
+
+
+def sensitivity(pillars: list[PillarResponse]) -> list[dict]:
+    """Welcher Bestandteil wuerde den Rohwert am staerksten bewegen, wenn er sich normalisiert?
+
+    Die Konzentrationsangabe im Modell-Panel sagt, woran der Score grundsaetzlich haengt. Sie sagt nicht,
+    welcher Bestandteil gerade an einem Extrem steht und deshalb das groesste Bewegungspotenzial hat. Am
+    18.09.2026 war das der Realzins mit einem Teil-Score von 6: Eine Rueckkehr auf einen mittleren Wert haette
+    den Rohwert um rund fuenf Punkte gehoben, ohne dass sich sonst etwas aendert.
+    """
+    from .model_card import INNER_WEIGHTS, SERIES_LABELS
+
+    out: list[dict] = []
+    for p in pillars:
+        weight = CONSENSUS_WEIGHTS.get(p.id)
+        inner = INNER_WEIGHTS.get(p.id, {})
+        if weight is None:
+            continue
+        for c in p.components:
+            if c.id not in inner or c.score is None:
+                continue
+            points = weight * inner[c.id] * (50 - c.score)
+            out.append({
+                "id": c.id, "pillar": p.id,
+                "label": SERIES_LABELS.get((p.id, c.id), c.label),
+                "score": c.score, "points": round(points, 1),
+            })
+    return sorted(out, key=lambda r: abs(r["points"]), reverse=True)
+
+
+def _value_at_rank(window: list[float], rank: float) -> float | None:
+    """Welcher Rohwert entspraeche diesem Rang im aktuellen Vergleichsfenster?"""
+    if not window:
+        return None
+    xs = sorted(window)
+    pos = max(0.0, min(1.0, rank / 100.0)) * (len(xs) - 1)
+    lo, hi = int(pos), min(int(pos) + 1, len(xs) - 1)
+    return xs[lo] + (xs[hi] - xs[lo]) * (pos - lo)
+
+
+def tipping(state: ConsensusState | None, adjusted: float, rank: int, by: dict[str, PillarResponse]) -> list[dict]:
+    """Was müsste sich ändern, damit die Zone kippt?
+
+    Der angezeigte Rang ist ein Perzentil im Fenster der letzten zehn Jahre. Um die naechste Zonengrenze zu
+    erreichen, muss der Rohwert auf den Wert steigen oder fallen, der dort im Fenster liegt. Diese Differenz
+    laesst sich durch das Gewicht eines Treibers teilen: So viele Punkte muesste allein dieser Treiber
+    zulegen, wenn sich sonst nichts bewegt. Das macht die Gewichte erfahrbar.
+    """
+    if not state or not state.window:
+        return []
+    out: list[dict] = []
+    for boundary, target_key in ((90, "very_positive"), (70, "positive"), (30, "negative"), (10, "very_negative")):
+        crossing_up = rank < boundary
+        target_value = _value_at_rank(state.window, boundary)
+        if target_value is None:
+            continue
+        gap = target_value - adjusted
+        # Nur die jeweils naechste Grenze nach oben und nach unten ist interessant.
+        out.append({
+            "boundary": boundary, "zone": target_key, "label": ZONE_LABEL[target_key],
+            "direction": "up" if crossing_up else "down",
+            "rank_gap": abs(boundary - rank), "value_gap": round(gap, 1),
+            "drivers": [
+                {"id": k, "name": DRIVER_NAMES.get(k, k), "points": round(gap / w, 1)}
+                for k, w in CONSENSUS_WEIGHTS.items() if w > 0 and k in by
+            ],
+        })
+    ups = [o for o in out if o["direction"] == "up"]
+    downs = [o for o in out if o["direction"] == "down"]
+    nearest = []
+    if ups:
+        nearest.append(min(ups, key=lambda o: o["rank_gap"]))
+    if downs:
+        nearest.append(min(downs, key=lambda o: o["rank_gap"]))
+    return nearest
 
 
 def build_consensus(
@@ -372,6 +459,7 @@ def build_consensus(
         why=_why(r, by, ov, phase_key, weeks, rank, zone, zone_raw, weeks_in_zone, pending_weeks, change_date),
         weighting=weighting_note(r, ov, zone_key, confirm_key),
         pillar_scores=scores, overlay_scores=overlay_scores, weights=dict(CONSENSUS_WEIGHTS),
+        sensitivity=sensitivity(pillars), tipping=tipping(state, r.adjusted, rank, by),
         core=round(r.core, 1), mechanics_adjustment=round(r.mechanics_adjustment, 1), valuation_cap=round(r.valuation_cap, 1) if r.valuation_cap is not None else None,
         vetoes=r.vetoes, cap=round(r.cap, 1) if r.cap is not None else None, adjusted=round(r.adjusted, 1),
         # Ein Deckel ueber dem Wert aendert nichts. Ohne diese Angabe wirkte "Bewertung extrem teuer, Deckel

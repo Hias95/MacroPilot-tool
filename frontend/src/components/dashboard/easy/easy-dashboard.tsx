@@ -5,7 +5,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { ConsensusResponse, HistoryResponse, PillarResponse } from "@/lib/api";
 import { availableRanges, filterByRange, useRange } from "@/lib/range";
 import { MARKET_CONFIRM, PHASES, ZONES, isValuationExtreme, marketConfirmedOf, pendingZoneOf, zoneChangeNote } from "@/lib/score";
+import { AttributionPanel } from "../attribution-panel";
 import { ConsensusGauge } from "../consensus-gauge";
+import { RankAnchor } from "../rank-anchor";
+import { SituationNote } from "../situation-note";
+import { TippingNote } from "../tipping-note";
+import { EasyHonesty } from "./easy-honesty";
 import { ReadingHelp } from "../reading-help";
 import { OutlookPanel } from "../outlook-panel";
 import { ConsensusHistoryChart } from "../consensus-history-chart";
@@ -29,7 +34,7 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
   const phase = consensus.phase_key ? PHASES[consensus.phase_key] : null;
   const confirm = consensus.market_confirmation_key ? MARKET_CONFIRM[consensus.market_confirmation_key] : null;
   const regimes = [...pillars, ...overlays].map((p) => p.regime).filter((r): r is NonNullable<typeof r> => !!r && r.active);
-  const [range, setRange] = useRange("consensus-easy", "1y");
+  const [range, setRange] = useRange("consensus-easy", "max");
   const [pillarRange, setPillarRange] = useRange("pillars-easy", "6m");
   const consensusPoints = history ? filterByRange(history.consensus, range) : [];
   const pointsOf = (id: string) => history?.pillars[id] ?? [];
@@ -39,12 +44,15 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
     <>
       <Card className="bg-card ring-white/8">
         <CardContent className="grid gap-6 py-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center lg:gap-10">
-          <div>
-            <div className="mb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Gesamtlage</div>
+          <div className="order-2 lg:order-1">
+            {/* I2: Der Zeithorizont gehoert in die Ueberschrift. "Gesamtlage" versprach eine zeitlose Wahrheit. */}
+            <div className="mb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              Umfeld für die nächsten drei Monate
+            </div>
             <ConsensusGauge score={consensus.score ?? 50} zone={zone} pending={pendingZone} />
             <ReadingHelp className="mt-2" />
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="order-1 flex flex-col gap-4 lg:order-2">
             <div>
               <div className="font-heading text-3xl font-semibold tracking-tight" style={{ color: zone.color }}>
                 {consensus.zone}
@@ -58,6 +66,10 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
               <p className="mt-1.5 max-w-lg text-sm leading-relaxed text-foreground/90 text-pretty">
                 {consensus.weighting || zone.hint}
               </p>
+              {/* J1: Die Zahl bekommt einen Vergleich, sonst bleibt sie eine Schulnote. */}
+              <div className="mt-1.5">
+                <RankAnchor points={history?.consensus} />
+              </div>
               {unconfirmed ? (
                 <p className="mt-1.5 text-xs text-amber-300/90 text-pretty">
                   Diese Woche zeigt bereits <span style={{ color: zoneRaw.color }}>{zoneRaw.label}</span>, {zoneChangeNote(consensus)}
@@ -100,6 +112,8 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
         </CardContent>
       </Card>
 
+      <SituationNote zone={consensus.zone_key} />
+
       <OutlookPanel
         zoneKey={consensus.zone_key}
         zoneLabel={zone.label}
@@ -107,6 +121,16 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
         valuationExtreme={isValuationExtreme(overlays)}
         marketConfirmed={marketConfirmedOf(consensus)}
       />
+
+      <Card className="bg-card ring-white/8">
+        <CardContent className="py-1">
+          <TippingNote consensus={consensus} compact />
+        </CardContent>
+      </Card>
+
+      <AttributionPanel consensus={consensus} pillars={pillars} history={history ?? null} compact />
+
+      <EasyHonesty />
 
       <section aria-label="Die drei Treiber" className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">

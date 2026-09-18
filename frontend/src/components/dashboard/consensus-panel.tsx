@@ -8,7 +8,9 @@ import { availableRanges, filterByRange, useRange } from "@/lib/range";
 import { MARKET_CONFIRM, PHASES, ZONES, pendingZoneOf, zoneChangeNote } from "@/lib/score";
 import { cn } from "@/lib/utils";
 import { ConsensusGauge } from "./consensus-gauge";
+import { RankAnchor } from "./rank-anchor";
 import { ReadingHelp } from "./reading-help";
+import { TippingNote } from "./tipping-note";
 import { ConsensusHistoryChart } from "./consensus-history-chart";
 import { RangeSelect } from "./range-select";
 
@@ -48,7 +50,7 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
       <CardContent className="grid gap-8 py-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center lg:gap-12">
         <div>
           <div className="mb-1 flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-            Consensus Score
+            Consensus Score · Umfeld für die nächsten drei Monate
             <Badge variant="outline" className="normal-case tracking-normal text-muted-foreground">
               {pillars.length} Treiber, {overlays.length} Overlays
             </Badge>
@@ -90,6 +92,12 @@ export function ConsensusPanel({ consensus, pillars, overlays = [], history }: P
             <p className="mt-2 max-w-md text-sm leading-relaxed text-foreground/90 text-pretty">
               {consensus.weighting || zone.hint}
             </p>
+            <div className="mt-2">
+              <RankAnchor points={history ?? undefined} />
+            </div>
+            <div className="mt-3">
+              <TippingNote consensus={consensus} />
+            </div>
             {unconfirmed ? (
               <p className="mt-2 text-xs text-amber-300/90 text-pretty">
                 Diese Woche zeigt bereits <span style={{ color: zoneRaw.color }}>{zoneRaw.label}</span>, {zoneChangeNote(consensus)}
