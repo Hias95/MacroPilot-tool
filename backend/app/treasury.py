@@ -87,7 +87,8 @@ async def fetch_tbill_share(force: bool = False) -> tuple[TreasuryResult, bool]:
         if disk:
             _cache = disk[0]
             return _cache, True
-        raise TreasuryError(f"Treasury Fiscal Data nicht erreichbar: {exc}") from exc
+        # httpx-Timeouts haben keinen Text; ohne den Typ steht im Log nur "nicht erreichbar:".
+        raise TreasuryError(f"Treasury Fiscal Data nicht erreichbar: {type(exc).__name__}: {exc}") from exc
     observations = parse_tbill_share(rows)
     if not observations:
         if disk:

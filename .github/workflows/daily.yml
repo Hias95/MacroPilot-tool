@@ -29,6 +29,17 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - name: Backend installieren
         run: pip install -r backend/requirements.txt
+      # Der Rohdaten-Cache liegt in backend/data und gehoert bewusst nicht ins Repository: 2 MB pro Tag waeren
+      # zu viel Git-Historie. Ohne ihn startet jeder Lauf kalt, und dann reisst ein einzelner Quellen-Ausfall den
+      # ganzen Export mit, weil der Rueckfall auf den Vortageswert nur greift, wenn eine Kopie da ist. Genau das
+      # ist am 18.09.2026 passiert: Die Treasury-API lief in einen Timeout, lokal mit warmem Cache lief derselbe
+      # Export durch. restore-keys holt den zuletzt gesicherten Stand, auch wenn der Schluessel nicht exakt passt.
+      - name: Rohdaten-Cache wiederherstellen
+        uses: actions/cache/restore@v4
+        with:
+          path: backend/data
+          key: macropilot-rohdaten-${{ github.run_id }}
+          restore-keys: macropilot-rohdaten-
       - name: Export (Refresh, Tagesbild, Hinweise, JSON)
         working-directory: backend
         # Bei einem Fehler landet das Ende der Ausgabe in der Zusammenfassung des Laufs (ohne Login lesbar).
@@ -48,6 +59,13 @@ jobs:
           set -o pipefail
           python -m app.export --out ../frontend/public/data --state ../data/state.json 2>&1 | tee export.log || { echo "## Export fehlgeschlagen" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; tail -60 export.log >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; exit 1; }
           grep -E "^(Refresh|Kanaele|Export)" export.log >> "$GITHUB_STEP_SUMMARY" || true
+      # Auch nach einem Fehlschlag sichern: Was erfolgreich geholt wurde, hilft dem naechsten Lauf.
+      - name: Rohdaten-Cache sichern
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: backend/data
+          key: macropilot-rohdaten-${{ github.run_id }}
       - name: Zustand sichern
         run: |
           git config user.name "macropilot-bot"
