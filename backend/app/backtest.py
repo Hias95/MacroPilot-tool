@@ -135,6 +135,11 @@ class BenchmarkResult:
     name: str
     start: date
     bands: list[BenchmarkBand]
+    #: Rangkorrelation Score gegen Vorwaertsertrag. Sagt, ob die Zonen ueberhaupt unterschieden haben.
+    #: Trefferquoten je Zone taugen dafuer nicht: In einem steigenden Markt sind sie ueberall hoch, auch
+    #: wenn die Reihenfolge der Zonen gar nicht stimmt.
+    ic_13w: float | None = None
+    weeks: int = 0
 
 
 @dataclass
@@ -335,6 +340,9 @@ class BacktestReport:
     benchmarks: list[BenchmarkResult] = field(default_factory=list)
     #: Dieselbe Rechnung nur auf dem Pruef-Fenster, also ausserhalb der Kalibrierung.
     test_window: BenchmarkResult | None = None
+    #: Und dieselbe Rechnung davor. Die Untersuchung vom 18.09.2026 zeigte, dass die Prognosekraft des
+    #: Modells fast ganz aus den spaeteren Jahren stammt; das gehoert sichtbar daneben.
+    early_window: BenchmarkResult | None = None
     generated_at: float = 0.0
 
 
@@ -444,7 +452,10 @@ def zone_stats(rows: list[tuple[date, float]], prices: PriceIndex, key: str, nam
             median_13w=_quantile(f13, 0.50),
         ))
     start = usable[0][1] if usable else rows[0][0]
-    return BenchmarkResult(key=key, name=name, start=start, bands=bands)
+    pairs = [(score, forward_return(prices, rows[i][0], 13)) for i, _, score in usable]
+    valid = [(a, b) for a, b in pairs if b is not None]
+    ic = round(spearman([a for a, _ in valid], [b for _, b in valid]), 3) if len(valid) >= 30 else None
+    return BenchmarkResult(key=key, name=name, start=start, bands=bands, ic_13w=ic, weeks=len(usable))
 
 
 def blend_index(a: PriceIndex, b: PriceIndex, dates: list[date], share_a: float) -> PriceIndex:
@@ -513,9 +524,11 @@ async def run_backtest(force: bool = False) -> BacktestReport:
     # C2: nur das Pruef-Fenster, also Wochen, die bei der Kalibrierung nicht gesehen wurden.
     test_rows = [(d, v) for d, v in ranked if d >= TEST_WINDOW_START]
     test_window = zone_stats(test_rows, prices, "SPY", f"S&P 500 ab {TEST_WINDOW_START.year}") if test_rows else None
+    early_rows = [(d, v) for d, v in ranked if d < TEST_WINDOW_START]
+    early_window = zone_stats(early_rows, prices, "SPY", f"S&P 500 bis {TEST_WINDOW_START.year - 1}") if early_rows else None
     report = BacktestReport(benchmark="SPY", start=raw[0][0], end=raw[-1][0], variants=variants,
                             conditional=conditional, benchmarks=benchmarks, test_window=test_window,
-                            generated_at=now)
+                            early_window=early_window, generated_at=now)
     _cache = (now, report)
     return report
 

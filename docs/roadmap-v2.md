@@ -23,10 +23,10 @@ Ergebnis:
 
 | Baustein | Rolle | Startgewicht | Wirkung |
 |---|---|---|---|
-| Liquiditaet | Treiber | 55 % (C2, vorher 35) | Score und Zone |
+| Liquiditaet | Treiber | 40 % (18.09.2026, vorher 55) | Score und Zone |
 | Marktsignale (frueher Marktwahrheit) | Overlay (seit 16.09.2026, docs/marktsignale-rolle.md) | 0 % | Badge Markt bestaetigt / zoegert / laeuft voraus, Flag Marktstress / Kapitulation |
 | Konjunktur | Treiber | 15 % (C2, vorher 25) | Score und Zone |
-| Struktur & Fiskus | Treiber | 30 % (C2, vorher 15) | Score und Zone |
+| Struktur & Fiskus | Treiber | 45 % (18.09.2026, vorher 30) | Score und Zone |
 | Bewertung / Fallhoehe | Overlay | 0 % linear | Deckel nach oben, Label "Fallhoehe" |
 | Marktmechanik / Volatilitaet | Overlay | 0 % linear | bis 5 Punkte als Kontra (C2: Stress hebt, Sorglosigkeit senkt), Warnung |
 | Fiskalische Dominanz | Regime-Flag | 0 % | Badge, Hinweis auf Sachwerte |
@@ -159,6 +159,16 @@ Phase E (Vorschlag, noch nicht entschieden, docs/mehrwert-konzept.md)
   Bausteine aus (Erwartungssatz mit Bezugsklasse, Ergebnisstreifen, Bewegung der Woche, Kippschwelle,
   Terminkalender, aehnlichste Wochen, Kalibriertafel, aufgeloester Tacho-Widerspruch) samt Reihenfolge,
   Datenlage und Quellen aus der Risikokommunikation. Alles mit den vorhandenen kostenlosen Quellen machbar.
+
+Umgewichtung 18.09.2026 (docs/liquiditaet-wirklich-55.md)
+- Befund: Die Konzentration auf die Liquiditaet ist durch die Daten nicht gedeckt. Struktur & Fiskus sagt
+  ueber den ganzen Zeitraum mindestens so viel vorher (+0,15 gegen +0,10 auf 13 Wochen), und die scheinbar
+  klaren Umfeld-Unterschiede drehen zwischen den Zeithaelften das Vorzeichen. Umfeldabhaengige Gewichte
+  wurden deshalb ausdruecklich verworfen.
+- Umgesetzt: CONSENSUS_WEIGHTS 40/15/45 statt 55/15/30. Begruendung ist Vorsicht, nicht ein besserer
+  Messwert: Wenn nicht feststeht, welcher Treiber fuehrt, wird nicht konzentriert. Nebenbefund: IC13 steigt
+  von +0,25 auf +0,27, IC26 von +0,28 auf +0,29, und die schwache erste Haelfte von +0,03 auf +0,13.
+  Die groesste Einzelserie bestimmt danach 20 statt 27,5 Prozent des Scores.
 
 ## 5. Offene Punkte und Risiken
 

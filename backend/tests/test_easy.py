@@ -56,10 +56,11 @@ def test_drivers_fall_back_to_values_without_part_scores():
 
 
 def test_role_names_weight_for_drivers_and_task_for_overlays():
-    # Anteil in Worten, damit das Gewicht nicht mit dem Score darueber verwechselt wird.
-    assert easy_role(pillar("liquidity", 55)) == "Macht gut die Hälfte des Gesamtscores aus. Damit wiegt sie schwerer als alle anderen."
-    assert easy_role(pillar("structure", 42)) == "Macht knapp ein Drittel des Gesamtscores aus."
-    assert "ein Siebtel" in easy_role(pillar("cycle", 89))
+    # Anteil in Worten, damit das Gewicht nicht mit dem Score darueber verwechselt wird. Seit der
+    # Umgewichtung auf 40/15/45 traegt Struktur & Fiskus den Zusatz "schwerer als alle anderen".
+    assert easy_role(pillar("liquidity", 55)) == "Macht gut ein Drittel des Gesamtscores aus."
+    assert easy_role(pillar("structure", 42)) == "Macht etwa die Hälfte des Gesamtscores aus. Damit wiegt sie schwerer als alle anderen."
+    assert "ein Siebtel" in easy_role(pillar("cycle", 89)) and "am wenigsten" in easy_role(pillar("cycle", 89))
     assert easy_role(pillar("valuation", 14)).startswith("Zählt nicht in den Gesamtscore")
     assert "begrenzt ihn nach oben" in easy_role(pillar("valuation", 14))
     assert "bestätigt" in easy_role(pillar("markets", 52))

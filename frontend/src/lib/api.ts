@@ -431,6 +431,9 @@ export interface BenchmarkResult {
   name: string;
   start: string;
   bands: BenchmarkBand[];
+  /** Rangkorrelation Score gegen Vorwaertsertrag: Haben die Zonen ueberhaupt unterschieden? */
+  ic_13w?: number | null;
+  weeks?: number;
 }
 
 export interface BacktestResponse {
@@ -443,6 +446,8 @@ export interface BacktestResponse {
   benchmarks?: BenchmarkResult[];
   /** Dieselbe Rechnung nur ausserhalb des Kalibrierzeitraums. */
   test_window?: BenchmarkResult | null;
+  /** Derselbe Zeitraum davor. Die Prognosekraft stammt fast ganz aus den spaeteren Jahren. */
+  early_window?: BenchmarkResult | null;
   generated_at: number;
 }
 export const fetchBacktest = (signal?: AbortSignal) => request<BacktestResponse>("/api/v1/backtest", signal);

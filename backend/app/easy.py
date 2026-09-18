@@ -75,11 +75,22 @@ PART_FRAME = {
     "valuation": "Noch am günstigsten ist {high}, am teuersten {low}.",
 }
 
-DRIVER_ROLE_EXTRA = {
-    "liquidity": " Damit wiegt sie schwerer als alle anderen.",
-    "cycle": " Damit wiegt sie am wenigsten, weil sie kurzfristig wenig über die Kurse sagt.",
-    "structure": "",
-}
+# Frueher stand hier fest, die Liquiditaet wiege am schwersten. Nach der Umgewichtung auf 40/15/45 war das
+# falsch, ohne dass es jemandem aufgefallen waere. Der Zusatz wird deshalb aus den Gewichten abgeleitet.
+CYCLE_NOTE = " Damit wiegt sie am wenigsten, weil sie kurzfristig wenig über die Kurse sagt."
+
+
+def role_extra(pillar_id: str) -> str:
+    weight = CONSENSUS_WEIGHTS.get(pillar_id)
+    if weight is None:
+        return ""
+    if pillar_id == "cycle":
+        return CYCLE_NOTE
+    if weight == max(CONSENSUS_WEIGHTS.values()):
+        return " Damit wiegt sie schwerer als alle anderen."
+    if weight == min(CONSENSUS_WEIGHTS.values()):
+        return " Damit wiegt sie am wenigsten."
+    return ""
 
 # Das Gewicht als Zahl zu nennen, war eine Falle: Bei der Liquiditaet stand "55 von 100 Punkten" direkt unter
 # dem Score 55, rein zufaellig dieselbe Zahl. Ein Anteil in Worten kann damit nicht verwechselt werden.
@@ -203,7 +214,7 @@ def easy_role(p: PillarResponse) -> str:
     weight = CONSENSUS_WEIGHTS.get(p.id)
     if weight is None:
         return ""
-    return f"Macht {weight_words(weight)} des Gesamtscores aus.{DRIVER_ROLE_EXTRA.get(p.id, '')}"
+    return f"Macht {weight_words(weight)} des Gesamtscores aus.{role_extra(p.id)}"
 
 
 def annotate(p: PillarResponse, score_change: int | None = None) -> PillarResponse:

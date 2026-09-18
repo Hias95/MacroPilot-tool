@@ -103,7 +103,15 @@ PUBLICATION_LAG_DAYS["z1_quarterly"] = 160  # Fed-Finanzierungsrechnung, gut zwe
 # sie wirken als Overlay "Marktbestaetigung" (Bestaetigung/Divergenz zum Makro-Kern, Flag Marktstress).
 # Drei Treiber, Lernfenster IC +0,29, Pruef-Fenster +0,39. Alte Gewichte 35/25/25/15, dann 50/10/15/25.
 # ---------------------------------------------------------------------------------------------
-CONSENSUS_WEIGHTS = {"liquidity": 0.55, "cycle": 0.15, "structure": 0.30}
+# Gewichte der Treiber. Bis 18.09.2026 lagen sie bei 55/15/30 aus der Walk-Forward-Kalibrierung (C2).
+# Die Untersuchung in docs/liquiditaet-wirklich-55.md zeigte, dass diese Konzentration nicht gedeckt ist:
+# Struktur & Fiskus sagt ueber den ganzen Zeitraum mindestens so viel vorher wie die Liquiditaet (+0,15 gegen
+# +0,10 auf 13 Wochen), und die scheinbar klaren Umfeld-Unterschiede drehen zwischen den Zeithaelften das
+# Vorzeichen. Der Grund fuer die ausgewogenere Verteilung ist deshalb nicht ein besserer Messwert, sondern
+# Vorsicht: Wenn nicht zuverlaessig feststeht, welcher Treiber fuehrt, wird das Gewicht nicht auf einen
+# konzentriert. Die Konjunktur behaelt ihre 15 Prozent, obwohl sie fuer sich genommen nichts liefert, weil die
+# Zyklusphase aus Liquiditaets- und Konjunkturrichtung entsteht.
+CONSENSUS_WEIGHTS = {"liquidity": 0.40, "cycle": 0.15, "structure": 0.45}
 # Overlay Marktbestaetigung: Marktsignal-Score gegen den Consensus-Rang (beide ueber/unter der Schwelle =
 # bestaetigt). Markt hoch bei Makro tief war historisch die schwaechste Kombination (13 W +1,8 %, 66 % Treffer),
 # Makro hoch bei Markt tief bringt gleiche Rendite, aber mehr Rueckschlaege (P10 -4,3 % statt +1,3 %).

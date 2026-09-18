@@ -134,6 +134,25 @@ ab 2019; ein Satz zur ersten Hälfte gehört daneben.
 −0,06 auf 26) und behält ihre 15 Prozent nur als Qualifier für die Zyklusphase. Die Modellkette braucht sie
 ohnehin, weil die Phase aus Liquiditäts- und Konjunkturrichtung entsteht.
 
+## 7a. Umgesetzt am 18.09.2026
+
+Die Gewichte stehen jetzt auf 40/15/45. Was sich dadurch messbar aendert:
+
+| Groesse | vorher 55/15/30 | nachher 40/15/45 |
+|---|---|---|
+| Rangkorrelation 13 Wochen | +0,25 | **+0,27** |
+| Rangkorrelation 26 Wochen | +0,28 | **+0,29** |
+| Trennschaerfe bis 2018 | +0,03 | **+0,13** |
+| groesste Einzelserie am Score | 27,5 % | **20,0 %** |
+| Notenbankbilanzen zusammen | 44 % | **32 %** |
+| angezeigter Rang am 18.09.2026 | 71 | 65 |
+
+Der Rang faellt, weil Struktur & Fiskus mit 42 schwach steht und nun schwerer wiegt. Das ist kein Fehler,
+sondern der Zweck der Aenderung: Das Bild haengt weniger an einer einzigen Zeitreihe.
+
+Zusaetzlich zeigt die Profi-Ansicht jetzt, wie unterschiedlich gut das Modell in den beiden Zeitraeumen war
+(bis 2018 kaum, ab 2019 deutlich). Umfeldabhaengige Gewichte gibt es weiterhin nicht, und das ist Absicht.
+
 ## 8. Was diese Untersuchung nicht kann
 
 Sie prüft nur den S&P 500, nur ab 2008 und nur mit heute gültigen, teils nachträglich revidierten Daten. Ein

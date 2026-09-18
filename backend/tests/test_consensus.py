@@ -68,17 +68,17 @@ def pillar(pid, score, momentum=60, change=1.0, regime_active=False):
 def test_build_consensus_ranks_against_window_and_uses_confirmed_zone():
     drivers_ = [pillar("liquidity", 54, 53, -1.0), pillar("cycle", 93, 95, 20.0), pillar("markets", 52), pillar("structure", 44)]
     overlays = [pillar("valuation", 14, regime_active=True), pillar("mechanics", 49)]
-    # Kern (Gewichte 55/15/30) = 0.55*54 + 0.15*93 + 0.30*44 = 56.85, Mechanik 49 -> +0.1 (Kontra), Deckel greift nicht -> 57.
-    window = [35.0 + i * 0.1 for i in range(300)]  # Rohwerte 35 bis 65: ein Rohwert von 57 liegt bei etwa 73 %
+    # Kern (Gewichte 40/15/45) = 0.40*54 + 0.15*93 + 0.45*44 = 55.35, Mechanik 49 -> +0.1 (Kontra), Deckel greift nicht -> 55.
+    window = [35.0 + i * 0.1 for i in range(300)]  # Rohwerte 35 bis 65: ein Rohwert von 55 liegt bei etwa 67 %
     state = ConsensusState(window=window, zone_key="neutral", weeks_in_zone=9, phase_key="late", weeks_in_phase=6)
     c = build_consensus(drivers_, overlays, state)
-    assert c.method == "macropilot-v2-rank" and c.composite == 57 and 70 <= c.score <= 76
-    assert c.zone == "Neutral" and c.zone_raw_key == "positive" and c.weeks_in_zone == 9
+    assert c.method == "macropilot-v2-rank" and c.composite == 55 and 64 <= c.score <= 70
+    assert c.zone == "Neutral" and c.zone_raw_key == "neutral" and c.weeks_in_zone == 9
     assert c.phase == "Spätzyklus" and c.weeks_in_phase == 6 and c.valuation_cap == 65.6
-    assert "besser als in" in c.why and "Rohwert 57" in c.why and "noch unbestätigt" in c.why
+    assert "besser als in" in c.why and "Rohwert 55" in c.why
     assert "Am stärksten stützt Konjunktur (93)" in c.why and "Deckel bei 66" in c.why
     plain = build_consensus(drivers_, overlays)
-    assert plain.score == 57 and plain.zone_raw_key == plain.zone_key
+    assert plain.score == 55 and plain.zone_raw_key == plain.zone_key
 
 
 def test_build_consensus_falls_back_without_scores():
@@ -124,7 +124,8 @@ def test_market_confirmation_and_stress_flag():
 
 def test_pending_zone_reports_streak_and_confirmation_date():
     """Der Widerspruch zwischen Nadel und Zonenwort wird zur Vorschau: wie lange schon, und ab wann es gilt."""
-    drivers_ = [pillar("liquidity", 54, 53, -1.0), pillar("cycle", 93, 95, 20.0), pillar("structure", 44)]
+    # Struktur 50 statt 44, damit der Rohwert mit 58 auf Rang 77 und damit in die Zone Positiv faellt.
+    drivers_ = [pillar("liquidity", 54, 53, -1.0), pillar("cycle", 93, 95, 20.0), pillar("structure", 50)]
     overlays = [pillar("valuation", 14, regime_active=True), pillar("mechanics", 49)]
     window = [35.0 + i * 0.1 for i in range(300)]
     base = dict(window=window, zone_key="neutral", weeks_in_zone=9, phase_key="late", weeks_in_phase=6,
@@ -176,7 +177,8 @@ def test_consensus_exposes_the_driver_weights():
     c = build_consensus(drivers_, [pillar("valuation", 60), pillar("mechanics", 49), pillar("markets", 52)])
     assert c.method == "macropilot-v2-rank"
     assert c.weights and round(sum(c.weights.values()), 6) == 1.0
-    assert c.weights["liquidity"] > c.weights["structure"] > c.weights["cycle"]
+    # Seit 18.09.2026 wiegt Struktur & Fiskus am schwersten, nicht mehr die Liquiditaet.
+    assert c.weights["structure"] > c.weights["liquidity"] > c.weights["cycle"]
 
 
 def test_model_card_reports_the_real_concentration():
@@ -185,8 +187,10 @@ def test_model_card_reports_the_real_concentration():
 
     card = model_card()
     top = card["concentration"][0]
-    assert top["label"] == "Net Liquidity der Fed" and abs(top["share"] - 0.275) < 1e-9
-    assert card["central_bank_share"] > 0.4, "Notenbankbilanzen dominieren und das muss sichtbar sein"
+    # Mit 40/15/45 sind es 20 Prozent statt 27,5, die Notenbankbilanzen zusammen 32 statt 44. Immer noch
+    # genug, um es auszuweisen, aber keine Ein-Serien-Dominanz mehr.
+    assert top["label"] == "Net Liquidity der Fed" and abs(top["share"] - 0.20) < 1e-9
+    assert 0.25 < card["central_bank_share"] < 0.4, "Anteil der Notenbankbilanzen muss ausgewiesen bleiben"
     assert round(sum(r["share"] for r in card["concentration"]), 6) == 1.0
     assert len(card["parameters_hash"]) == 10 and card["version"] == "macropilot-v2-rank"
 

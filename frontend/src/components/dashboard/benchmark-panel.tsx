@@ -75,6 +75,9 @@ export function BenchmarkPanel({ currentZone }: { currentZone?: ZoneKey }) {
               zehn heißt: Die Zahlen beruhen auf einer Handvoll Fälle und können Zufall sein.
             </p>
             <ZoneTable variant={variant} currentZone={currentZone} />
+            {data?.early_window && data?.test_window ? (
+              <EraNote early={data.early_window} late={data.test_window} />
+            ) : null}
             {data?.benchmarks?.length && currentZone ? (
               <OtherAssets benchmarks={data.benchmarks} zone={currentZone} zoneLabel={zoneLabelOf(variant, currentZone)} />
             ) : null}
@@ -259,9 +262,40 @@ function OtherAssets({ benchmarks, zone, zoneLabel }: { benchmarks: BenchmarkRes
         </table>
       </div>
       <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
-        Gleiche Rechnung wie oben, nur mit anderen Kursen. Gold und Anleihen laufen in starken Makro-Phasen oft
-        gegen die Aktien: Wenn alles stützt, braucht kaum jemand einen sicheren Hafen.
+        Gleiche Rechnung wie oben, nur mit anderen Kursen. Über den ganzen Zeitraum trennen die Zonen bei Aktien deutlich
+        {rank(benchmarks, "SPY")}, bei der Mischung ähnlich{rank(benchmarks, "MIX6040")}, bei Gold{rank(benchmarks, "GLD")} und
+        Anleihen{rank(benchmarks, "IEF")} dagegen praktisch nicht. Das Modell misst das Umfeld für Aktien, nicht für alles.
       </p>
     </div>
+  );
+}
+
+/** Die gemessene Trennschärfe einer Anlage, als knapper Einschub im Fließtext. */
+function rank(benchmarks: BenchmarkResult[], key: string): string {
+  const ic = benchmarks.find((b) => b.key === key)?.ic_13w;
+  return ic == null ? "" : ` (${ic > 0 ? "+" : ""}${ic.toFixed(2)})`;
+}
+
+/**
+ * Antwort auf die Frage, ob das Modell immer gleich gut war: Es war es nicht.
+ *
+ * Trefferquoten je Zone taugen dafür nicht. In einem steigenden Markt sind sie überall hoch, auch wenn die
+ * Reihenfolge der Zonen gar nicht stimmt. Gemessen wird deshalb, wie stark der Rang überhaupt mit dem
+ * folgenden Ertrag zusammenhängt.
+ */
+function EraNote({ early, late }: { early: BenchmarkResult; late: BenchmarkResult }) {
+  if (early.ic_13w == null || late.ic_13w == null) return null;
+  const word = (ic: number) => (ic >= 0.3 ? "deutlich" : ic >= 0.15 ? "erkennbar" : "kaum");
+  const earlyYear = new Date(early.start).getFullYear();
+  const lateYear = new Date(late.start).getFullYear();
+  return (
+    <p className="max-w-3xl rounded-lg border border-amber-400/20 bg-amber-400/5 p-3 text-xs leading-relaxed text-pretty">
+      <span className="font-medium text-amber-200">Das Modell war nicht immer gleich gut.</span>{" "}
+      Wie stark die Zonen den folgenden Ertrag überhaupt getrennt haben, unterscheidet sich stark nach Zeitraum: von{" "}
+      {earlyYear} bis {lateYear - 1} <strong>{word(early.ic_13w)}</strong> ({early.ic_13w.toFixed(2)}), ab {lateYear}{" "}
+      <strong>{word(late.ic_13w)}</strong> ({late.ic_13w.toFixed(2)}). Der größte Teil der Aussagekraft stammt aus den
+      späteren Jahren. Ob das am veränderten Umfeld liegt oder an Zufall, lässt sich mit einem einzigen Marktzyklus nicht
+      entscheiden.
+    </p>
   );
 }

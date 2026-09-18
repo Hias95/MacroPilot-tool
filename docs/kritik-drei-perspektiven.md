@@ -286,7 +286,7 @@ Struktur-Score war in dreizehn Wochen von 29 auf 40 gestiegen. Die Saetze nennen
 
 | # | Was jetzt dasteht |
 |---|---|
-| D1 | Neues Panel "Woran der Score wirklich haengt": Net Liquidity der Fed allein 28 Prozent, Notenbankbilanzen zusammen 44 Prozent, dazu ein Balken je Einzelserie. Der Text sagt es ohne Umschweife: "Das Modell ist vor allem ein Liquiditaetsmodell." |
+| D1 | Neues Panel "Woran der Score wirklich haengt" mit einem Balken je Einzelserie. Bei Einfuehrung: Net Liquidity 28 Prozent, Notenbankbilanzen zusammen 44 Prozent. Nach der Umgewichtung vom selben Tag sind es 20 und 32 Prozent; die Einordnung darunter wird aus den Zahlen abgeleitet und veraltet daher nicht. |
 | D2 | Effektive Stichprobe (Ueberlappung und Zonenaufenthalte, der kleinere Wert) und Wilson-Intervall. Die Grundlagenzeile sagt: "52 solcher Phasen seit 2010; die Stichprobe laesst 6 bis 9 von 10 zu." |
 | D3 | Der wandernde Massstab steht in der Lesehilfe und im Modell-Panel: Ein Rang von 71 wird heute gegen andere Jahre gemessen als vor fuenf Jahren, und die enthielten Nullzinsen. |
 | D4 | Die Revisionen sind nicht mehr nur erwaehnt, sondern mit ihrer Folge benannt: Der Rueckblick rechnet mit heutigen Werten, die es damals nicht gab, und die Veroeffentlichungsverzoegerungen verschieben nur den Zeitpunkt, nicht den Wert. Die Zahlen sind dadurch zu freundlich. |

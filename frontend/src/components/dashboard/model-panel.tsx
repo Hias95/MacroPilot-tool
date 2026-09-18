@@ -45,12 +45,17 @@ export function ModelPanel() {
           </span>
         </div>
 
+        {/* Die Einordnung wird aus den Zahlen abgeleitet. Fest hineingeschrieben stand hier "vor allem ein
+            Liquiditaetsmodell"; nach der Umgewichtung auf 40/15/45 stimmte das nicht mehr, ohne dass es
+            aufgefallen waere. */}
         <p className="max-w-3xl text-sm leading-relaxed text-pretty">
           Drei Treiber klingen breit. Tatsächlich bestimmt <strong className="font-semibold">{card.concentration[0]?.label}</strong>{" "}
           allein <strong className="font-semibold">{Math.round((card.concentration[0]?.share ?? 0) * 100)} Prozent</strong> des
           Gesamtscores, und die Notenbankbilanzen zusammen{" "}
-          <strong className="font-semibold">{Math.round(card.central_bank_share * 100)} Prozent</strong>. Das Modell ist vor allem
-          ein Liquiditätsmodell.
+          <strong className="font-semibold">{Math.round(card.central_bank_share * 100)} Prozent</strong>.{" "}
+          {card.central_bank_share >= 0.4 || (card.concentration[0]?.share ?? 0) >= 0.25
+            ? "Das Modell ist damit vor allem ein Liquiditätsmodell."
+            : "Kein einzelner Treiber beherrscht den Score, die Notenbankbilanzen bleiben aber der größte zusammenhängende Block."}
         </p>
 
         <ul className="flex flex-col gap-1">

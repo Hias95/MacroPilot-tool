@@ -165,7 +165,7 @@ faellt. Backend, kleiner bis mittlerer Aufwand.
 
 **C2 Der Terminkalender.** Was in den naechsten Tagen veroeffentlicht wird und welchen Treiber es beruehrt.
 
-> **Mi 23.09.** Notenbankbilanz der Fed, woechentlich, wirkt auf Liquiditaet (Gewicht 55 %).
+> **Mi 23.09.** Notenbankbilanz der Fed, woechentlich, wirkt auf Liquiditaet (Gewicht 40 %).
 > **Do 24.09.** Philadelphia-Fed-Umfrage, wirkt auf Konjunktur (15 %).
 
 Damit hat der Nutzer zum ersten Mal einen Grund wiederzukommen, und das Warten bekommt eine Richtung.
@@ -304,7 +304,7 @@ Frage beantworten:
 |---|---|---|
 | `easy_summary` | Wie ist die Lage, und wohin laeuft sie? | "Der Geldzufluss ist ausgeglichen. Seit einem halben Jahr hat sich daran wenig geaendert." |
 | `easy_drivers` | Woran haengt das gerade? | "Am meisten Schub gibt gerade der Anteil kurzlaufender Staatsschulden, am wenigsten die Bilanzen der grossen Notenbanken zusammen." |
-| `easy_role` | Was macht das mit dem Gesamtscore? | "Zaehlt 55 von 100 Punkten im Gesamtscore. Sie wiegt damit schwerer als alle anderen." |
+| `easy_role` | Was macht das mit dem Gesamtscore? | "Macht gut ein Drittel des Gesamtscores aus." Der Anteil steht in Worten, weil eine Zahl mit dem Score darueber kollidierte. |
 
 Drei Regeln dabei: Bestandteile bekommen Alltagsnamen statt ihrer technischen Labels, jede Saeule hat einen
 eigenen Satzrahmen (bei der Liquiditaet "gibt Schub", bei der Bewertung "ist guenstig"), und liegen die
