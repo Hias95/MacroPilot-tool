@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from . import backtest, data_quality, notify, store
+from . import backtest, data_quality, model_card, notify, store
 from .config import get_settings
 from .explain import explain_pillar, resolve_provider
 from .history import build_history
@@ -111,6 +111,8 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
         "cache_ttl_seconds": settings.cache_ttl_seconds, "last_refresh": store.get_meta("last_refresh"),
         "snapshot_date": store.get_meta("last_snapshot_date"), "auto_refresh": False,
         "oldest_input": store.get_meta("oldest_input"),
+        # Was das Modell ueber sich selbst sagt: Version, Parameter, Konzentration, Vergleichsfenster.
+        "model": model_card.model_card(),
         "recording_since": store.first_snapshot_date(),
         # Eingerichtete Kanaele, nicht die benutzten: ohne neue Ereignisse verschickt ein Lauf nichts, das sagt
         # aber nichts ueber die Konfiguration. Was wirklich rausging, steht daneben.

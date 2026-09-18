@@ -44,11 +44,46 @@ def _quantile(values: list[float], q: float) -> float | None:
     return round(100 * val, 2)
 
 
+def effective_n(n_weeks: int, episodes: int, horizon: int = 13) -> int:
+    """Zahl der praktisch unabhaengigen Beobachtungen.
+
+    Woechentliche Fenster ueber 13 Wochen ueberlappen sich um zwoelf Dreizehntel, 315 Wochen sind also eher
+    24 unabhaengige Faelle. Zugleich liegen viele Wochen im selben Zonenaufenthalt. Genommen wird der
+    kleinere der beiden Werte, weil beide Effekte gleichzeitig wirken.
+    """
+    return max(1, min(episodes if episodes > 0 else n_weeks, n_weeks // horizon if n_weeks >= horizon else 1))
+
+
+def wilson_interval(successes: int, n: int, z: float = 1.96) -> tuple[float, float] | None:
+    """95-Prozent-Intervall einer Trefferquote nach Wilson, in Prozent.
+
+    Die Normalnaeherung ergaebe bei einer Quote von 100 Prozent eine Spanne von null und wuerde damit genau
+    dort Sicherheit vortaeuschen, wo die Stichprobe am duennsten ist. Wilson tut das nicht.
+    """
+    if n <= 0:
+        return None
+    p = successes / n
+    denom = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / denom
+    half = z / denom * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    return round(100 * max(0.0, centre - half), 1), round(100 * min(1.0, centre + half), 1)
+
+
 def _episodes(indices: list[int]) -> int:
     """Zusammenhaengende Aufenthalte in einer Zone. Zwei benachbarte Wochen zaehlen als eine Episode."""
     if not indices:
         return 0
     return 1 + sum(1 for a, b in zip(indices, indices[1:]) if b != a + 1)
+
+
+def _uncertainty(f13: list[float], episodes: int) -> dict:
+    """Effektive Stichprobe und Wilson-Intervall als Felder fuer BandStat."""
+    if not f13:
+        return {"n_effective": 0, "hit_low_13w": None, "hit_high_13w": None}
+    n_eff = effective_n(len(f13), episodes)
+    hits = round(sum(1 for f in f13 if f > 0) / len(f13) * n_eff)
+    lo_hi = wilson_interval(hits, n_eff)
+    return {"n_effective": n_eff, "hit_low_13w": lo_hi[0] if lo_hi else None, "hit_high_13w": lo_hi[1] if lo_hi else None}
 
 
 @dataclass
@@ -68,6 +103,10 @@ class BandStat:
     # ehrlichere Mass fuer die Belastbarkeit: 53 Wochen koennen fuenf Episoden sein.
     episodes: int = 0
     n_13w: int = 0
+    #: Praktisch unabhaengige Faelle und das daraus folgende 95-Prozent-Intervall der Trefferquote.
+    n_effective: int = 0
+    hit_low_13w: float | None = None
+    hit_high_13w: float | None = None
 
 
 # C1: Der Consensus misst das Umfeld fuer US-Aktien. Ob er auch ueber Gold und Anleihen etwas sagt, war
@@ -269,6 +308,7 @@ def evaluate_series(name: str, points: list[tuple[date, float]], prices: PriceIn
             hit_rate_13w=round(100 * sum(1 for f in f13 if f > 0) / len(f13), 1) if f13 else None,
             p10_fwd_13w=_quantile(f13, 0.10), p50_fwd_13w=_quantile(f13, 0.50), p90_fwd_13w=_quantile(f13, 0.90),
             episodes=_episodes(idx), n_13w=len(f13),
+            **_uncertainty(f13, _episodes(idx)),
         ))
     order = sorted(range(len(rows)), key=lambda i: rows[i][1])
     deciles = []

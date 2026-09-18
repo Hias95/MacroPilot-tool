@@ -215,8 +215,29 @@ export interface HealthResponse {
   /** Aeltester Eingang ueber alle Saeulen. Der Gesamtscore mischt Daten unterschiedlichen Alters. */
   oldest_input?: string | null;
   recording_since?: string | null;
+  /** Was das Modell ueber sich selbst sagt: Version, Parameter, Konzentration, Vergleichsfenster. */
+  model?: ModelCard;
   mode?: "static";
   generated_at?: string;
+}
+
+/** Anteil einer Einzelserie am Gesamtscore. */
+export interface ConcentrationRow {
+  pillar: string;
+  pillar_label: string;
+  label: string;
+  share: number;
+}
+export interface ModelCard {
+  version: string;
+  parameters_hash: string;
+  weights: Record<string, number>;
+  rank_window_weeks: number;
+  rank_min_history_weeks: number;
+  zone_confirm_weeks: number;
+  concentration: ConcentrationRow[];
+  /** Zusammen: wie viel des Scores an Notenbankbilanzen haengt. */
+  central_bank_share: number;
 }
 
 export const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
@@ -353,6 +374,10 @@ export interface BacktestBand {
   /** Zusammenhaengende Aufenthalte in der Zone. Ehrlicheres Mass als die Zahl der Wochen, weil die sich ueberlappen. */
   episodes: number;
   n_13w: number;
+  /** Praktisch unabhaengige Faelle und das 95-Prozent-Intervall der Trefferquote (Wilson). */
+  n_effective?: number;
+  hit_low_13w?: number | null;
+  hit_high_13w?: number | null;
 }
 export interface BacktestPerformance {
   cagr_pct: number;

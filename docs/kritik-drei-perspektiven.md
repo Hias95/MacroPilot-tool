@@ -282,6 +282,26 @@ Momentum-Perzentil, das das Tempo der Rohserie beschreibt, nicht die Veraenderun
 Struktur-Score war in dreizehn Wochen von 29 auf 40 gestiegen. Die Saetze nennen jetzt die Score-Veraenderung
 ("In drei Monaten um 11 Punkte gestiegen") und sind damit an der Kurve daneben nachpruefbar.
 
+## 5d. Stufe D erledigt bis auf einen Punkt (18.09.2026)
+
+| # | Was jetzt dasteht |
+|---|---|
+| D1 | Neues Panel "Woran der Score wirklich haengt": Net Liquidity der Fed allein 28 Prozent, Notenbankbilanzen zusammen 44 Prozent, dazu ein Balken je Einzelserie. Der Text sagt es ohne Umschweife: "Das Modell ist vor allem ein Liquiditaetsmodell." |
+| D2 | Effektive Stichprobe (Ueberlappung und Zonenaufenthalte, der kleinere Wert) und Wilson-Intervall. Die Grundlagenzeile sagt: "52 solcher Phasen seit 2010; die Stichprobe laesst 6 bis 9 von 10 zu." |
+| D3 | Der wandernde Massstab steht in der Lesehilfe und im Modell-Panel: Ein Rang von 71 wird heute gegen andere Jahre gemessen als vor fuenf Jahren, und die enthielten Nullzinsen. |
+| D4 | Die Revisionen sind nicht mehr nur erwaehnt, sondern mit ihrer Folge benannt: Der Rueckblick rechnet mit heutigen Werten, die es damals nicht gab, und die Veroeffentlichungsverzoegerungen verschieben nur den Zeitpunkt, nicht den Wert. Die Zahlen sind dadurch zu freundlich. |
+| D6 | Version und Parameterkennung stehen neben den Zahlen: `macropilot-v2-rank · Parameter ccb6bfe9c7`, aus einem Fingerabdruck ueber Gewichte, Schwellen und Fenster. |
+
+**D5 bewusst nicht umgesetzt.** Aussagen zu Duration, Kredit, Waehrung und Rohstoffen waeren ein zweites
+Modell, kein Zusatz zum bestehenden. Das widerspraeche der Vorgabe, das Werkzeug einfacher statt groesser zu
+machen. Den informativen Teil deckt C1 bereits ab: Die Zonen-Kennzahlen fuer Gold, Anleihen und eine Mischung
+zeigen, wo der Consensus ausserhalb von US-Aktien etwas sagt und wo nicht. Wer mehr will, braucht eigene
+Treiber je Anlageklasse; das ist ein eigenes Vorhaben, keine Verbesserung dieses Bildschirms.
+
+**Was D2 sichtbar macht.** Bei "Stark positiv" bleiben von 53 Wochen vier Episoden und damit vier praktisch
+unabhaengige Faelle. Das Wilson-Intervall reicht dort von 51 bis 100 Prozent. Die Normalnaeherung haette
+null Spanne ergeben und genau dort Sicherheit vorgetaeuscht, wo am wenigsten Belege liegen.
+
 ## 6. Ein Satz zu jeder Perspektive
 
 **Einsteiger:** Er versteht nach dem Besuch mehr ueber den Markt als vorher, aber nicht mehr ueber seine

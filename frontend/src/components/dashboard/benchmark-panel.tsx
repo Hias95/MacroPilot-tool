@@ -80,9 +80,11 @@ export function BenchmarkPanel({ currentZone }: { currentZone?: ZoneKey }) {
             ) : null}
             <StrategyTable variant={variant} />
             <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
-              Grenzen des Rückblicks: Kosten, Steuern und Spreads sind nicht enthalten, Datenrevisionen bei Inflation und Umfragen
-              lassen sich nicht rekonstruieren, und der Zeitraum umfasst nur einen einzigen langen Aufwärtsmarkt. Das Tool leitet
-              daraus bewusst keine Quoten ab und gibt keine Anlageempfehlung.
+              Grenzen des Rückblicks: Kosten, Steuern und Spreads sind nicht enthalten, und der Zeitraum umfasst nur einen einzigen
+              langen Aufwärtsmarkt. Dazu kommt ein Punkt, der die Zahlen zu freundlich macht: Inflation, Umfragen und
+              Schuldendienst werden nachträglich revidiert. Der Rückblick rechnet mit den heute gültigen Werten, die es damals so
+              noch nicht gab. Die eingebauten Veröffentlichungsverzögerungen verschieben nur den Zeitpunkt, nicht den Wert. Das
+              Tool leitet daraus bewusst keine Quoten ab und gibt keine Anlageempfehlung.
             </p>
           </>
         ) : null}

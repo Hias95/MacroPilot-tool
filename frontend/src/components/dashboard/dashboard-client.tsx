@@ -12,6 +12,7 @@ import { AttributionPanel } from "./attribution-panel";
 import { BenchmarkPanel } from "./benchmark-panel";
 import { ChangesPanel } from "./changes-panel";
 import { LimitsPanel } from "./limits-panel";
+import { ModelPanel } from "./model-panel";
 import { OutlookPanel } from "./outlook-panel";
 import { EasyDashboard } from "./easy/easy-dashboard";
 import { ConsensusPanel } from "./consensus-panel";
@@ -138,6 +139,7 @@ export function DashboardClient() {
         </section>
       ) : null}
       <BenchmarkPanel currentZone={consensus.zone_key} />
+      <ModelPanel />
       <LimitsPanel />
       {/* C4: Die Zahlen sollen das Werkzeug verlassen koennen. Die Dateien entstehen im Tagesexport, im
           API-Betrieb gibt es sie nicht, deshalb erscheint die Zeile nur im statischen Modus. */}

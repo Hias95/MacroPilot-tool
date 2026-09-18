@@ -143,16 +143,19 @@ function Outlook({ band, benchmark, startYear, conditions, test, zoneLabel, zone
       ) : null}
 
       <p className={cn("max-w-3xl text-[11px] leading-relaxed text-pretty", thin ? "text-amber-300/90" : "text-muted-foreground/80")}>
+        {/* Eine Zeile Kleingedrucktes, drei Angaben: worauf es beruht, wie fest die Zahl sein kann, und wie
+            es ausserhalb des Kalibrierzeitraums aussieht. Mehr Saetze liest an dieser Stelle niemand. */}
         {thin
-          ? `So etwas gab es seit ${startYear} aber nur ${band.episodes} Mal. Das ist zu selten, um daraus viel abzuleiten.`
-          : `Gezählt über ${band.episodes} solcher Phasen seit ${startYear}.`}{" "}
-        {/* C2: Die Gewichte wurden auf Daten bis Ende 2018 gesucht. Nur die Jahre danach sind unverbraucht. */}
-        {test
-          ? `Rechnet man nur die Jahre ab ${test.fromYear}, die bei der Kalibrierung nicht verwendet wurden: ` +
-            `${Math.round((test.band.hit_rate_13w ?? 0) / 10)} von 10 aus ${test.band.episodes} ` +
-            `${test.band.episodes === 1 ? "Phase" : "Phasen"}. `
+          ? `Nur ${band.episodes} solcher Phasen seit ${startYear}, zu wenige für eine belastbare Aussage`
+          : `${band.episodes} solcher Phasen seit ${startYear}`}
+        {band.hit_low_13w != null && band.hit_high_13w != null
+          ? `; die Stichprobe lässt ${Math.round(band.hit_low_13w / 10)} bis ${Math.round(band.hit_high_13w / 10)} von 10 zu`
           : ""}
-        Das ist ein Rückblick, keine Vorhersage.
+        .{" "}
+        {test
+          ? `Ab ${test.fromYear}, außerhalb der Kalibrierung: ${Math.round((test.band.hit_rate_13w ?? 0) / 10)} von 10. `
+          : ""}
+        Rückblick, keine Vorhersage.
       </p>
     </>
   );

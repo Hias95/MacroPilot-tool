@@ -7,7 +7,7 @@ from collections.abc import AsyncIterator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import store
+from . import model_card, store
 from .config import get_settings
 from .explain import resolve_provider
 from .refresh import scheduler
@@ -73,5 +73,6 @@ async def health() -> dict:
         "auto_refresh": settings.auto_refresh,
         "alert_channels": [c for c in ("ntfy", "email") if (settings.ntfy_topic if c == "ntfy" else settings.smtp_host and settings.alert_email_to)],
         "oldest_input": store.get_meta("oldest_input"),
+        "model": model_card.model_card(),
         "recording_since": store.first_snapshot_date(),
     }

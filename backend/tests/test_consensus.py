@@ -177,3 +177,26 @@ def test_consensus_exposes_the_driver_weights():
     assert c.method == "macropilot-v2-rank"
     assert c.weights and round(sum(c.weights.values()), 6) == 1.0
     assert c.weights["liquidity"] > c.weights["structure"] > c.weights["cycle"]
+
+
+def test_model_card_reports_the_real_concentration():
+    """Drei Treiber sehen breit aus; eine einzige Zeitreihe bestimmt aber gut ein Viertel des Scores."""
+    from app.model_card import model_card
+
+    card = model_card()
+    top = card["concentration"][0]
+    assert top["label"] == "Net Liquidity der Fed" and abs(top["share"] - 0.275) < 1e-9
+    assert card["central_bank_share"] > 0.4, "Notenbankbilanzen dominieren und das muss sichtbar sein"
+    assert round(sum(r["share"] for r in card["concentration"]), 6) == 1.0
+    assert len(card["parameters_hash"]) == 10 and card["version"] == "macropilot-v2-rank"
+
+
+def test_wilson_interval_stays_wide_when_the_sample_is_thin():
+    """Bei vier Faellen und 100 Prozent Trefferquote darf keine Sicherheit vorgetaeuscht werden."""
+    from app.backtest import effective_n, wilson_interval
+
+    assert effective_n(315, 52) == 24, "Ueberlappung und Episoden begrenzen beide"
+    lo, hi = wilson_interval(4, 4)
+    assert lo < 60 and hi == 100.0
+    lo2, hi2 = wilson_interval(19, 24)
+    assert 55 < lo2 < 65 and 85 < hi2 < 95

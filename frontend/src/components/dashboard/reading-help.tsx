@@ -23,6 +23,10 @@ const POINTS: { term: string; text: string }[] = [
     text: "Die Marken 10, 30, 70 und 90 sind Quantile. Die beiden äußeren Zonen kommen je nur in etwa jeder zehnten Woche vor, die mittlere in vier von zehn.",
   },
   {
+    term: "Der Maßstab wandert mit",
+    text: "Verglichen wird immer mit den vorangegangenen zehn Jahren. Dasselbe Umfeld bekommt deshalb in zehn Jahren einen anderen Rang als heute, weil sich der Vergleichszeitraum verschoben hat.",
+  },
+  {
     term: "Die Zone wechselt langsam",
     text: "Erst nach drei Wochen in Folge, damit sie nicht bei jedem Ausschlag springt. Deshalb kann die Nadel bereits in der Nachbarzone stehen, während das Wort noch die alte nennt.",
   },
