@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException, Query
 from .. import cboe, fred, market, shiller
 from ..consensus import build_consensus
 from ..easy import annotate
+from ..refresh import score_changes
 from ..explain import explain_pillar
 from ..backtest import run_backtest
 from ..data_quality import run_audit, to_dict
@@ -30,9 +31,13 @@ async def dashboard() -> DashboardResponse:
         state = await current_state()
     except (fred.FredError, market.MarketError, cboe.CboeError, shiller.ShillerError):
         state = None
+    try:
+        changes = await score_changes()
+    except (fred.FredError, market.MarketError, cboe.CboeError, shiller.ShillerError):
+        changes = {}
     return DashboardResponse(
-        consensus=build_consensus(pillars, overlays, state), pillars=[annotate(p) for p in pillars],
-        overlays=[annotate(p) for p in overlays], generated_at=datetime.now(tz=timezone.utc),
+        consensus=build_consensus(pillars, overlays, state), pillars=[annotate(p, changes.get(p.id)) for p in pillars],
+        overlays=[annotate(p, changes.get(p.id)) for p in overlays], generated_at=datetime.now(tz=timezone.utc),
     )
 
 

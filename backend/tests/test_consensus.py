@@ -168,3 +168,12 @@ def test_weighting_note_ranks_timing_against_fall_height():
     weak = [pillar("liquidity", 8, 10, -5.0), pillar("cycle", 93, 95, 20.0), pillar("structure", 44)]
     veto = build_consensus(weak, overlays, state)
     assert veto.vetoes and veto.weighting.startswith("Ein Veto überlagert alles andere")
+
+
+def test_consensus_exposes_the_driver_weights():
+    """Die Beitragsrechnung im Frontend braucht die Gewichte; sie standen zuerst nur im Fallback."""
+    drivers_ = [pillar("liquidity", 54), pillar("cycle", 93), pillar("structure", 44)]
+    c = build_consensus(drivers_, [pillar("valuation", 60), pillar("mechanics", 49), pillar("markets", 52)])
+    assert c.method == "macropilot-v2-rank"
+    assert c.weights and round(sum(c.weights.values()), 6) == 1.0
+    assert c.weights["liquidity"] > c.weights["structure"] > c.weights["cycle"]

@@ -11,14 +11,27 @@ def comp(cid, score, value=0.0):
 
 
 def test_driver_labels_and_sentences():
-    """Lage plus Richtung, und der Zeitraum wird ausgesprochen statt 'Trend' zu sagen."""
+    """Die Richtung beschreibt die Veraenderung des Scores, nicht das Tempo der Rohserie."""
     p = pillar("liquidity", 72, momentum=80).model_copy(update={"tone": "bullish"})
     assert easy_label(p) == "Rückenwind"
-    assert easy_summary(p) == "Es kommt netto Geld ins System. Seit drei Monaten geht es deutlich aufwärts."
+    assert easy_summary(p, score_change=14) == "Es kommt netto Geld ins System. In drei Monaten um 14 Punkte gestiegen."
     weak = pillar("cycle", 30, momentum=20).model_copy(update={"tone": "bearish"})
-    assert easy_summary(weak) == "Die Industrie bremst. Seit drei Monaten geht es deutlich abwärts."
+    assert easy_summary(weak, score_change=-18) == "Die Industrie bremst. In drei Monaten um 18 Punkte gefallen."
     flat = pillar("structure", 50, momentum=50).model_copy(update={"tone": "neutral"})
-    assert "hat sich daran wenig geändert" in easy_summary(flat)
+    assert "In drei Monaten kaum verändert" in easy_summary(flat, score_change=1)
+
+
+def test_direction_does_not_call_a_rising_score_unchanged():
+    """Der Fehler, der das ausgeloest hat: Score 29 auf 40 bei mittlerem Momentum hiess 'wenig geaendert'."""
+    p = pillar("structure", 40, momentum=50).model_copy(update={"tone": "neutral"})
+    text = easy_summary(p, score_change=11)
+    assert "11 Punkte gestiegen" in text and "kaum verändert" not in text
+
+
+def test_direction_falls_back_to_pace_without_history():
+    """Ohne Score-Historie wird ueber das Tempo gesprochen, nicht ueber eine Veraenderung."""
+    p = pillar("structure", 40, momentum=50).model_copy(update={"tone": "neutral"})
+    assert "Tempo" in easy_summary(p, score_change=None)
 
 
 def test_drivers_name_the_strongest_and_weakest_part():

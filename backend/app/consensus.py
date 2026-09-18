@@ -213,7 +213,7 @@ def _fallback(scores: dict[str, int | None], overlay_scores: dict[str, int | Non
     return ConsensusResponse(
         score=score, composite=score, zone_key=key, zone=label, method="mean-fallback",  # type: ignore[arg-type]
         note="Mittelwert, weil nicht alle Treiber einen Score liefern.", why="Für die volle Logik fehlen Treiber-Scores.",
-        pillar_scores=scores, overlay_scores=overlay_scores, confidence="knapp",
+        pillar_scores=scores, overlay_scores=overlay_scores, weights=dict(CONSENSUS_WEIGHTS), confidence="knapp",
     )
 
 
@@ -371,7 +371,7 @@ def build_consensus(
         note="Rohwert aus drei gewichteten Treibern, Marktmechanik als Kontra-Korrektur, Bewertung als Deckel, Marktsignale als Bestätigung, Vetos bei Systemkrisen. Angezeigt wird der Rang des Rohwerts in den letzten zehn Jahren; Zone und Zyklusphase wechseln erst nach Bestätigung.",
         why=_why(r, by, ov, phase_key, weeks, rank, zone, zone_raw, weeks_in_zone, pending_weeks, change_date),
         weighting=weighting_note(r, ov, zone_key, confirm_key),
-        pillar_scores=scores, overlay_scores=overlay_scores,
+        pillar_scores=scores, overlay_scores=overlay_scores, weights=dict(CONSENSUS_WEIGHTS),
         core=round(r.core, 1), mechanics_adjustment=round(r.mechanics_adjustment, 1), valuation_cap=round(r.valuation_cap, 1) if r.valuation_cap is not None else None,
         vetoes=r.vetoes, cap=round(r.cap, 1) if r.cap is not None else None, adjusted=round(r.adjusted, 1),
         # Ein Deckel ueber dem Wert aendert nichts. Ohne diese Angabe wirkte "Bewertung extrem teuer, Deckel

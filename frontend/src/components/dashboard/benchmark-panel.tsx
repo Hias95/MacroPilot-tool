@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { ChartNoAxesColumn } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import type { BacktestPerformance, BacktestResponse, BacktestVariant, ZoneKey } from "@/lib/api";
-import { THIN_EVIDENCE_EPISODES, liveVariant, loadBacktest } from "@/lib/backtest";
+import type { BacktestPerformance, BacktestResponse, BacktestVariant, BenchmarkResult, ZoneKey } from "@/lib/api";
+import { THIN_EVIDENCE_EPISODES, liveVariant, loadBacktest, zoneBandOf } from "@/lib/backtest";
 import { formatDateDe } from "@/lib/format";
 import { ZONES } from "@/lib/score";
 import { cn } from "@/lib/utils";
@@ -75,6 +75,9 @@ export function BenchmarkPanel({ currentZone }: { currentZone?: ZoneKey }) {
               zehn heißt: Die Zahlen beruhen auf einer Handvoll Fälle und können Zufall sein.
             </p>
             <ZoneTable variant={variant} currentZone={currentZone} />
+            {data?.benchmarks?.length && currentZone ? (
+              <OtherAssets benchmarks={data.benchmarks} zone={currentZone} zoneLabel={zoneLabelOf(variant, currentZone)} />
+            ) : null}
             <StrategyTable variant={variant} />
             <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
               Grenzen des Rückblicks: Kosten, Steuern und Spreads sind nicht enthalten, Datenrevisionen bei Inflation und Umfragen
@@ -146,6 +149,9 @@ function ZoneTable({ variant, currentZone }: { variant: BacktestVariant; current
 
 /** Regel entlang der Zonen gegen schlichtes Halten. Beide Regelvarianten sind Rechenbeispiele, keine Quoten-Empfehlung. */
 function StrategyTable({ variant }: { variant: BacktestVariant }) {
+  // "Praktisch nichts gespart" heisst: weniger als einen Prozentpunkt besser als schlichtes Halten.
+  const baseSavedNothing = variant.strategy_base.max_drawdown_pct - variant.buy_hold.max_drawdown_pct < 1;
+  const fmtPct = (n: number) => `${n.toFixed(1)} %`;
   return (
     <div className="flex flex-col gap-2">
       <h3 className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -183,9 +189,76 @@ function StrategyTable({ variant }: { variant: BacktestVariant }) {
           </tbody>
         </table>
       </div>
+      {/* C5: Das wichtigste Negativergebnis stand bisher nicht da. Die Regel mit Grundquote senkt die
+          Schwankung, aber beim groessten Rueckgang half sie im Rueckblick praktisch nicht. */}
       <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
-        Lesart: Die Regeln kosteten Rendite und sparten Schwankung. Wer defensiv aussteigt, verpasst auch die Erholung, weil die
-        stärksten Wochen oft direkt auf die schlechtesten folgen. Das Tool zeigt deshalb Zonen und Kräfte, nicht Prozentquoten.
+        Lesart: Die Regeln kosteten Rendite und sparten Schwankung.{" "}
+        {baseSavedNothing ? (
+          <span className="text-amber-300/90">
+            Beim größten Rückgang half die Grundquoten-Regel dabei praktisch nicht ({fmtPct(variant.strategy_base.max_drawdown_pct)}{" "}
+            gegen {fmtPct(variant.buy_hold.max_drawdown_pct)}), sie kostete nur Rendite. Ein ruhigerer Verlauf ist nicht dasselbe wie
+            weniger Absturz.
+          </span>
+        ) : (
+          `Beim größten Rückgang brachte die Grundquoten-Regel ${fmtPct(variant.strategy_base.max_drawdown_pct)} statt ${fmtPct(variant.buy_hold.max_drawdown_pct)}.`
+        )}{" "}
+        Wer defensiv aussteigt, verpasst auch die Erholung, weil die stärksten Wochen oft direkt auf die schlechtesten folgen. Das
+        Tool zeigt deshalb Zonen und Kräfte, nicht Prozentquoten.
+      </p>
+    </div>
+  );
+}
+
+/** Das Label der aktuellen Zone aus der Bänder-Tabelle, damit die Überschrift die Zone benennt. */
+function zoneLabelOf(variant: BacktestVariant, zone: ZoneKey): string {
+  return variant.bands.find((b) => b.key === zone)?.label ?? "dieser Zone";
+}
+
+/**
+ * C1: Sagt der Consensus auch etwas über Gold, Anleihen und eine Mischung?
+ *
+ * Das Regime-Flag "Fiskalische Dominanz" behauptet, Sachwerte und Gold profitierten historisch. Bisher stand
+ * diese Behauptung ohne eine einzige Zahl da, in einem Werkzeug, das sonst alles belegt. Gezeigt wird nur die
+ * aktuelle Zone, sonst wäre es eine Tabelle mit fünfundzwanzig Feldern.
+ */
+function OtherAssets({ benchmarks, zone, zoneLabel }: { benchmarks: BenchmarkResult[]; zone: ZoneKey; zoneLabel: string }) {
+  const rows = benchmarks
+    .map((b) => ({ name: b.name, band: zoneBandOf(b, zone) }))
+    .filter((r): r is { name: string; band: NonNullable<ReturnType<typeof zoneBandOf>> } => r.band?.hit_rate_13w != null);
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        Und die anderen Anlagen? Nach Wochen in der Zone {zoneLabel}
+      </h3>
+      <div className="-mx-1 overflow-x-auto px-1">
+        <table className="w-full min-w-[30rem] border-collapse text-sm">
+          <thead>
+            <tr className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              <th scope="col" className="py-1.5 text-left font-medium">Anlage</th>
+              <th scope="col" className="py-1.5 pl-4 text-right font-medium">Nach 13 Wochen im Plus</th>
+              <th scope="col" className="py-1.5 pl-4 text-right font-medium">Typisch</th>
+              <th scope="col" className="py-1.5 pl-4 text-right font-medium">Phasen</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/60">
+            {rows.map((r) => (
+              <tr key={r.name}>
+                <th scope="row" className="py-2 text-left font-normal">{r.name}</th>
+                <td className="py-2 pl-4 text-right tabular-nums">{Math.round((r.band.hit_rate_13w ?? 0) / 10)} von 10</td>
+                <td className="py-2 pl-4 text-right tabular-nums">{r.band.median_13w != null ? pct(r.band.median_13w) : "—"}</td>
+                <td className={cn("py-2 pl-4 text-right tabular-nums", r.band.episodes < THIN_EVIDENCE_EPISODES ? "text-amber-300/90" : "text-muted-foreground")}>
+                  {r.band.episodes}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="max-w-3xl text-[11px] leading-relaxed text-muted-foreground/80 text-pretty">
+        Gleiche Rechnung wie oben, nur mit anderen Kursen. Gold und Anleihen laufen in starken Makro-Phasen oft
+        gegen die Aktien: Wenn alles stützt, braucht kaum jemand einen sicheren Hafen.
       </p>
     </div>
   );

@@ -13,7 +13,7 @@ from datetime import date, datetime, timedelta, timezone
 from . import backtest, cboe, fred, history, market, notify, shiller, snapshots, store, treasury
 from .config import get_settings
 from .consensus import build_consensus
-from .easy import annotate
+from .easy import TREND_WEEKS, annotate
 from .explain import clear_cache as clear_explanations
 from .pillars import common, get_all, get_overlays
 from .schemas import DashboardResponse
@@ -41,11 +41,26 @@ def clear_memory_caches() -> None:
     clear_explanations()
 
 
+async def score_changes(weeks: int = TREND_WEEKS) -> dict[str, int]:
+    """Veraenderung des Scores je Saeule ueber `weeks` Wochen, aus der gemeinsamen Wochenhistorie."""
+    hist = await history.build_history()
+    out: dict[str, int] = {}
+    for name, points in hist.pillars.items():
+        if len(points) > weeks:
+            out[name] = points[-1].score - points[-1 - weeks].score
+    return out
+
+
 async def build_dashboard() -> DashboardResponse:
     pillars, overlays = await get_all(), await get_overlays()
     state = await history.current_state()
-    return DashboardResponse(consensus=build_consensus(pillars, overlays, state), pillars=[annotate(p) for p in pillars],
-                             overlays=[annotate(p) for p in overlays], generated_at=datetime.now(tz=timezone.utc))
+    changes = await score_changes()
+    return DashboardResponse(
+        consensus=build_consensus(pillars, overlays, state),
+        pillars=[annotate(p, changes.get(p.id)) for p in pillars],
+        overlays=[annotate(p, changes.get(p.id)) for p in overlays],
+        generated_at=datetime.now(tz=timezone.utc),
+    )
 
 
 async def refresh(force_network: bool = True, today: date | None = None) -> RefreshResult:

@@ -1,4 +1,4 @@
-import { fetchBacktest, type BacktestBand, type BacktestResponse, type BacktestVariant, type ConditionalBand, type ZoneKey } from "./api";
+import { fetchBacktest, type BacktestBand, type BacktestResponse, type BacktestVariant, type BenchmarkBand, type ConditionalBand, type ZoneKey } from "./api";
 
 /** Der Backtest ist eine grosse Datei und wird von zwei Panels gebraucht. Einmal laden, beide bedienen. */
 let pending: Promise<BacktestResponse> | null = null;
@@ -44,3 +44,8 @@ export function conditionalFor(
  * ehrliche Aussage "hat historisch wenig geaendert", und die ist genauso wertvoll wie ein Unterschied.
  */
 export const CONDITION_MATTERS_PP = 5;
+
+/** Die Zeile einer Vergleichsanlage oder des Prüf-Fensters zur gesuchten Zone. */
+export function zoneBandOf(result: { bands: BenchmarkBand[] } | null | undefined, zone: ZoneKey): BenchmarkBand | null {
+  return result?.bands.find((b) => b.zone === zone) ?? null;
+}

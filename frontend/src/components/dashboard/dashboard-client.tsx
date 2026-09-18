@@ -5,9 +5,10 @@ import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchDashboard, fetchHistory, type DashboardResponse, type HistoryResponse } from "@/lib/api";
+import { DATA_MODE, DATA_URL, fetchDashboard, fetchHistory, type DashboardResponse, type HistoryResponse } from "@/lib/api";
 import { useViewMode } from "@/lib/mode";
 import { ZONES, isValuationExtreme, marketConfirmedOf } from "@/lib/score";
+import { AttributionPanel } from "./attribution-panel";
 import { BenchmarkPanel } from "./benchmark-panel";
 import { ChangesPanel } from "./changes-panel";
 import { LimitsPanel } from "./limits-panel";
@@ -102,6 +103,7 @@ export function DashboardClient() {
       <>
         <EasyDashboard consensus={consensus} pillars={pillars} overlays={overlays} history={history} />
         <ChangesPanel days={90} compact />
+        <LimitsPanel />
       </>
     );
   }
@@ -115,6 +117,7 @@ export function DashboardClient() {
         valuationExtreme={isValuationExtreme(overlays)}
         marketConfirmed={marketConfirmedOf(consensus)}
       />
+      <AttributionPanel consensus={consensus} pillars={pillars} history={history ?? null} />
       <ChangesPanel days={365} />
       <section aria-label="Die drei Treiber" className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {pillars.map((p) => (
@@ -136,6 +139,20 @@ export function DashboardClient() {
       ) : null}
       <BenchmarkPanel currentZone={consensus.zone_key} />
       <LimitsPanel />
+      {/* C4: Die Zahlen sollen das Werkzeug verlassen koennen. Die Dateien entstehen im Tagesexport, im
+          API-Betrieb gibt es sie nicht, deshalb erscheint die Zeile nur im statischen Modus. */}
+      {DATA_MODE === "static" ? (
+        <p className="text-[11px] text-muted-foreground/80">
+          Zahlen zum Weiterrechnen:{" "}
+          <a href={`${DATA_URL}/consensus.csv`} download className="underline underline-offset-2 hover:text-foreground">
+            Consensus-Verlauf (CSV)
+          </a>{" "}
+          &middot;{" "}
+          <a href={`${DATA_URL}/saeulen.csv`} download className="underline underline-offset-2 hover:text-foreground">
+            Säulen-Scores (CSV)
+          </a>
+        </p>
+      ) : null}
     </>
   );
 }

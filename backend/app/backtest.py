@@ -8,6 +8,7 @@ Ausgewertet werden mehrere Varianten des Gesamtscores und jeder Baustein allein,
 
 from __future__ import annotations
 
+import logging
 import math
 import time
 from bisect import bisect_right
@@ -20,6 +21,8 @@ from .history import build_history
 from .model_config import CONSENSUS_WEIGHTS, ZONE_BANDS
 from .pillars.valuation import fallhoehe_label
 from .scoring import RollingPercentile
+
+log = logging.getLogger(__name__)
 
 HORIZONS = (4, 13, 26, 52)
 # Zwei Aktienquoten-Profile je Zone: defensiv (0 bis 100 %) und Basis (50 bis 100 %, fuer Privatanleger realistischer).
@@ -65,6 +68,34 @@ class BandStat:
     # ehrlichere Mass fuer die Belastbarkeit: 53 Wochen koennen fuenf Episoden sein.
     episodes: int = 0
     n_13w: int = 0
+
+
+# C1: Der Consensus misst das Umfeld fuer US-Aktien. Ob er auch ueber Gold und Anleihen etwas sagt, war
+# bisher unbelegt, obwohl das Regime-Flag "Fiskalische Dominanz" genau das behauptet. Alles investierbare
+# ETFs, damit die Zahlen vergleichbar bleiben.
+BENCHMARK_TICKERS = [("SPY", "S&P 500"), ("GLD", "Gold"), ("IEF", "US-Staatsanleihen 7 bis 10 J")]
+MIXED_NAME = "Mischung 60 Aktien / 40 Anleihen"
+# C2: Die Gewichte wurden auf Daten bis Ende 2018 kalibriert. Alles danach ist echtes Pruef-Fenster.
+TEST_WINDOW_START = date(2019, 1, 1)
+
+
+@dataclass
+class BenchmarkBand:
+    zone: str
+    n_13w: int
+    episodes: int
+    hit_rate_13w: float | None
+    median_13w: float | None
+
+
+@dataclass
+class BenchmarkResult:
+    """Wie sich eine Anlage nach Wochen in jeder Zone entwickelt hat. Gleiche Rechnung wie beim Hauptindex."""
+
+    key: str
+    name: str
+    start: date
+    bands: list[BenchmarkBand]
 
 
 @dataclass
@@ -261,6 +292,9 @@ class BacktestReport:
     end: date
     variants: list[VariantResult]
     conditional: list[ConditionalBand] = field(default_factory=list)
+    benchmarks: list[BenchmarkResult] = field(default_factory=list)
+    #: Dieselbe Rechnung nur auf dem Pruef-Fenster, also ausserhalb der Kalibrierung.
+    test_window: BenchmarkResult | None = None
     generated_at: float = 0.0
 
 
@@ -345,6 +379,51 @@ def conditional_bands(rows: list[tuple[date, float]], fwd13: list[float | None],
     return out
 
 
+def zone_stats(rows: list[tuple[date, float]], prices: PriceIndex, key: str, name: str) -> BenchmarkResult:
+    """Zonen-Kennzahlen einer beliebigen Anlage: Trefferquote und Median der 13-Wochen-Rendite.
+
+    Episoden sind wieder betroffene Zonenaufenthalte, damit die Zahl nicht Unabhaengigkeit vortaeuscht.
+    """
+    usable = [(i, d, s) for i, (d, s) in enumerate(rows) if prices.at(d) is not None]
+    stay_of: dict[int, int] = {}
+    prev_zone, stay = None, -1
+    for i, _, score in usable:
+        zone = band_of(score)[0]
+        if zone != prev_zone:
+            stay += 1
+            prev_zone = zone
+        stay_of[i] = stay
+
+    bands: list[BenchmarkBand] = []
+    for _, zkey, _label in ZONE_BANDS:
+        idx = [i for i, _, score in usable if band_of(score)[0] == zkey]
+        f13 = [r for r in (forward_return(prices, rows[i][0], 13) for i in idx) if r is not None]
+        bands.append(BenchmarkBand(
+            zone=zkey, n_13w=len(f13), episodes=len({stay_of[i] for i in idx}),
+            hit_rate_13w=round(100 * sum(1 for f in f13 if f > 0) / len(f13), 1) if f13 else None,
+            median_13w=_quantile(f13, 0.50),
+        ))
+    start = usable[0][1] if usable else rows[0][0]
+    return BenchmarkResult(key=key, name=name, start=start, bands=bands)
+
+
+def blend_index(a: PriceIndex, b: PriceIndex, dates: list[date], share_a: float) -> PriceIndex:
+    """Woechentlich neu gewichtete Mischung zweier Anlagen als eigener Kursindex."""
+    from .fred import Observation
+
+    out, value = [], 100.0
+    prev_a, prev_b = None, None
+    for d in dates:
+        pa, pb = a.at(d), b.at(d)
+        if pa is None or pb is None:
+            continue
+        if prev_a is not None and prev_b is not None and prev_a and prev_b:
+            value *= 1.0 + share_a * (pa / prev_a - 1.0) + (1.0 - share_a) * (pb / prev_b - 1.0)
+        prev_a, prev_b = pa, pb
+        out.append(Observation(date=d, value=value))
+    return PriceIndex(out)
+
+
 async def run_backtest(force: bool = False) -> BacktestReport:
     global _cache
     now = time.time()
@@ -375,8 +454,28 @@ async def run_backtest(force: bool = False) -> BacktestReport:
         variants.append(evaluate_series(f"Nur {k}", [(pt.date, float(pt.score)) for pt in pts], prices, cash))
     fwd13 = [forward_return(prices, d, 13) for d, _ in ranked]
     conditional = conditional_bands(ranked, fwd13, by_date.get("valuation", {}), by_date.get("markets", {}))
+
+    # C1: dieselbe Rechnung fuer Gold, Anleihen und eine Mischung. Faellt eine Quelle aus, fehlt nur ihre Zeile.
+    benchmarks: list[BenchmarkResult] = []
+    indices: dict[str, PriceIndex] = {"SPY": prices}
+    for ticker, label in BENCHMARK_TICKERS:
+        try:
+            idx = prices if ticker == "SPY" else PriceIndex((await market.fetch_weekly_closes(ticker))[0].observations)
+        except Exception as exc:  # noqa: BLE001 - ein fehlender Vergleich darf den Backtest nicht stoppen
+            log.warning("Vergleichsanlage %s nicht verfuegbar: %s", ticker, exc)
+            continue
+        indices[ticker] = idx
+        benchmarks.append(zone_stats(ranked, idx, ticker, label))
+    if "IEF" in indices:
+        mixed = blend_index(prices, indices["IEF"], [d for d, _ in ranked], 0.6)
+        benchmarks.append(zone_stats(ranked, mixed, "MIX6040", MIXED_NAME))
+
+    # C2: nur das Pruef-Fenster, also Wochen, die bei der Kalibrierung nicht gesehen wurden.
+    test_rows = [(d, v) for d, v in ranked if d >= TEST_WINDOW_START]
+    test_window = zone_stats(test_rows, prices, "SPY", f"S&P 500 ab {TEST_WINDOW_START.year}") if test_rows else None
     report = BacktestReport(benchmark="SPY", start=raw[0][0], end=raw[-1][0], variants=variants,
-                            conditional=conditional, generated_at=now)
+                            conditional=conditional, benchmarks=benchmarks, test_window=test_window,
+                            generated_at=now)
     _cache = (now, report)
     return report
 

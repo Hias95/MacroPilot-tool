@@ -152,6 +152,7 @@ class ConsensusResponse(BaseModel):
     why: str
     weighting: str = Field("", description="Rangfolge der widersprechenden Hinweise: Zeitpunkt gegen Fallhoehe")
     pillar_scores: dict[str, int | None]
+    weights: dict[str, float] = Field(default_factory=dict, description="Gewicht je Treiber im Kern, Summe 1")
     overlay_scores: dict[str, int | None] = Field(default_factory=dict)
     core: float | None = None
     mechanics_adjustment: float = 0.0

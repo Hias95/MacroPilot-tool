@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { Telescope } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import type { BacktestBand, ConditionalBand, ZoneKey } from "@/lib/api";
-import { CONDITION_MATTERS_PP, OUTLOOK_LABEL, THIN_EVIDENCE_EPISODES, bandFor, conditionalFor, liveVariant, loadBacktest } from "@/lib/backtest";
+import type { BacktestBand, BenchmarkBand, ConditionalBand, ZoneKey } from "@/lib/api";
+import { CONDITION_MATTERS_PP, OUTLOOK_LABEL, THIN_EVIDENCE_EPISODES, bandFor, conditionalFor, liveVariant, loadBacktest, zoneBandOf } from "@/lib/backtest";
 import { cn } from "@/lib/utils";
 
 // Genau zehn Punkte, damit der Streifen eins zu eins zum Satz "X von 10" passt. Eine feinere Aufloesung
@@ -17,6 +17,8 @@ interface Loaded {
   startYear: number;
   /** Paare aus heutiger Bedingung und ihrem Gegenstueck, fuer den Vergleich "mit gegen ohne". */
   conditions: { now: ConditionalBand; other: ConditionalBand | null; intro: string }[];
+  /** Dieselbe Zone ausserhalb des Kalibrierzeitraums. Gehoert in die Grundlagenzeile, nicht in eine eigene. */
+  test: { band: BenchmarkBand; fromYear: number } | null;
 }
 
 /**
@@ -55,7 +57,13 @@ export function OutlookPanel({ zoneKey, zoneLabel, zoneColor, valuationExtreme, 
         const conditions = wanted
           .map(([now, other, intro]) => ({ now: conditionalFor(res, zoneKey, now), other: conditionalFor(res, zoneKey, other), intro }))
           .filter((c): c is { now: ConditionalBand; other: ConditionalBand | null; intro: string } => c.now != null && c.now.hit_rate_13w != null);
-        setData(band && variant ? { band, benchmark: res.benchmark, startYear: new Date(variant.start).getFullYear(), conditions } : null);
+        const testBand = zoneBandOf(res.test_window, zoneKey);
+        const test = testBand && testBand.hit_rate_13w != null && res.test_window
+          ? { band: testBand, fromYear: new Date(res.test_window.start).getFullYear() }
+          : null;
+        setData(band && variant
+          ? { band, benchmark: res.benchmark, startYear: new Date(variant.start).getFullYear(), conditions, test }
+          : null);
       })
       .catch(() => alive && setData(null));
     return () => {
@@ -82,7 +90,7 @@ export function OutlookPanel({ zoneKey, zoneLabel, zoneColor, valuationExtreme, 
   );
 }
 
-function Outlook({ band, benchmark, startYear, conditions, zoneLabel, zoneColor }: Loaded & { zoneLabel: string; zoneColor: string }) {
+function Outlook({ band, benchmark, startYear, conditions, test, zoneLabel, zoneColor }: Loaded & { zoneLabel: string; zoneColor: string }) {
   const hit = band.hit_rate_13w;
   if (hit == null || !band.n_13w) {
     return <p className="text-sm text-muted-foreground text-pretty">Für diese Zone liegen noch zu wenige Vergleichswochen vor.</p>;
@@ -138,6 +146,12 @@ function Outlook({ band, benchmark, startYear, conditions, zoneLabel, zoneColor 
         {thin
           ? `So etwas gab es seit ${startYear} aber nur ${band.episodes} Mal. Das ist zu selten, um daraus viel abzuleiten.`
           : `Gezählt über ${band.episodes} solcher Phasen seit ${startYear}.`}{" "}
+        {/* C2: Die Gewichte wurden auf Daten bis Ende 2018 gesucht. Nur die Jahre danach sind unverbraucht. */}
+        {test
+          ? `Rechnet man nur die Jahre ab ${test.fromYear}, die bei der Kalibrierung nicht verwendet wurden: ` +
+            `${Math.round((test.band.hit_rate_13w ?? 0) / 10)} von 10 aus ${test.band.episodes} ` +
+            `${test.band.episodes === 1 ? "Phase" : "Phasen"}. `
+          : ""}
         Das ist ein Rückblick, keine Vorhersage.
       </p>
     </>

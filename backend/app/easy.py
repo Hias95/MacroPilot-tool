@@ -105,17 +105,33 @@ def _span_words(weeks: int, unit: str) -> str:
     return {1: "einem Monat", 3: "drei Monaten", 6: "einem halben Jahr", 12: "einem Jahr"}.get(months, f"{months} Monaten")
 
 
-def _direction(momentum: int, span: str) -> str:
-    """Richtung aus dem Momentum-Perzentil, ohne die Zahl zu nennen."""
-    if momentum >= 75:
-        return f"Seit {span} geht es deutlich aufwärts."
-    if momentum >= 58:
-        return f"Seit {span} geht es leicht aufwärts."
-    if momentum > 42:
-        return f"Seit {span} hat sich daran wenig geändert."
-    if momentum > 25:
-        return f"Seit {span} geht es leicht abwärts."
-    return f"Seit {span} geht es deutlich abwärts."
+TREND_WEEKS = 13
+TREND_SPAN = "drei Monaten"
+
+
+def _direction(score_change: int | None, momentum: int, span: str) -> str:
+    """Richtung des Scores ueber die letzten Wochen, in Alltagsworten.
+
+    Frueher stand hier das Momentum-Perzentil. Das beschreibt das Tempo der zugrunde liegenden Kennzahl, nicht
+    die Veraenderung des Scores, den der Leser sieht. Ergebnis war ein falscher Satz: Der Struktur-Score stieg
+    in dreizehn Wochen von 29 auf 40, waehrend daneben "hat sich daran wenig geaendert" stand. Ohne Historie
+    bleibt das Momentum als Rueckfall, dann aber als Aussage ueber das Tempo.
+    """
+    if score_change is None:
+        if momentum >= 58:
+            return f"Das Tempo ist zuletzt hoch, über {span} gerechnet."
+        if momentum > 42:
+            return f"Das Tempo ist über {span} unauffällig."
+        return f"Das Tempo ist zuletzt schwach, über {span} gerechnet."
+    if score_change >= 10:
+        return f"In {TREND_SPAN} um {score_change} Punkte gestiegen."
+    if score_change >= 4:
+        return f"In {TREND_SPAN} leicht gestiegen, um {score_change} Punkte."
+    if score_change > -4:
+        return f"In {TREND_SPAN} kaum verändert."
+    if score_change > -10:
+        return f"In {TREND_SPAN} leicht gefallen, um {abs(score_change)} Punkte."
+    return f"In {TREND_SPAN} um {abs(score_change)} Punkte gefallen."
 
 
 def _ranked(p: PillarResponse) -> list[tuple[Component, float]]:
@@ -144,11 +160,11 @@ def easy_label(p: PillarResponse) -> str:
     return TONE_LABEL[p.tone]
 
 
-def easy_summary(p: PillarResponse) -> str:
+def easy_summary(p: PillarResponse, score_change: int | None = None) -> str:
     """Lage und Richtung. Der Zeitraum wird ausgesprochen, damit 'Trend' nicht in der Luft haengt."""
     if p.score is None:
         return "Noch kein Score verfügbar."
-    direction = _direction(p.score.momentum, _span_words(p.score.momentum_window, p.score.unit))
+    direction = _direction(score_change, p.score.momentum, _span_words(p.score.momentum_window, p.score.unit))
     if p.id == "valuation":
         return f"{VALUATION_INTRO.get(easy_label(p), 'Bewertung ohne Einordnung.')} {direction}"
     if p.id == "mechanics":
@@ -190,8 +206,8 @@ def easy_role(p: PillarResponse) -> str:
     return f"Macht {weight_words(weight)} des Gesamtscores aus.{DRIVER_ROLE_EXTRA.get(p.id, '')}"
 
 
-def annotate(p: PillarResponse) -> PillarResponse:
+def annotate(p: PillarResponse, score_change: int | None = None) -> PillarResponse:
     return p.model_copy(update={
-        "easy_label": easy_label(p), "easy_summary": easy_summary(p),
+        "easy_label": easy_label(p), "easy_summary": easy_summary(p, score_change),
         "easy_drivers": easy_drivers(p), "easy_role": easy_role(p),
     })

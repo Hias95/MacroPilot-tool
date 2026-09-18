@@ -139,6 +139,8 @@ export interface ConsensusResponse {
   /** Rangfolge der widersprechenden Hinweise: Zeitpunkt gegen Fallhöhe. */
   weighting?: string;
   pillar_scores: Record<string, number | null>;
+  /** Gewicht je Treiber im Kern, Summe 1. Grundlage der Beitragsrechnung. */
+  weights?: Record<string, number>;
   overlay_scores: Record<string, number | null>;
   core: number | null;
   mechanics_adjustment: number;
@@ -391,12 +393,31 @@ export interface ConditionalBand {
   p50_fwd_13w: number | null;
 }
 
+/** Zonen-Kennzahlen einer weiteren Anlage oder eines anderen Zeitfensters. */
+export interface BenchmarkBand {
+  zone: ZoneKey;
+  n_13w: number;
+  episodes: number;
+  hit_rate_13w: number | null;
+  median_13w: number | null;
+}
+export interface BenchmarkResult {
+  key: string;
+  name: string;
+  start: string;
+  bands: BenchmarkBand[];
+}
+
 export interface BacktestResponse {
   benchmark: string;
   start: string;
   end: string;
   variants: BacktestVariant[];
   conditional?: ConditionalBand[];
+  /** Gold, Anleihen, Mischung: sagt der Consensus auch ausserhalb von US-Aktien etwas? */
+  benchmarks?: BenchmarkResult[];
+  /** Dieselbe Rechnung nur ausserhalb des Kalibrierzeitraums. */
+  test_window?: BenchmarkResult | null;
   generated_at: number;
 }
 export const fetchBacktest = (signal?: AbortSignal) => request<BacktestResponse>("/api/v1/backtest", signal);

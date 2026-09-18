@@ -6,7 +6,6 @@ import type { ConsensusResponse, HistoryResponse, PillarResponse } from "@/lib/a
 import { availableRanges, filterByRange, useRange } from "@/lib/range";
 import { MARKET_CONFIRM, PHASES, ZONES, isValuationExtreme, marketConfirmedOf, pendingZoneOf, zoneChangeNote } from "@/lib/score";
 import { ConsensusGauge } from "../consensus-gauge";
-import { LimitsPanel } from "../limits-panel";
 import { ReadingHelp } from "../reading-help";
 import { OutlookPanel } from "../outlook-panel";
 import { ConsensusHistoryChart } from "../consensus-history-chart";
@@ -137,7 +136,6 @@ export function EasyDashboard({ consensus, pillars, overlays, history }: Props) 
           </div>
         </section>
       ) : null}
-      <LimitsPanel />
     </>
   );
 }

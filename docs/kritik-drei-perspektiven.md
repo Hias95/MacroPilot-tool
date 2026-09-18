@@ -259,6 +259,29 @@ Beim Einbauen von B3 zeigte sich, dass der Gewichtungssatz drei Zeilen darunter 
 Er ersetzt deshalb den allgemeinen Zonentext und die Erklaerung zur Marktbestaetigung, statt sie zu ergaenzen.
 Unter dem Strich steht weniger Text als vorher.
 
+## 5c. Stufe C erledigt (18.09.2026)
+
+| # | Was jetzt dasteht |
+|---|---|
+| C1 | Tabelle "Und die anderen Anlagen?" fuer die aktuelle Zone: S&P 500, Gold, US-Staatsanleihen und eine 60/40-Mischung, jeweils Trefferquote, typische Rendite und Phasenzahl. |
+| C2 | Die Grundlagenzeile nennt zusaetzlich das Pruef-Fenster: "Rechnet man nur die Jahre ab 2019, die bei der Kalibrierung nicht verwendet wurden: 7 von 10 aus 23 Phasen." |
+| C3 | Neues Panel "Wer hat den Rohwert bewegt?" mit dem Beitrag je Treiber ueber 13 Wochen (Score mal Gewicht), Balken von der Mitte aus. |
+| C4 | `consensus.csv` und `saeulen.csv` im Tagesexport, verlinkt am Ende der Profi-Ansicht. Semikolon und BOM, damit Excel sie ohne Importdialog oeffnet. |
+| C5 | Die Lesart benennt das Negativergebnis: "Beim groessten Rueckgang half die Grundquoten-Regel praktisch nicht (-31,8 % gegen -31,8 %), sie kostete nur Rendite." |
+
+**Befunde aus C1 und C2.** Der Consensus sagt auch etwas ueber andere Anlagen, teils gegenlaeufig: In der Zone
+"Stark positiv" liegt Gold nur in 40 Prozent der Faelle im Plus (Median -2,7 %), Anleihen in 32 Prozent. Wenn
+alles stuetzt, braucht kaum jemand einen sicheren Hafen. Das Regime-Flag "Fiskalische Dominanz" behauptet
+pauschal, Sachwerte und Gold profitierten; die Zahlen zeigen, dass das von der Makro-Zone abhaengt. Im
+Pruef-Fenster ab 2019 faellt die Trefferquote der neutralen Zone von 8 auf 7 von 10, und "Stark positiv"
+beruht dort auf einer einzigen Phase.
+
+**Dabei gefunden und behoben.** Das Attributions-Panel zeigte fuer Struktur & Fiskus +3,3 Punkte Beitrag,
+waehrend die Kachel daneben "wenig geaendert" sagte. Ursache: Die Richtung im Saeulentext kam aus dem
+Momentum-Perzentil, das das Tempo der Rohserie beschreibt, nicht die Veraenderung des Scores. Der
+Struktur-Score war in dreizehn Wochen von 29 auf 40 gestiegen. Die Saetze nennen jetzt die Score-Veraenderung
+("In drei Monaten um 11 Punkte gestiegen") und sind damit an der Kurve daneben nachpruefbar.
+
 ## 6. Ein Satz zu jeder Perspektive
 
 **Einsteiger:** Er versteht nach dem Besuch mehr ueber den Markt als vorher, aber nicht mehr ueber seine

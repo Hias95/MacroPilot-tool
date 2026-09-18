@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import csv
 import json
 import sys
 from dataclasses import asdict
@@ -22,6 +23,15 @@ from .config import get_settings
 from .explain import explain_pillar, resolve_provider
 from .history import build_history
 from .refresh import build_dashboard, refresh
+
+
+def _dump_csv(path: Path, header: list[str], rows) -> None:
+    """Schlichtes CSV mit Semikolon, damit Excel in deutscher Einstellung es ohne Importdialog oeffnet."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8-sig", newline="") as fh:
+        writer = csv.writer(fh, delimiter=";")
+        writer.writerow(header)
+        writer.writerows(rows)
 
 
 def _dump(path: Path, payload: Any) -> None:
@@ -65,6 +75,12 @@ async def run(out: Path, state_file: Path | None, with_backtest: bool = True, wi
                                  "snapshot_date": store.get_meta("last_snapshot_date"),
                                  "recording_since": store.first_snapshot_date()})
     _dump(out / "snapshots.json", {"days": 3650, "snapshots": store.list_snapshots(3650)})
+    # C4: Dieselben Zahlen zum Weiterrechnen. Ohne Export bleibt jede Pruefung im Werkzeug gefangen.
+    _dump_csv(out / "consensus.csv", ["Datum", "Rohwert", "Rang", "Zone", "Zyklusphase"],
+              ([p.date, p.composite, p.score, p.zone_key, p.phase_key] for p in history.consensus))
+    _dump_csv(out / "saeulen.csv", ["Datum", "Saeule", "Score", "Niveau", "Momentum"],
+              ([pt.date, name, pt.score, pt.level, pt.momentum] for name, pts in history.pillars.items() for pt in pts))
+    log(f"CSV geschrieben: {len(history.consensus)} Consensus-Zeilen")
     if with_backtest:
         report = await backtest.run_backtest(force=True)
         _dump(out / "backtest.json", asdict(report))
