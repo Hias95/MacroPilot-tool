@@ -1,0 +1,108 @@
+Untersuchung Umfeld-Abhaengigkeit, 2008-06-22 bis 2026-09-13, 952 Wochen
+Feste Gewichte im Modell: {'liquidity': 0.55, 'cycle': 0.15, 'structure': 0.3}
+
+=== Rangkorrelation Score gegen Rendite der folgenden 13 Wochen ===
+  Alle Wochen                        n= 952 eff= 74 | liquidity +0.10 |     cycle +0.03 | structure +0.15 | valuation +0.10 | mechanics -0.21 |   markets -0.04
+  Kerninflation ueber 3 %            n= 217 eff= 18 | liquidity +0.24 |     cycle -0.01 | structure +0.25 | valuation -0.12 | mechanics -0.05 |   markets -0.14
+  Kerninflation unter 2 %            n= 420 eff= 35 | liquidity +0.15 |     cycle +0.04 | structure +0.17 | valuation +0.25 | mechanics -0.32 |   markets +0.13
+  Kerninflation 2 bis 3 %            n= 315 eff= 29 | liquidity -0.06 |     cycle -0.02 | structure -0.04 | valuation -0.00 | mechanics -0.26 |   markets -0.22
+  Realzins negativ                   n= 200 eff= 20 | liquidity +0.51 |     cycle -0.05 | structure +0.42 | valuation +0.26 | mechanics -0.14 |   markets -0.15
+  Realzins ueber 1 %                 n= 346 eff= 29 | liquidity -0.07 |     cycle -0.11 | structure +0.04 | valuation +0.04 | mechanics -0.28 |   markets -0.11
+  Bewertung extrem teuer (<25)       n= 128 eff= 14 | liquidity +0.40 |     cycle +0.03 | structure +0.28 | valuation -0.04 | mechanics -0.26 |   markets +0.24
+  Bewertung nicht extrem (>=25)      n= 824 eff= 65 | liquidity +0.06 |     cycle +0.03 | structure +0.12 | valuation +0.07 | mechanics -0.22 |   markets -0.09
+  Marktstress (Mechanik <30)         n= 136 eff= 33 | liquidity +0.29 |     cycle -0.20 | structure +0.27 | valuation +0.22 | mechanics -0.06 |   markets -0.20
+  Ruhige Technik (Mechanik >60)      n= 247 eff= 41 | liquidity +0.30 |     cycle +0.17 | structure +0.05 | valuation -0.02 | mechanics -0.02 |   markets +0.05
+  Konjunktur schwach (<30)           n= 228 eff= 24 | liquidity +0.12 |     cycle +0.10 | structure +0.03 | valuation +0.01 | mechanics -0.45 |   markets -0.34
+  Konjunktur stark (>70)             n= 199 eff= 25 | liquidity +0.36 |     cycle +0.15 | structure +0.28 | valuation +0.11 | mechanics -0.17 |   markets +0.15
+
+=== Rangkorrelation Score gegen Rendite der folgenden 26 Wochen ===
+  Alle Wochen                        n= 952 eff= 37 | liquidity +0.16 |     cycle -0.06 | structure +0.19 | valuation +0.11 | mechanics -0.19 |   markets -0.02
+  Kerninflation ueber 3 %            n= 217 eff=  9 | liquidity +0.19 |     cycle -0.06 | structure -0.08 | valuation -0.21 | mechanics +0.12 |   markets +0.09
+  Kerninflation unter 2 %            n= 420 eff= 18 | liquidity +0.25 |     cycle -0.05 | structure +0.19 | valuation +0.34 | mechanics -0.20 |   markets +0.03
+  Kerninflation 2 bis 3 %            n= 315 eff= 16 | liquidity -0.06 |     cycle -0.17 | structure +0.23 | valuation -0.10 | mechanics -0.44 |   markets -0.29
+  Realzins negativ                   n= 200 eff= 12 | liquidity +0.57 |     cycle +0.04 | structure +0.65 | valuation +0.26 | mechanics -0.06 |   markets -0.06
+  Realzins ueber 1 %                 n= 346 eff= 16 | liquidity -0.09 |     cycle -0.21 | structure -0.08 | valuation +0.05 | mechanics -0.13 |   markets -0.03
+  Bewertung extrem teuer (<25)       n= 128 eff=  9 | liquidity +0.42 |     cycle -0.26 | structure +0.01 | valuation +0.05 | mechanics -0.28 |   markets +0.45
+  Bewertung nicht extrem (>=25)      n= 824 eff= 35 | liquidity +0.16 |     cycle -0.05 | structure +0.21 | valuation +0.16 | mechanics -0.17 |   markets -0.06
+  Marktstress (Mechanik <30)         n= 136 eff= 24 | liquidity +0.30 |     cycle -0.20 | structure +0.25 | valuation +0.17 | mechanics -0.04 |   markets -0.27
+  Ruhige Technik (Mechanik >60)      n= 247 eff= 27 | liquidity +0.44 |     cycle -0.01 | structure +0.22 | valuation +0.04 | mechanics -0.03 |   markets +0.19
+  Konjunktur schwach (<30)           n= 228 eff= 17 | liquidity +0.18 |     cycle -0.09 | structure +0.15 | valuation +0.12 | mechanics -0.38 |   markets -0.33
+  Konjunktur stark (>70)             n= 199 eff= 19 | liquidity +0.40 |     cycle +0.27 | structure +0.40 | valuation +0.15 | mechanics -0.23 |   markets +0.03
+
+=== Stabilitaet der Treibergewichte, 13 Wochen ===
+  Gewichtung                   gesamt   bis 2017   ab 2018   Abstand
+  aktuell 55/15/30              +0.13      -0.08     +0.33      0.42
+  gleich 34/33/33               +0.12      +0.03     +0.23      0.21
+  ausgewogen 40/15/45           +0.14      -0.05     +0.34      0.39
+  struktur-schwer 30/15/55      +0.15      -0.01     +0.34      0.35
+  ohne Konjunktur 50/0/50       +0.14      -0.11     +0.39      0.49
+  nur Liquiditaet               +0.10      -0.15     +0.33      0.48
+  nur Struktur                  +0.15      +0.01     +0.34      0.33
+
+=== Stabilitaet der Treibergewichte, 26 Wochen ===
+  Gewichtung                   gesamt   bis 2017   ab 2018   Abstand
+  aktuell 55/15/30              +0.16      -0.03     +0.34      0.37
+  gleich 34/33/33               +0.09      -0.04     +0.21      0.25
+  ausgewogen 40/15/45           +0.17      -0.01     +0.34      0.35
+  struktur-schwer 30/15/55      +0.17      +0.01     +0.33      0.32
+  ohne Konjunktur 50/0/50       +0.20      -0.00     +0.41      0.41
+  nur Liquiditaet               +0.16      -0.06     +0.37      0.43
+  nur Struktur                  +0.19      +0.06     +0.35      0.29
+
+=== Echte Modellkette (Rang des Rohwerts), 13 Wochen ===
+  Gewichtung                   gesamt   bis 2017   ab 2018   Abstand
+  aktuell 55/15/30              +0.25      +0.03     +0.39      0.35
+  gleich 34/33/33               +0.20      +0.06     +0.30      0.24
+  ausgewogen 40/15/45           +0.27      +0.08     +0.40      0.32
+  struktur-schwer 30/15/55      +0.28      +0.09     +0.40      0.31
+  ohne Konjunktur 50/0/50    nicht pruefbar: die Modellkette braucht die Konjunktur fuer die Zyklusphase
+  nur Liquiditaet            nicht pruefbar: die Modellkette braucht die Konjunktur fuer die Zyklusphase
+  nur Struktur               nicht pruefbar: die Modellkette braucht die Konjunktur fuer die Zyklusphase
+
+=== Echte Modellkette (Rang des Rohwerts), 26 Wochen ===
+  Gewichtung                   gesamt   bis 2017   ab 2018   Abstand
+  aktuell 55/15/30              +0.28      +0.07     +0.43      0.36
+  gleich 34/33/33               +0.17      -0.03     +0.32      0.35
+  ausgewogen 40/15/45           +0.29      +0.09     +0.44      0.35
+  struktur-schwer 30/15/55      +0.30      +0.11     +0.45      0.34
+  ohne Konjunktur 50/0/50    nicht pruefbar: die Modellkette braucht die Konjunktur fuer die Zyklusphase
+  nur Liquiditaet            nicht pruefbar: die Modellkette braucht die Konjunktur fuer die Zyklusphase
+  nur Struktur               nicht pruefbar: die Modellkette braucht die Konjunktur fuer die Zyklusphase
+
+=== Dieselben Umfelder getrennt nach Zeitraum (13 Wochen) ===
+  Alle Wochen | bis 2017             n= 498 eff= 39 | liquidity -0.15 |     cycle +0.08 | structure +0.01 | valuation +0.18 | mechanics -0.30 |   markets +0.04
+  Alle Wochen | ab 2018              n= 454 eff= 35 | liquidity +0.33 |     cycle -0.04 | structure +0.34 | valuation +0.17 | mechanics -0.16 |   markets -0.13
+
+  Kerninflation ueber 3 % | bis 2017 zu wenige Wochen (0)
+  Kerninflation ueber 3 % | ab 2018  n= 217 eff= 18 | liquidity +0.24 |     cycle -0.01 | structure +0.25 | valuation -0.12 | mechanics -0.05 |   markets -0.14
+
+  Kerninflation unter 2 % | bis 2017 n= 356 eff= 30 | liquidity -0.09 |     cycle +0.10 | structure +0.01 | valuation +0.29 | mechanics -0.31 |   markets +0.18
+  Kerninflation unter 2 % | ab 2018  n=  64 eff=  6 | liquidity +0.47 |     cycle -0.33 | structure +0.31 | valuation +0.57 | mechanics -0.33 |   markets -0.28
+
+  Kerninflation 2 bis 3 % | bis 2017 n= 142 eff= 13 | liquidity -0.34 |     cycle +0.01 | structure -0.12 | valuation +0.02 | mechanics -0.34 |   markets -0.31
+  Kerninflation 2 bis 3 % | ab 2018  n= 173 eff= 16 | liquidity +0.25 |     cycle -0.05 | structure +0.07 | valuation +0.21 | mechanics -0.25 |   markets -0.15
+
+  Realzins negativ | bis 2017        n=  83 eff= 10 | liquidity +0.31 |     cycle -0.16 | structure -0.16 | valuation +0.22 | mechanics -0.45 |   markets -0.11
+  Realzins negativ | ab 2018         n= 117 eff= 10 | liquidity +0.71 |     cycle -0.01 | structure +0.64 | valuation +0.32 | mechanics +0.05 |   markets -0.20
+
+  Realzins ueber 1 % | bis 2017      n= 126 eff= 11 | liquidity -0.24 |     cycle +0.09 | structure +0.12 | valuation +0.29 | mechanics   n/a |   markets +0.04
+  Realzins ueber 1 % | ab 2018       n= 220 eff= 18 | liquidity +0.30 |     cycle -0.23 | structure +0.22 | valuation +0.24 | mechanics -0.28 |   markets -0.18
+
+  Bewertung extrem teuer (<25) | bis 2017 zu wenige Wochen (0)
+  Bewertung extrem teuer (<25) | ab 2018 n= 128 eff= 14 | liquidity +0.40 |     cycle +0.03 | structure +0.28 | valuation -0.04 | mechanics -0.26 |   markets +0.24
+
+  Bewertung nicht extrem (>=25) | bis 2017 n= 498 eff= 39 | liquidity -0.15 |     cycle +0.08 | structure +0.01 | valuation +0.18 | mechanics -0.30 |   markets +0.04
+  Bewertung nicht extrem (>=25) | ab 2018 n= 326 eff= 27 | liquidity +0.31 |     cycle -0.05 | structure +0.35 | valuation +0.08 | mechanics -0.15 |   markets -0.25
+
+  Marktstress (Mechanik <30) | bis 2017 n=  42 eff= 13 | liquidity -0.02 |     cycle -0.23 | structure -0.03 | valuation +0.49 | mechanics -0.05 |   markets -0.22
+  Marktstress (Mechanik <30) | ab 2018 n=  94 eff= 20 | liquidity +0.35 |     cycle -0.21 | structure +0.34 | valuation +0.20 | mechanics -0.05 |   markets -0.24
+
+  Ruhige Technik (Mechanik >60) | bis 2017 n= 134 eff= 18 | liquidity +0.21 |     cycle +0.35 | structure -0.18 | valuation -0.02 | mechanics -0.01 |   markets +0.13
+  Ruhige Technik (Mechanik >60) | ab 2018 n= 113 eff= 23 | liquidity +0.44 |     cycle -0.01 | structure +0.29 | valuation +0.15 | mechanics -0.00 |   markets -0.03
+
+  Konjunktur schwach (<30) | bis 2017 n= 120 eff= 12 | liquidity -0.28 |     cycle +0.15 | structure -0.03 | valuation +0.22 | mechanics -0.49 |   markets -0.28
+  Konjunktur schwach (<30) | ab 2018 n= 108 eff= 12 | liquidity +0.60 |     cycle -0.01 | structure +0.39 | valuation +0.05 | mechanics -0.41 |   markets -0.52
+
+  Konjunktur stark (>70) | bis 2017  n= 104 eff= 13 | liquidity -0.05 |     cycle -0.04 | structure -0.12 | valuation -0.09 | mechanics -0.19 |   markets -0.04
+  Konjunktur stark (>70) | ab 2018   n=  95 eff= 12 | liquidity +0.50 |     cycle +0.26 | structure +0.53 | valuation +0.41 | mechanics -0.13 |   markets +0.28
+
